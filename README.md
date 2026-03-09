@@ -1,6 +1,6 @@
 # Apiary 🐝 
 
-Apiary is an opinionated workflow for taking an idea from inception to working software.  
+Apiary is an opinionated agentic workflow for taking an idea from inception to working software.  
 It uses the [bees](https://github.com/gabemahoney/bees) ticket management system. Install that first.
 
 ## Install
