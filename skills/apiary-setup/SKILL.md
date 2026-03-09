@@ -62,6 +62,20 @@ tmux enables split-pane display so each agent teammate gets its own pane. Withou
 
 ---
 
+### Egg Resolver
+
+Before configuring hives, set up the bees egg resolver.
+
+Use AskUserQuestion to ask: "Where would you like to save the bees egg resolver in your repo?" (e.g. `resolvers/bee_resolver.py`).
+
+Then:
+1. Download the resolver from: `https://raw.githubusercontent.com/gabemahoney/bees/main/resolvers/bee_resolver.py`
+2. Save it to the user-specified path within the repo
+3. Make it executable: `chmod +x <path>`
+
+When colonizing hives, pass the absolute path to this file as the `egg_resolver` parameter.
+If hives already exist, update their `egg_resolver` configuration to point to this file.
+
 ### Hive Configuration
 
 Check for the existence of the above hives and validate their configs.
@@ -69,6 +83,7 @@ If any hives are missing:
 - Ask the user if you can create them and if so where they should reside.
 - Colonize the hive with no optional repo_root (unless the user instructs you to)
 - Configure the hive with valid child tiers and status values
+- Pass the egg resolver path as `egg_resolver`
 
 If a hive exists:
 - Validate its child tiers and status values
