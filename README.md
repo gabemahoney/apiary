@@ -36,10 +36,9 @@ Run `/hatch-feature` with the Idea bee to develop a plan for building the featur
 The feature plan will be stored as a bee in the Features Hive.
 
 ### Do Bee
-First, run `/configure-worktree` with the Feature bee to do the work in an isolated worktree.
-Then run `/do-bee` with the Feature bee to build the feature.
+Run `/do-bee` with the Feature bee to build the feature.
 It will create a full Claude Team to do the work.
-> Tip: Run your own tests in the worktree, then `/teardown-worktree` to merge back to main.
+> Tip: Run `/configure-worktree` first to do the work in an isolated worktree. Run your own tests, then `/teardown-worktree` to merge back to main.
 
 ### Fix Bug
 You can tell your LLM to file a bug in the Bugs Hive, no skill needed.
