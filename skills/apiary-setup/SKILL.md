@@ -64,7 +64,9 @@ tmux enables split-pane display so each agent teammate gets its own pane. Withou
 
 ### Egg Resolver
 
-Before configuring hives, set up the bees egg resolver.
+Before configuring hives, set up the bees egg resolver.  
+This will ensure your development work can be traced back to the requirements documents that defined it.  
+Apiary uses a custom resolver you must download from the bees github repo.
 
 Use AskUserQuestion to ask: "Where would you like to save the bees egg resolver in your repo?" (e.g. `resolvers/bee_resolver.py`).
 
