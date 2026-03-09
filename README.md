@@ -1,31 +1,54 @@
-# Apiary
+# Apiary 🐝 
 
-A collection of Claude Code skills for structured software development workflows.
-
-## Skills
-
-| Skill | Description |
-|-------|-------------|
-| `apiary-setup` | Configure hives for Apiary workflow |
-| `code-review` | Review changed files after task completion |
-| `configure_worktree` | Launch Claude in isolated tmux session to work on a Bee asynchronously |
-| `do-bee` | Proceed through each Epic in a Bee, doing the work described therein |
-| `doc-review` | Review documentation completeness after task completes |
-| `fix-bug` | Fix a bug described in a Bee ticket |
-| `hatch-epic` | Break down a single Epic into Tasks |
-| `hatch-feature` | Read Idea Bee and create a Feature Bee with Epics |
-| `idea` | Create a persistent file describing a new idea |
-| `req-review` | Review requirements for completeness |
-| `teardown_worktree` | Merge and clean up a git worktree |
-| `test-review` | Review test files for quality and coverage |
-| `write-prd` | Write a Product Requirements Document for a development effort |
-| `write-srd` | Write a System Requirements Document |
+Apiary is an opinionated workflow for taking an idea from inception to working software.  
+It uses the [bees](https://github.com/gabemahoney/bees) ticket management system. Install that first.
 
 ## Install
+
+### Clone Repo
 
 ```bash
 git clone https://github.com/gmahoney/apiary ~/projects/apiary
 ln -s ~/projects/apiary/skills ~/.claude/skills
 ```
 
-Or use the dotfiles `setup.sh` which handles this automatically.
+### Configure
+Run `/apiary-setup`
+
+## Workflow
+
+### Idea
+Run `/idea` to jot down a new idea.  
+It will be stored as a bee in the Idea hive.
+
+### Product Requirements Document
+Run `/write-prd` with the Idea bee to flesh out a PRD.  
+The PRD will be stored as a child of the Idea bee.  
+> Tip: Run `/req-review` on the idea bee after the PRD is written multiple times until the feedback becomes trivial
+
+### Software Requirements Document
+Run `/write-srd` with the idea bee to flesh out an SRD  
+The SRD will be stored as a child of the Idea bee.  
+> Tip: Run `/req-review` on the idea bee after the SRD is written multiple times until the feedback becomes trivial
+
+### Hatch Feature
+Run `/hatch-feature` with the Idea bee to develop a plan for building the feature.  
+The feature plan will be stored as a bee in the Features hive.
+
+### Do Bee
+Run `/do-bee` with the Feature bee to build the feature.  
+It will create a full Claude Team to do the work.  
+> Tip: Run `/configure-worktree` with the Feature bee to do the work in a worktree, run your own tests, then `/teardown-worktree` to merge back to main.
+
+### Fix Bug
+You can tell your LLM to file a bug in the Bugs hive, no skill needed.  
+Run `/fix-bug` with the bug in the Bugs hive to fix.  
+It will create a smaller Claude Team to do the work.  
+
+
+## Advanced
+The following skills are run by agents as part of the workflow above.  
+- `hatch-epic`
+- `code-review`
+- `test-review`
+- `doc-review`

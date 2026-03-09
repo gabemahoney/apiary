@@ -131,9 +131,9 @@ The team should consist of the following agents:
     - Writing implementation Subtasks for a task (if required)
       - Tasks that only involve research (no code or doc changes) may omit all of these subtasks.
   - Instructions:
-    - Review any relevant docs at docs/architecture
+    - Review any relevant internal architecture docs referenced in CLAUDE.md under "Documentation Locations"
     - Review the existing code to determine the current state
-    - Review the engineering best practices guide at docs/engineering-best-practices.md
+    - Review the engineering best practices guide referenced in CLAUDE.md under "Documentation Locations"
     - Write subtasks for each logical implementation step.
     - There may be one or many implementation subtasks
 - Test Writer
@@ -141,12 +141,12 @@ The team should consist of the following agents:
   - Responsibilities:
     - Writing testing Subtasks for a task (if required)
   - Instructions:
-    - Use docs/architecture/testing.md for reference
-    - Use docs/guides/test_review_guide.md for reference
+    - Use the test writing guide referenced in CLAUDE.md under "Documentation Locations"
+    - Use the test review guide referenced in CLAUDE.md under "Documentation Locations"
     - Write or modify any required unit tests
     - Write or modify any required Integration tests
     - Add a subtask **for each test file or logical group of test file** that needs to be modified based on the work described by the Engineer
-      - The substask will provide high level instructions to: 
+      - The substask will provide high level instructions to:
         - Update any tests that cover the work done in the parent Task
         - Delete any tests that are now made obsolete by work done in the parent Task
         - Add any tests to cover functionality that is currently not tested based on the work done in the parent Task
@@ -158,15 +158,14 @@ The team should consist of the following agents:
   - Responsibilities:
     - Writing documentation Subtasks for a task (if required)
   - Instructions:
-    - Use docs/guides/docs_guide.md for guidance
+    - Use the doc writing guide referenced in CLAUDE.md under "Documentation Locations"
     - Readme:
       - If the Task modifies user-facing code or installation and setup:
-        - Review the Readme
-        - Write a subtask describing how the Readme should be updated based on the work done in this Task
+        - Review the customer-facing docs referenced in CLAUDE.md under "Documentation Locations"
+        - Write a subtask describing how the customer-facing docs should be updated based on the work done in this Task
     - Architecture Docs:
       - If the Task modifies source code:
-        - Review the architecture docs at /docs/architecture
-        - Review the development guides at /docs/guides
+        - Review the internal architecture docs referenced in CLAUDE.md under "Documentation Locations"
         - Write a subtask for each architecture doc that needs to be updated based on the work done in this Task
 - Product Manager
   - Model: Claude Opus

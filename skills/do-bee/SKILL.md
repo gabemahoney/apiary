@@ -98,9 +98,9 @@ The team may consist of any of the following agents, but the Product Manager mus
       - Tasks that only involve research (no code or doc changes) may omit all of these subtasks.
   - Instructions:
     - Read the Subtask description from the Bees server — it contains Context, What Needs to Change, Key Files, and Acceptance Criteria
-    - Review any relevant docs at docs/architecture
+    - Review any relevant internal architecture docs referenced in CLAUDE.md under "Documentation Locations"
     - Review the existing code to determine the current state
-    - Review the engineering best practices guide at docs/guides/engineering-best-practices.md
+    - Review the engineering best practices guide referenced in CLAUDE.md under "Documentation Locations"
     - Execute each implementation Subtask following the instructions in its description
     - There may be one or many implementation subtasks
     - Mark each Subtask as `status=worker` when starting it and `status=finished` when done
@@ -110,8 +110,8 @@ The team may consist of any of the following agents, but the Product Manager mus
     - Executing testing Subtasks for a task (if required)
       - Tasks that only involve research (no code or doc changes) may omit all of these subtasks.
   - Instructions:
-    - Use docs/architecture/testing.md for reference
-    - Use docs/guides/test_review_guide.md for reference
+    - Use the test writing guide referenced in CLAUDE.md under "Documentation Locations"
+    - Use the test review guide referenced in CLAUDE.md under "Documentation Locations"
     - Execute all test subtasks to change, add or delete tests
     - Review the work of the Engineer and see if any tests need to be added, deleted or updated based on that work
       - It is possible the testing subtasks were incomplete
@@ -123,9 +123,9 @@ The team may consist of any of the following agents, but the Product Manager mus
     - Execute documentation Subtasks for a task (if required)
       - Tasks that only involve research (no code or doc changes) may omit all of these subtasks.
   - Instructions:
-    - Use docs/guides/docs_guide.md for guidance
-    - Execute any Readme subtasks 
-    - Execute any Arch and Guides docs subtasks
+    - Use the doc writing guide referenced in CLAUDE.md under "Documentation Locations"
+    - Execute any customer-facing docs subtasks
+    - Execute any internal architecture docs subtasks
     - Review the work of the Engineer and see if any docs need to be updated based on that work
       - It is possible the doc subtasks were incomplete
       - Review the work of the Engineer to find any gaps, then update docs

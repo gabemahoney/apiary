@@ -44,6 +44,26 @@ Status values:
 
 ## Instructions
 
+### Prerequisites
+
+Before configuring hives, verify the following are installed and configured.
+
+#### 1. bees
+
+Verify bees is available either as a CLI on PATH (`which bees`) or as a configured MCP server. If neither is present, direct the user to the bees repo for installation instructions: https://github.com/gabemahoney/bees
+
+#### 2. Claude Code Agent Teams
+
+The Apiary workflow uses agent teams to parallelize work. Check whether `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` is set to `"1"` in `~/.claude/settings.json`. If not configured, direct the user to: https://code.claude.com/docs/en/agent-teams
+
+#### 3. tmux (optional)
+
+tmux enables split-pane display so each agent teammate gets its own pane. Without it, teammates run in-process (still functional). Check if tmux is installed (`which tmux`). If not, note it is optional but recommended and direct the user to the Claude Code agent teams documentation for setup guidance.
+
+---
+
+### Hive Configuration
+
 Check for the existence of the above hives and validate their configs.
 If any hives are missing:
 - Ask the user if you can create them and if so where they should reside.
@@ -53,3 +73,40 @@ If any hives are missing:
 If a hive exists:
 - Validate its child tiers and status values
 - If they differ from above, ask user if you may change them to the values listed above.
+
+### Documentation Locations
+
+After hives are configured, ask the user to define their project documentation locations in their CLAUDE.md.
+
+Use AskUserQuestion to ask: "Would you like to define documentation locations in CLAUDE.md now?"
+- Tell the user: "The Apiary workflow will enforce your project standards. To do so, you must define the locations of those documents in your CLAUDE.md. You may skip this step if you have not defined such standards."
+- Options: "Yes" / "Skip for now"
+
+If yes, ask for the following (can use a single multi-part question or sequential questions):
+- Engineering best practices guide path
+- Internal architecture docs directory path
+- Customer-facing docs path (e.g. README)
+- Test writing guide path
+- Test review guide path
+- Doc writing guide path
+
+Do NOT volunteer the following context unless the user asks what a location is for:
+- **Engineering best practices**: Used by the Engineer agent in fix-bug, hatch-epic, and do-bee to follow project coding standards when writing or modifying source code.
+- **Internal architecture docs**: Used by the Engineer to understand existing system design, and by the Doc Writer to update architecture documentation after code changes.
+- **Customer-facing docs**: Used by the Doc Writer to update user-facing documentation when user-visible behavior changes.
+- **Test writing guide**: Used by the Test Writer to follow project testing conventions when writing or modifying tests.
+- **Test review guide**: Used by the Test Writer to self-review test quality before completing work.
+- **Doc writing guide**: Used by the Doc Writer to follow project documentation style and format conventions.
+
+Then write or update a `## Documentation Locations` section in the project's CLAUDE.md with the provided paths, using this format:
+
+```markdown
+## Documentation Locations
+
+- **Engineering best practices**: <path>
+- **Internal architecture docs**: <path>
+- **Customer-facing docs**: <path>
+- **Test writing guide**: <path>
+- **Test review guide**: <path>
+- **Doc writing guide**: <path>
+```

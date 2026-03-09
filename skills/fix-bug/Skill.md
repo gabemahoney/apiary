@@ -54,17 +54,17 @@ The team may consist of any of the following agents:
     - Executing implementation Subtasks for a task (if required)
   - Instructions:
     - Read the Bug description from the Bees server
-    - Review any relevant docs at docs/architecture
+    - Review any relevant internal architecture docs referenced in CLAUDE.md under "Documentation Locations"
     - Review the existing code to determine the current state
-    - Review the engineering best practices guide at docs/guides/engineering-best-practices.md
+    - Review the engineering best practices guide referenced in CLAUDE.md under "Documentation Locations"
     - Modify any source code required to fix the bug
 - Test Writer
   - Model: Claude Sonnet
   - Responsibilities:
     - Executing testing Subtasks for a task (if required)
   - Instructions:
-    - Use docs/architecture/testing.md for reference
-    - Use docs/guides/test_review_guide.md for reference
+    - Use the test writing guide referenced in CLAUDE.md under "Documentation Locations"
+    - Use the test review guide referenced in CLAUDE.md under "Documentation Locations"
     - Review the work of the Engineer and see if any tests need to be added, deleted or updated based on that work
       - Review the work of the Engineer to find any gaps, then add, delete or updated required tests
 - Doc Writer
@@ -72,9 +72,9 @@ The team may consist of any of the following agents:
   - Responsibilities:
     - Execute documentation Subtasks for a task (if required)
   - Instructions:
-    - Use docs/guides/docs_guide.md for guidance
-    - Review the Readme and see if it needs any updates
-    - Review the Arch docs and see if they need any updates
+    - Use the doc writing guide referenced in CLAUDE.md under "Documentation Locations"
+    - Review the customer-facing docs referenced in CLAUDE.md under "Documentation Locations" and see if they need any updates
+    - Review the internal architecture docs referenced in CLAUDE.md under "Documentation Locations" and see if they need any updates
     - Review the work of the Engineer and see if any docs need to be updated based on that work
       - Review the work of the Engineer to find any gaps, then update docs
     - Update any docs that require updating
