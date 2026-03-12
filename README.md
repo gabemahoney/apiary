@@ -15,6 +15,7 @@ ln -s ~/projects/apiary/skills ~/.claude/skills
 ### Configure
 Run `/apiary-setup`
 
+
 ## Workflow
 
 ### Idea
@@ -49,9 +50,11 @@ Run `/fix-bug` with the bug in the Bugs Hive to fix.
 It will create a smaller Claude Team to do the work.
 
 
-## Advanced
-The following skills are run by agents as part of the workflow above.
-- `hatch-epic`
-- `code-review`
-- `test-review`
-- `doc-review`
+## Advanced Configuration
+Apiary provides default `/code-review`, `/test-review` and `doc-review` skills. Feel free to replace this in part 
+or wholesale with your own guidelines.
+
+**Note:** These guidelines are enforced across all repos.
+Documents describing repo-specific guidelines should be defined in a repo-specific Claude.md file. 
+`/apiary-setup` configures these repo-specific entries but does not modify the above-listed skills.
+

@@ -94,8 +94,9 @@ If a hive exists:
 ### Documentation Locations
 
 After hives are configured, ask the user to define their project documentation locations in their CLAUDE.md.
+Note that these are repo-specific documents.
 
-Use AskUserQuestion to ask: "Would you like to define documentation locations in CLAUDE.md now?"
+Use AskUserQuestion to ask: "Would you like to define repo-specific documentation locations in a repo-specific CLAUDE.md now?"
 - Tell the user: "The Apiary workflow will enforce your project standards. To do so, you must define the locations of those documents in your CLAUDE.md. You may skip this step if you have not defined such standards."
 - Options: "Yes" / "Skip for now"
 
