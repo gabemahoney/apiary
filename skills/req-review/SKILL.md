@@ -1,7 +1,7 @@
 ---
 name: req-review
 description: Review product and software requirement documents and provide suggestions
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 # Overview
