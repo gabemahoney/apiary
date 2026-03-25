@@ -34,20 +34,45 @@ If you do not have such context, report and act on the whole set.
 
 If your context limits you to a subset of repos, skip the broad queries below and query only the specific hives for those repos.
 
-Otherwise, run these three queries in parallel to sweep all repos at once:
+Otherwise, run these five queries in parallel to sweep all repos at once.
+Each query uses inline `report` fields so no follow-up `show_ticket` call is needed.
 
 ```yaml
-# All ideas
-- [type=bee, hive~ideas]
+# Query 1: All Idea bees
+stages:
+  - [type=bee, hive~ideas]
+report: [title, ticket_status, up_dependencies]
 
-# All plans
-- [type=bee, hive~plans]
+# Query 2: Doc children of Ideas (PRDs, SRDs)
+stages:
+  - [type=bee, hive~ideas]
+  - [children]
+report: [title, ticket_status, parent]
 
-# All bugs
-- [type=bee, hive~bugs]
+# Query 3: All Plan bees
+stages:
+  - [type=bee, hive~plans]
+report: [title, ticket_status, children, up_dependencies]
+
+# Query 4: Epics under Plans (children of Plan bees)
+stages:
+  - [type=bee, hive~plans]
+  - [children]
+report: [title, ticket_status, parent]
+
+# Query 5: All Bug bees
+stages:
+  - [type=bee, hive~bugs]
+report: [title, ticket_status]
 ```
+
 Do this every time /beekeeper is called. Do not use cached data from your context.
-Then fetch full ticket details for all returned IDs in a single `show_ticket` call.
+
+**Linking results across queries:**
+- **PRD/SRD → Idea**: Match Query 2 results to Ideas via the `parent` field.
+- **Plan → Idea**: Match Query 3 results to Ideas via the Plan's `up_dependencies` field.
+- **Epic status → Plan**: Match Query 4 results to Plans via the `parent` field to determine 🟢/🔴/🐝 for the Plan column.
+
 Group results by repo using the hive's `scope` field from `list_hives`.
 
 ### 3. Check Worktrees and Active Sessions
