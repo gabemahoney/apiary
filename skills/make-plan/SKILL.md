@@ -1,26 +1,26 @@
 ---
-name: hatch-feature
-description: Read documents from Idea Bee and creates a Feature Bee with Epics to describe the work that needs to be done.
+name: make-plan
+description: Read documents from an Idea Bee and create a Plan Bee with Epics in the Plans hive to describe the work that needs to be done.
 disable-model-invocation: false
 ---
 
-# PRD/SRD to Bees
+# PRD/SRD to Plan
 
 ## Workflow
 
 ### Setup:
-If there is no hive called Features, ask the user if you can create one somewhere. It must have these child tiers:
+If there is no Plans hive nested inside the Ideas hive, ask the user if you can create one. It must have these child tiers:
 - t1 — Epic / Epics
 - t2 — Task / Tasks
 - t3 — Subtask / Subtasks
 
 ### 1. Read PRD/SRD and make top level Bee
 
-The user should provide you a Bee in the Ideas hive. If they do not, list the Idea hive and ask them which they want to hatch.
+The user should provide you a Bee in the Ideas hive. If they do not, list the Ideas hive and ask them which they want to hatch.
 First check if the Idea Bee is in the `pupa` state (which means its ready to be worked on). If not, warn the user and ask if they want to continue.
 It will have children that represent the documents describing the work to be done.
 These might take the form of Product Requirements Docs, Software Requirements docs, UI mockups.
- 
+
 
 - Get file paths, read documents, extract features/requirements/acceptance criteria
 - Then expand beyond what the user sent. Look in the repo and read any architectural documents to understand design constraints.
@@ -38,9 +38,9 @@ These might take the form of Product Requirements Docs, Software Requirements do
 
 ### 2. Create the Bee
 
-Goal: Create one top level Bee ticket in the Features hive to track the work
+Goal: Create one top level Bee ticket in the Plans hive to track the work
 - Contains a brief summary of the goal and scope (2-3 sentences max).
-- Set `up_deps` to the Idea Bee's ID so the Feature Bee depends on the Idea Bee being finished.
+- Set `up_deps` to the Idea Bee's ID so the Plan Bee depends on the Idea Bee being finished.
 
 **Setting the `egg` field:**
 1. Read `~/.bees/config.json` and find the `egg_resolver` configured for this scope (check scope-level, then global-level).
@@ -49,7 +49,7 @@ Goal: Create one top level Bee ticket in the Features hive to track the work
 
 - Mark the Bee as `larva` (its children — the Epics — have not been written yet)
 
-### 3. Break Feature Bee down into Epics
+### 3. Break Plan Bee down into Epics
 
 #### Every Epic Must Leave the Codebase Green
 Every Epic must leave the codebase in a working state with all existing tests passing. This is the non-negotiable constraint for all Epics.
@@ -89,7 +89,7 @@ For pure infrastructure or refactor work, strict vertical slicing may not apply.
 
 ##### Granularity
 Make Epics as granular as possible while adhering to the above constraints of one outcome and vertical decomposition.
-Its OK to have a lot of Epics as long as: 
+Its OK to have a lot of Epics as long as:
 - logical outcomes and acceptance criteria are still contained in one Epic
 - Epics still represent a vertical slice of end-to-end behavior (unless the technical refactor exception applies)
 Imagine that we will celebrate the completion of each new Epic with a birthday party! Its ok to have a lot!
@@ -118,13 +118,13 @@ When all Epics are complete, present them to the user for final review.
 - **Use AskUserQuestion tool** to ask: proceed with creation, modify Epics, or cancel
 - **Wait for approval.** Allow modifications if requested.
 
-### 4. Create Shell Epics in Feature Bee
+### 4. Create Shell Epics in Plan Bee
 
 #### Creating Epics in the bees MCP server
 
-Create T1 type child tickets in the Feature bee with status `larva` (their children — Tasks — have not been written yet).
+Create T1 type child tickets in the Plan Bee with status `larva` (their children — Tasks — have not been written yet).
 Use the egg resolver to determine what to put in the `egg`.
-**NOTE**: If the feature is small, there may only be one Epic. You dont need to make multiple.
+**NOTE**: If the plan is small, there may only be one Epic. You dont need to make multiple.
 
 ##### Epic Viability Checklist
 [ ] No testing Epic - testing is folded into the Epics where the work is done
@@ -152,11 +152,7 @@ Output markdown summary:
 - Each Epic: ID, title, status, dependencies (if any)
 - Dependency relationships created
 
-### 6. Ask to continue to next step
+### 6. Continue to hatch-epic
 
-The next optional step is described in the skill called `hatch-epic`. Ask the User if they want to proceed or stop here.
-If they want to continue, load the `hatch-epic` skill and execute it with each epic until done 
-- be mindful to hatch-epics in dependency order
-- you do not have to ask permission from the user to hatch any specific epics, just go through all of them.
-If not, you are done.
-
+Load the `hatch-epic` skill and execute it for each Epic in dependency order until all are hatched.
+Do not ask the user for permission — proceed automatically.

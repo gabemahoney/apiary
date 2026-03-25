@@ -79,5 +79,15 @@ to either Skip this concern or enter their own response. Also give them the "Cha
 
 # Next Steps
 
-After the review is complete, recommend:
-- `/hatch-feature <bee-id>` — break the feature into epics and tasks ready for implementation
+After all feedback is complete, use AskUserQuestion to ask the user for each doc reviewed:
+- "Mark [PRD/SRD] as `pupa`?"
+  - Options: "Yes, mark as pupa" / "No, more work needed"
+- If yes, update the doc's ticket status to `pupa`.
+
+After marking docs, check if **both** the PRD and SRD are now `pupa`. If so, use AskUserQuestion to ask:
+- "Both PRD and SRD are pupa. Mark the Idea Bee as `pupa` too?"
+  - Options: "Yes, mark as pupa" / "No, not yet"
+- If yes, update the Idea Bee's status to `pupa`.
+
+Then recommend:
+- `/make-plan <bee-id>` — create a Plan Bee with Epics ready for implementation

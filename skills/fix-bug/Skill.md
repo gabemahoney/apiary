@@ -40,7 +40,7 @@ If not blocked:
 Analyze the bug, the source code, the tests and the docs. Understand the likely scope of the bug fix.
 If the fix requires modifications to the source code, you will need to spawn and Engineer.
 If the fix will require modifications to unit tests, you will need to spawn a Test Writer.
-If the fix will require modifications to the Readme or Architecture docs, you will need to spawn a Doc Writer.
+Always spawn a Doc Writer so that it can determine if any docs need updating based on the changes.
 
 Use AskUserQuestion to confirm with User the scope of the problem and your proposed fix.
 Once user agrees, form the appropriate team.

@@ -127,16 +127,9 @@ Before presenting the SRD, verify:
 ### 3. Write the SRD
 
 Write the SRD as a child of the Idea Bee.
-Use the title "SRD"
-Set its stats to `pupa`
-
-Use `AskUserQuestion` to ask: "Is the Idea Bee fully documented and ready to be worked on?"
-- Options: "Yes, mark it `pupa`" / "No, more docs needed"
-
-If yes, set the Idea Bee status to `pupa`.
+Use the title "SRD".
+Set its status to `larva`.
 
 ### 4. Next steps
-Next steps are either:
-- /req-review <parent bee>
-- /hatch-feature <parent bee> 
-- Make changes to the SRD
+
+Suggest the user run `/req-review <idea-bee-id>` to review and finalize the docs before they can be marked `pupa`.

@@ -10,9 +10,9 @@ Launch Claude Code in a dedicated tmux session within an isolated git worktree t
 # Usage
 
 **Invocation patterns**:
-- `/configure_worktree features.bees-abc`
-- "Launch async session for bugs.bees-xyz"
-- "Make a workspace for features.bees-abc"
+- `/configure_worktree b.xxx`
+- "Launch async session for b.yyy"
+- "Make a workspace for b.xxx"
 
 # Steps
 
@@ -39,7 +39,7 @@ Display the ticket content to the user:
 ## 2. Check current environment and ask user to confirm.
 
 Check if a worktree already exists for this work. 
-The worktree will be at the same directory level as the repo the user is in, named as the normalized ticket ID (dots replaced with underscores, e.g., `features.bees-abc` → `features_bees_abc`).
+The worktree will be at the same directory level as the repo the user is in, named as the normalized ticket ID (dots replaced with underscores, e.g., `b.xxx` → `features_bees_abc`).
 If it does, tell the user you will spawn the agent into that repo.
 If it does not, ask the User for permission to setup that worktree
 
@@ -75,7 +75,7 @@ If there are uncommitted changes:
 
 ## 2b. If needed, create Worktree
 
-Normalize ticket ID: Replace dots with underscores (e.g., `features.bees-abc` → `features_bees_abc`)
+Normalize ticket ID: Replace dots with underscores (e.g., `b.xxx` → `features_bees_abc`)
 
 Determine the repo root from the current working directory:
 ```bash

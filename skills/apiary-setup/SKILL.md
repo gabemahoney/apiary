@@ -12,18 +12,6 @@ have gotten misconfigured.
 
 The repo must have the following hives available and configured with these child tiers and valid status values:
 
-### Features Hive
-Child tiers:
-- t1 — Epic / Epics
-- t2 — Task / Tasks
-- t3 — Subtask / Subtasks
-
-Status values:
-- larva — not fully documented, not ready to work
-- pupa — fully documented, ready to work
-- worker — in progress
-- finished — done
-
 ### Bugs Hive
 Child tiers:
 none
@@ -35,6 +23,20 @@ Status values:
 ### Ideas Hive
 Child tiers:
 - t1 - Doc / Docs
+
+Status values:
+- larva — not fully documented, not ready to work
+- pupa — fully documented, ready to work
+- worker — in progress
+- finished — done
+
+#### Plans Hive (nested inside Ideas)
+Located at `{ideas_hive_path}/Plans`.
+
+Child tiers:
+- t1 — Epic / Epics
+- t2 — Task / Tasks
+- t3 — Subtask / Subtasks
 
 Status values:
 - larva — not fully documented, not ready to work

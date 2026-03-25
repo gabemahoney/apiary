@@ -148,17 +148,8 @@ Before presenting the PRD, verify:
 
 Add the PRD as a child to the Idea bee.
 Use the title "PRD".
-Set its stats to `pupa`
+Set its status to `larva`.
 
-### 5. Mark Idea Bee complete?
+### 5. Next steps
 
-Use `AskUserQuestion` to ask: "Is the Idea Bee fully documented and ready to be worked on?"
-- Options: "Yes, mark it `pupa`" / "No, more docs needed"
-
-If yes, set the Idea Bee status to `pupa`.
-
-### 6. Next steps
-Present the user with either:
-- /req-review b.xyz
-- /write-srd b.xyz
-- Make more changes to the PRD
+Suggest the user run `/req-review <idea-bee-id>` to review and finalize the docs before they can be marked `pupa`.
