@@ -62,6 +62,18 @@ The Apiary workflow uses agent teams to parallelize work. Check whether `CLAUDE_
 
 tmux enables split-pane display so each agent teammate gets its own pane. Without it, teammates run in-process (still functional). Check if tmux is installed (`which tmux`). If not, note it is optional but recommended and direct the user to the Claude Code agent teams documentation for setup guidance.
 
+#### 4. Repository Directory Structure
+
+Apiary expects the repo to live one level below a parent project directory:
+
+```
+project-root/
+├── repo/          # the main checkout (tracks main/master)
+└── workspace/     # git worktrees created by Apiary agents
+```
+
+This layout keeps the primary checkout clean while giving each agent an isolated worktree under `workspace/`. If the target repo is not already structured this way, offer to reorganize it before proceeding.
+
 ---
 
 ### Egg Resolver
@@ -69,6 +81,7 @@ tmux enables split-pane display so each agent teammate gets its own pane. Withou
 Before configuring hives, set up the bees egg resolver.  
 This will ensure your development work can be traced back to the requirements documents that defined it.  
 Apiary uses a custom resolver you must download from the bees github repo.
+The location does not matter. If the user asks what this is just explain it allows you to set an Idea Bee as the source documents for a Plan Bee.
 
 Use AskUserQuestion to ask: "Where would you like to save the bees egg resolver in your repo?" (e.g. `resolvers/bee_resolver.py`).
 
