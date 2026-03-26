@@ -31,7 +31,7 @@ The user will either call without arguments, with a Bee id or with an Epic ID:
 You will ultimately get the Bee ID you need to work on.
 Validate it is ready for work:
 - Must have a status of `pupa` or `worker`
-- If it has `up_dependencies` they must be in `finished` state
+- If it has `up_dependencies` they must be in `pupa` state
 
 #### Validate worktree
 You should have been launched in a worktree with a name like "b_Wx7" for a bee called "b.Wx7".
