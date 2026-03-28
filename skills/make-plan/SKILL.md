@@ -40,7 +40,7 @@ These might take the form of Product Requirements Docs, Software Requirements do
 
 Goal: Create one top level Bee ticket in the Plans hive to track the work
 - Contains a brief summary of the goal and scope (2-3 sentences max).
-- Set `up_deps` to the Idea Bee's ID so the Plan Bee depends on the Idea Bee being finished.
+- Set `up_deps` to the Idea Bee's ID so the Plan Bee depends on the Idea Bee being `pupa`.
 
 **Setting the `egg` field:**
 1. Read `~/.bees/config.json` and find the `egg_resolver` configured for this scope (check scope-level, then global-level).
