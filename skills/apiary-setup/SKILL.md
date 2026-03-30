@@ -64,15 +64,15 @@ tmux enables split-pane display so each agent teammate gets its own pane. Withou
 
 #### 4. Repository Directory Structure
 
-Apiary expects the repo to live one level below a parent project directory:
+Apiary expects the repo's main checkout to live one level below a parent directory, so that git worktrees can be created alongside it during development:
 
 ```
 project-root/
-├── repo/          # the main checkout (tracks main/master)
-└── workspace/     # git worktrees created by Apiary agents
+├── repo/          # the main checkout (already exists — do NOT create this)
+└── ...            # worktrees appear here later, created by Apiary agents as needed
 ```
 
-This layout keeps the primary checkout clean while giving each agent an isolated worktree under `workspace/`. If the target repo is not already structured this way, offer to reorganize it before proceeding.
+**Do not create the main repo or any worktree directories during setup.** The only check here is that the main checkout is not itself the top-level directory (i.e., it has a parent directory with room for sibling worktrees). If it is, offer to reorganize it before proceeding.
 
 ---
 
