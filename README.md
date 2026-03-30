@@ -32,9 +32,9 @@ Run `/write-srd` with the Idea bee to flesh out an SRD.
 The SRD will be stored as a child of the Idea bee.
 > Tip: Run `/req-review` on the Idea bee after the SRD is written multiple times until the feedback becomes trivial
 
-### Hatch Feature
-Run `/hatch-feature` with the Idea bee to develop a plan for building the feature.
-The feature plan will be stored as a bee in the Features Hive.
+### Make Plan
+Run `/make-plan` with the Idea bee to develop a plan for building the feature.
+The plan will be stored as a bee in the Plans Hive.
 
 ### Do Bee
 Run `/do-bee` with the Feature bee to build the feature.
