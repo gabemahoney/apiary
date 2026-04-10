@@ -5,14 +5,21 @@ It uses the [bees](https://github.com/gabemahoney/bees) ticket management system
 
 ## Install
 
-### Clone Repo
+### 1. Clone the repo
 
 ```bash
-git clone https://github.com/gmahoney/apiary ~/projects/apiary
-ln -s ~/projects/apiary/skills ~/.claude/skills
+git clone https://github.com/gabemahoney/apiary ~/projects/apiary
 ```
 
-### Configure
+### 2. Install the skills
+
+Ask Claude Code to install the Apiary skills into your user skills directory. For example:
+
+> "Install the Apiary skills from `~/projects/apiary/skills` into `~/.claude/skills`."
+
+Claude will copy each skill directory (`apiary-setup`, `idea`, `write-prd`, `write-srd`, `make-plan`, `hatch-epic`, `do-bee`, `fix-bug`, etc.) into `~/.claude/skills` without disturbing any other skills already installed there.
+
+### 3. Configure
 Run `/apiary-setup`
 
 
