@@ -71,13 +71,6 @@ Before forming the Team, load all Tasks and Subtasks for the Epic:
 Create an Agent Team to work on an individual Task.
 **IMPORTANT: You must stay in `delegate` mode. Do not take on work, delegate work to Team members.**
 
-**Email Notification When Stuck:**
-If you encounter a blocking issue that requires user input, send an email notification before waiting.
-For example, use this anytime you use the AskUserQuestion tool, since you will be blocked waiting on their input.
-```bash
-~/scripts/email-me.sh "Epic $1 blocked: [brief description of blocker]"
-```
-
 Choose which Team members are required.
 - If source code is being modified or created, spawn the Engineer.
   - **The Engineer is responsible for source code. It does *not* know how to update unit tests or docs!**
@@ -235,11 +228,7 @@ If you invoked the Doc Writer in the first team, invoke the Doc Reviewer in this
   
 ### 6. Final Output
 
-When **all** Epics in the Bee are done, you must show the User the full list of all Reviewer feedback you chose to ignore. 
-- Send an email to alert them to come back to the terminal 
-```bash
-~/scripts/email-me.sh "Bee $title done and ready for review"
-```
+When **all** Epics in the Bee are done, you must show the User the full list of all Reviewer feedback you chose to ignore.
 - Use the AskUserQuestion tool to ask the User if they want you to act on any of these, or just continue.
 
 For each Acceptance Criteria, either demonstrate it directly (via test or script) or instruct the user how to validate it manually. Then use `AskUserQuestion` to get official sign-off on the Acceptance Criteria.
