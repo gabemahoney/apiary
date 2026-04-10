@@ -13,11 +13,17 @@ git clone https://github.com/gabemahoney/apiary ~/projects/apiary
 
 ### 2. Install the skills
 
-Ask Claude Code to install the Apiary skills into your user skills directory. For example:
+Ask Claude Code to install the Apiary skills. You have two options — pick one.
 
-> "Install the Apiary skills from `~/projects/apiary/skills` into `~/.claude/skills`."
+**Option A — Global install (recommended for single-user machines).** Installs the skills into your user-level skills directory so every repo you work in can use them.
 
-Claude will copy each skill directory (`apiary-setup`, `idea`, `write-prd`, `write-srd`, `make-plan`, `hatch-epic`, `do-bee`, `fix-bug`, etc.) into `~/.claude/skills` without disturbing any other skills already installed there.
+> "Install the Apiary skills from `~/projects/apiary/skills` globally into `~/.claude/skills`."
+
+**Option B — Single-repo install.** Installs the skills into a specific project's `.claude/skills` directory so only that repo sees them. Useful if you want to try Apiary on one project without affecting anything else.
+
+> "Install the Apiary skills from `~/projects/apiary/skills` into `<absolute path to target repo>/.claude/skills`."
+
+In either case, Claude will copy each skill directory (`apiary-setup`, `idea`, `write-prd`, `write-srd`, `make-plan`, `hatch-epic`, `do-bee`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
 
 ### 3. Configure
 Run `/apiary-setup`
