@@ -40,7 +40,9 @@ These might take the form of Product Requirements Docs, Software Requirements do
 
 Goal: Create one top level Bee ticket in the Plans hive to track the work
 - Contains a brief summary of the goal and scope (2-3 sentences max).
-- Set `up_deps` to the Idea Bee's ID so the Plan Bee depends on the Idea Bee being `pupa`.
+- Set `up_deps` to the Idea Bee's ID (e.g., `["b.266"]`) so the Plan Bee depends on the Idea Bee.
+  - Cross-hive dependencies are supported. A Bee in Plans can depend on a Bee in Ideas — same-type is the only constraint, not same-hive.
+  - **Do NOT skip `up_deps` or note the dependency in the body as a workaround.** Always set the actual dependency field.
 
 **Setting the `egg` field:**
 1. Read `~/.bees/config.json` and find the `egg_resolver` configured for this scope (check scope-level, then global-level).

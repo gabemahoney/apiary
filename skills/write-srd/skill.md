@@ -1,7 +1,6 @@
 ---
 name: write-srd
 description: Write a Software Requirements Document (SRD) from a Product Requirements Document (PRD). Explores the codebase, then defines what must be true about the software without solving the problem.
-disable-model-invocation: true
 ---
 
 # Write SRD from PRD

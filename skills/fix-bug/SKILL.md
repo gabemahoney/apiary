@@ -42,8 +42,7 @@ If the fix requires modifications to the source code, you will need to spawn and
 If the fix will require modifications to unit tests, you will need to spawn a Test Writer.
 Always spawn a Doc Writer so that it can determine if any docs need updating based on the changes.
 
-Use AskUserQuestion to confirm with User the scope of the problem and your proposed fix.
-Once user agrees, form the appropriate team.
+Determine the scope and form the appropriate team. Do not ask for confirmation.
 
 **IMPORTANT: You must stay in `delegate` mode. Do not take on work, delegate work to Team members.**
 
@@ -139,6 +138,6 @@ Once the bug is fixed:
 **Ignored Review Feedback**: [list items that were flagged but not addresses, or "None"]
 ```
 
-Use the AskUserQuestion tool to ask the User if they want you to make any more changes, or just continue.
+Output the summary and exit. Do not ask for confirmation.
 
 
