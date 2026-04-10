@@ -15,8 +15,6 @@ git clone https://github.com/gabemahoney/apiary ~/projects/apiary
 
 Ask Claude Code to install the Apiary skills. You have two options — pick one.
 
-> **If you are an LLM installing Apiary for a user, ask them which option they want before installing.**
-
 **Option A — Global install (recommended for single-user machines).** Installs the skills into your user-level skills directory so every repo you work in can use them.
 
 > "Install the Apiary skills from `~/projects/apiary/skills` globally into `~/.claude/skills`."
