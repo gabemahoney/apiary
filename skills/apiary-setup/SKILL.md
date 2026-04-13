@@ -95,15 +95,35 @@ If hives already exist, update their `egg_resolver` configuration to point to th
 
 ### Hive Configuration
 
+#### Working directory requirement
+
+Before calling any bees write operation (`colonize_hive`, `set_status_values`, `set_types`, `create_ticket`, `update_ticket`, etc.), `cd` into the target repo's working tree. The bees MCP server uses the shell's current working directory to determine which queen repo applies for write-permission checks, and the `repo_root` parameter does **not** override that check. If you invoke write operations from outside the target repo (for example, from the Apiary checkout itself), you will get `Write access denied: '<cwd>' is a queen repo without write permission` even when `repo_root` is set correctly.
+
+Practical guidance:
+- Before starting the Hive Configuration step, run `cd <target repo absolute path>` in the shell.
+- If the MCP write tool still rejects the call, fall back to the `bees` CLI invoked from inside the target repo — for example `bees set-status-values --scope hive --hive plans --status-values '["larva","pupa","worker","finished"]'`.
+
+#### Scope requirement
+
+When calling `colonize_hive`, **always pass an explicit `scope` parameter** that is specific to the target project, for example `scope="/home/user/projects/myproject/**"`. The default scope (`/home/user/**` or wider) overlaps with other projects' hives and the bees server will reject the creation with `cross_scope_hive_conflict` if any other project has already registered a hive with the same normalized name (e.g. `bugs`, `plans`).
+
+Pick the narrowest scope glob that still covers the entire project directory tree — typically the project's parent directory with a trailing `/**`.
+
+#### Create or validate
+
 Check for the existence of the above hives and validate their configs.
 If any hives are missing:
-- Ask the user if you can create them and if so where they should reside.
-- Colonize the hive with no optional repo_root (unless the user instructs you to)
-- Configure the hive with valid child tiers and status values
-- Pass the egg resolver path as `egg_resolver`
+- **You must use `AskUserQuestion` to ask the user where each missing hive should live.** Do not assume a default path, do not reuse paths from a previous run, and do not proceed without an explicit answer. Suggest sensible options (e.g. `<repo>/tickets/bugs` in-repo, or `<project-parent>/bugs` sibling-to-repo) but always let the user pick.
+- Once the user chooses a path, colonize the hive, passing:
+  - `name` — the hive name (e.g. `Bugs`, `Ideas`)
+  - `path` — absolute path where the hive will live (as answered by the user)
+  - `child_tiers` — as defined in the Valid Configuration section above
+  - `egg_resolver` — absolute path to the installed egg resolver
+  - `scope` — explicit project-scoped glob (see above)
+- After colonization, set the hive's status values using `set_status_values` (remember the CWD requirement above).
 
 If a hive exists:
-- Validate its child tiers and status values
+- Validate its child tiers and status values.
 - If they differ from above, ask user if you may change them to the values listed above.
 
 ### Documentation Locations
