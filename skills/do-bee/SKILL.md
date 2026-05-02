@@ -83,6 +83,8 @@ Choose which Team members are required.
 - If this is the first time forming the team, **always** spawn the Product Manager.
   - If you are re-forming the team to address Code, Doc and Test Reviewer feedback you may **optionally** choose to not spawn the Product Manager, if the work is minor enough and will not impact Product functionality 
 
+Do not spawn more than 8 total Team Agents. They consume a lot of system memory.
+
 The team may consist of any of the following agents, but the Product Manager must always be spawned:
 - Engineer
   - Model: Claude Sonnet
@@ -167,7 +169,22 @@ When a Task and all its Subtasks are done (all reviewer feedback addressed or ig
 
 1. Create one git commit for the Task. Use system or project defined guidance on git usage. **NEVER push to remote — committing only.**
 2. Mark the Task as `status=finished` (Subtasks were marked finished by each agent as they completed their work).
-3. Output the summary below to the screen and continue to the next Task
+3. **CRITICAL — Clean up sub-agents before proceeding.** Sub-agents that are not cleaned up will accumulate as zombie background tasks, consuming memory within the Claude Code process. First, delete the team so Claude Code releases internal agent references:
+   ```
+   TeamDelete (the current task's team)
+   ```
+   **NEVER manually delete team/task directories with `rm -rf` or any Bash command.** `TeamDelete` handles all necessary cleanup. Manual deletion triggers permission prompts and bypasses internal bookkeeping.
+
+   Then kill all sub-agent tmux panes to ensure OS processes are dead:
+   ```bash
+   for pane in $(tmux list-panes -F '#{pane_id}'); do
+     if [ "$pane" != "$TMUX_PANE" ]; then
+       tmux kill-pane -t "$pane"
+     fi
+   done
+   ```
+   `$TMUX_PANE` is set by tmux in each pane's environment and correctly identifies your own pane. This kills all other panes (sub-agents) while preserving yours. Both steps are required — `TeamDelete` handles Claude Code's internal cleanup, `kill-pane` handles OS-level cleanup. Verify only your pane remains before spawning the next team.
+4. Output the summary below to the screen and continue to the next Task
 
 ```
 ## Task [N] of [total] Complete: [task-title]
