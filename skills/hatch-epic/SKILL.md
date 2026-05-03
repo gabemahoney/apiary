@@ -30,7 +30,7 @@ Fetch full Epic details from the Bees server to understand scope of total work.
 - Get that Epic from the Bees server and read it.
 - Parse Epic title, description, and requirements.
 - Read the parent Bee
-- Read the egg source material linked in the parent Bee.
+- Read the reference_materials linked in the parent Bee.
 - Identify what implementation work is needed as a list of Tasks.
 - Find any Epics this Epic depends on (check `up_dependencies` field) and use `show_ticket()` to read them
   - These Epics describe foundational work that will be complete before this Epic you are working on is done

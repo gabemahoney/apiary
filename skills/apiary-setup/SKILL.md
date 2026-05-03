@@ -76,23 +76,6 @@ project-root/
 
 ---
 
-### Egg Resolver
-
-Before configuring hives, set up the bees egg resolver.  
-This will ensure your development work can be traced back to the requirements documents that defined it.  
-Apiary uses a custom resolver you must download from the bees github repo.
-The location does not matter. If the user asks what this is just explain it allows you to set an Idea Bee as the source documents for a Plan Bee.
-
-Use AskUserQuestion to ask: "Where would you like to save the bees egg resolver in your repo?" (e.g. `resolvers/bee_resolver.py`).
-
-Then:
-1. Download the resolver from: `https://raw.githubusercontent.com/gabemahoney/bees/main/resolvers/bee_resolver.py`
-2. Save it to the user-specified path within the repo
-3. Make it executable: `chmod +x <path>`
-
-When colonizing hives, pass the absolute path to this file as the `egg_resolver` parameter.
-If hives already exist, update their `egg_resolver` configuration to point to this file.
-
 ### Hive Configuration
 
 #### Working directory requirement
@@ -118,7 +101,6 @@ If any hives are missing:
   - `name` — the hive name (e.g. `Bugs`, `Ideas`)
   - `path` — absolute path where the hive will live (as answered by the user)
   - `child_tiers` — as defined in the Valid Configuration section above
-  - `egg_resolver` — absolute path to the installed egg resolver
   - `scope` — explicit project-scoped glob (see above)
 - After colonization, set the hive's status values using `set_status_values` (remember the CWD requirement above).
 

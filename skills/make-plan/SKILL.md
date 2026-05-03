@@ -44,10 +44,11 @@ Goal: Create one top level Bee ticket in the Plans hive to track the work
   - Cross-hive dependencies are supported. A Bee in Plans can depend on a Bee in Ideas — same-type is the only constraint, not same-hive.
   - **Do NOT skip `up_deps` or note the dependency in the body as a workaround.** Always set the actual dependency field.
 
-**Setting the `egg` field:**
-1. Read `~/.bees/config.json` and find the `egg_resolver` configured for this scope (check scope-level, then global-level).
-2. If an `egg_resolver` is configured, read that script file and locate its `## RESOLVER CONVENTION` block. Follow its instructions exactly.
-3. If no resolver is configured, set `egg` to the absolute path of the source documents provided by the caller.
+**Setting `reference_materials`:**
+Set `reference_materials` on the Plan Bee to link it back to the Idea Bee. Pass an entry using the built-in `bees` resolver:
+```json
+[{"value": "<idea_bee_id>", "resolver": "bees"}]
+```
 
 - Mark the Bee as `larva` (its children — the Epics — have not been written yet)
 
@@ -125,7 +126,6 @@ When all Epics are complete, present them to the user for final review.
 #### Creating Epics in the bees MCP server
 
 Create T1 type child tickets in the Plan Bee with status `larva` (their children — Tasks — have not been written yet).
-Use the egg resolver to determine what to put in the `egg`.
 **NOTE**: If the plan is small, there may only be one Epic. You dont need to make multiple.
 
 ##### Epic Viability Checklist
