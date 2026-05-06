@@ -80,11 +80,17 @@ project-root/
 
 #### Working directory requirement
 
-Before calling any bees write operation (`colonize_hive`, `set_status_values`, `set_types`, `create_ticket`, `update_ticket`, etc.), `cd` into the target repo's working tree. The bees MCP server uses the shell's current working directory to determine which queen repo applies for write-permission checks, and the `repo_root` parameter does **not** override that check. If you invoke write operations from outside the target repo (for example, from the Apiary checkout itself), you will get `Write access denied: '<cwd>' is a queen repo without write permission` even when `repo_root` is set correctly.
+Bees validates that hive paths are within the git repo root of the current working directory.
 
-Practical guidance:
-- Before starting the Hive Configuration step, run `cd <target repo absolute path>` in the shell.
-- If the MCP write tool still rejects the call, fall back to the `bees` CLI invoked from inside the target repo — for example `bees set-status-values --scope hive --hive plans --status-values '["larva","pupa","worker","finished"]'`.
+**Rule:** Before running `colonize-hive`, your CWD must be a directory that is at or above the hive path. This is typically:
+- The **repo** — if the hive lives inside the repo (e.g. `<repo>/tickets/bugs`)
+- The **project parent** — if the hive lives alongside the repo (e.g. `<project-parent>/Bugs`)
+
+After colonization, `cd` into the target repo for all other bees write operations (`set_status_values`, `create_ticket`, etc.) — these need CWD inside the repo for write-permission checks.
+
+**Do not** run bees write operations from the Apiary checkout — it is a queen repo without write permission.
+
+If the MCP write tool rejects the call, fall back to the `bees` CLI invoked from the correct directory.
 
 #### Scope requirement
 
