@@ -23,7 +23,7 @@ Ask Claude Code to install the Apiary skills. You have two options — pick one.
 
 > "Install the Apiary skills from `~/projects/apiary/skills` into `<absolute path to target repo>/.claude/skills`."
 
-In either case, Claude will copy each skill directory — `project-setup`, `new-feature`, `write-prd`, `write-srd`, `write-plan`, `write-epic`, `develop-feature`, `develop-epic`, `new-bug`, `fix-bug`, `req-review`, `code-review`, `test-review`, `doc-review`, `configure_worktree`, `teardown_worktree`, `file-share` — into the chosen skills directory without disturbing any other skills already installed there.
+In either case, Claude will copy each skill directory — `project-setup`, `new-feature`, `write-prd`, `write-srd`, `write-plan`, `write-epic`, `develop-feature`, `develop-epic`, `new-bug`, `fix-bug`, `req-review`, `code-review`, `test-review`, `doc-review`, `configure_worktree`, `teardown_worktree` — into the chosen skills directory without disturbing any other skills already installed there.
 
 ### 2b. Install the subagents
 
