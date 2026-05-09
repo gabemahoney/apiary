@@ -7,12 +7,11 @@ description: Execute one Epic end-to-end via subagents, with PM oversight, revie
 
 `develop-epic` is the per-Epic execution engine. It runs all Tasks in
 one Epic in dependency order, dispatches subagents (engineer,
-test-writer, doc-writer, plus a per-Task pm) via the Agent tool to
-do the work, runs a post-Tasks review cycle (code-reviewer,
-test-reviewer, doc-reviewer), and lands a **single commit per Epic**
-at close-out. It accumulates deferred reviewer feedback for the
-caller (typically `develop-feature`) — it never surfaces deferred
-items to the user.
+test-writer, doc-writer, plus a per-Task pm) to do the work, runs
+a post-Tasks review cycle (code-reviewer, test-reviewer,
+doc-reviewer), and lands a **single commit per Epic** at close-out.
+It accumulates deferred reviewer feedback for the caller (typically
+`develop-feature`) — it never surfaces deferred items to the user.
 
 This skill drives the Epic and Task statuses through the generic
 flow `ready` -> `active` -> `done`. All transitions are idempotent.
@@ -35,11 +34,11 @@ This skill does NOT touch:
 - Feature status (owned by Feature-level skills)
 - PRD/SRD status
 - Bug status
-- Subtask status owned by the dispatched subagents whenever the
-  subagent has `Bash` in its tool allowlist (`engineer`,
-  `test-writer`) — they read at `ready`, set `active` on start,
-  and `done` on completion. The `doc-writer` subagent ships
-  without `Bash` by design, so for `doc-writer` Subtasks this
+- Subtask status owned by the dispatched subagents that perform
+  their own backend writes (`engineer`, `test-writer`) — they
+  read at `ready`, set `active` on start, and `done` on
+  completion. The `doc-writer` subagent does not write to the
+  ticket backend directly, so for `doc-writer` Subtasks this
   skill writes `active` on dispatch and `done` after the subagent
   returns; the handoff contract is identical from the
   reviewer/PM perspective.
@@ -94,13 +93,11 @@ preserve `active` Tasks and existing Subtask statuses; do not redo
 Step 2 (codebase sync was already performed when the Epic first
 went `active`).
 
-Verify the seven subagent types are available to the Agent tool:
+Verify the seven subagent types are available for dispatch:
 `engineer`, `test-writer`, `doc-writer`, `pm`, `code-reviewer`,
 `test-reviewer`, `doc-reviewer`. If any are missing, instruct the
 user to install them per the apiary repo README (section *Install
-the subagents*) — typically copied or symlinked into
-`~/.claude/agents/` — and to run `/agents` (or restart the
-session) so Claude Code picks them up.
+the subagents*) so the runtime picks them up.
 
 ### Step 2: Pre-execution codebase sync (ONCE per Epic, NOT per Task)
 
@@ -141,33 +138,29 @@ For each Task that is not `done`:
 
 2. **Dispatch implementer subagents per Subtask.** Read the Task's
    Subtasks. For each Subtask that is not `done`, decide its role
-   from the Subtask body and dispatch the matching subagent via
-   the Agent tool:
+   from the Subtask body and dispatch the matching subagent:
 
-   - Implementation Subtasks -> Agent tool with
-     `subagent_type: engineer`
-   - Test Subtasks -> Agent tool with `subagent_type: test-writer`
-   - Documentation Subtasks -> Agent tool with
-     `subagent_type: doc-writer`
+   - Implementation Subtasks -> dispatch the Engineer
+   - Test Subtasks -> dispatch the Test Writer
+   - Documentation Subtasks -> dispatch the Doc Writer
 
    Pass the Subtask body, Documentation Locations, and Build
    Commands from `apiary.md` into each spawn prompt. The dispatched
-   subagent OWNS its Subtask status transitions when it has shell
-   access: `engineer` and `test-writer` carry `Bash` in their tool
-   allowlist and write the Subtask `→ active` / `→ done`
-   transitions themselves. The `doc-writer` subagent ships without
-   `Bash` (doc work does not need shell access), so this skill
-   marks `doc-writer` Subtasks `active` immediately before
-   dispatch and `done` immediately after the subagent returns.
-   The handoff is the same either way — this skill does not
-   second-guess Subtask status transitions performed by `engineer`
-   or `test-writer`.
+   subagent OWNS its Subtask status transitions when it writes to
+   the ticket backend directly: `engineer` and `test-writer` write
+   the Subtask `→ active` / `→ done` transitions themselves. The
+   `doc-writer` subagent does not write to the ticket backend, so
+   this skill marks `doc-writer` Subtasks `active` immediately
+   before dispatch and `done` immediately after the subagent
+   returns. The handoff is the same either way — this skill does
+   not second-guess Subtask status transitions performed by
+   `engineer` or `test-writer`.
 
    Track which subagent types ran during this Epic — the set is
    used to gate reviewer dispatch in step 5.
 
-3. **Dispatch the per-Task `pm` subagent.** Spawn one `pm` via the
-   Agent tool with `subagent_type: pm`. The `pm` reads:
+3. **Dispatch the per-Task `pm` subagent.** Spawn one `pm`. The
+   `pm` reads:
 
    - The Task and all its Subtasks
    - The parent Epic
@@ -209,26 +202,23 @@ Once every Task in the Epic is `done`, run the review cycle.
 Reviewer dispatch is conditional on which writer types ran during
 this Epic (tracked in step 4):
 
-- Dispatch `code-reviewer` (Agent tool, `subagent_type:
-  code-reviewer`) only if at least one Engineer subagent ran. The
-  reviewer wraps the apiary `/code-review` skill.
-- Dispatch `test-reviewer` (`subagent_type: test-reviewer`) only
-  if at least one Test Writer subagent ran. The reviewer wraps
-  `/test-review`.
-- Dispatch `doc-reviewer` (`subagent_type: doc-reviewer`) only if
-  at least one Doc Writer subagent ran. The reviewer wraps
-  `/doc-review`.
+- Dispatch the Code Reviewer only if at least one Engineer
+  subagent ran. The reviewer wraps the apiary `/code-review`
+  skill.
+- Dispatch the Test Reviewer only if at least one Test Writer
+  subagent ran. The reviewer wraps `/test-review`.
+- Dispatch the Doc Reviewer only if at least one Doc Writer
+  subagent ran. The reviewer wraps `/doc-review`.
 
-Run the dispatched reviewers concurrently via parallel Agent
-calls.
+Run the dispatched reviewers concurrently.
 
 **Triage.** Each reviewer returns a numbered list of work items.
 For each item, `develop-epic` decides:
 
 - **Act now** — respawn the corresponding implementer subagent
-  (`engineer`, `test-writer`, or `doc-writer`) via the Agent tool
-  to fix the item, then re-run Format + Full test for the affected
-  Task(s). On a non-trivial fix, re-run the relevant reviewer.
+  (`engineer`, `test-writer`, or `doc-writer`) to fix the item,
+  then re-run Format + Full test for the affected Task(s). On a
+  non-trivial fix, re-run the relevant reviewer.
 - **Defer** — keep the item but do not act on it. Add a record to
   the deferred-feedback accumulator (see below).
 
@@ -301,10 +291,11 @@ Otherwise:
   Subtasks, Plans, Features, PRDs, SRDs, and tickets.
 - Generic statuses only: `draft`, `ready`, `active`, `done`.
 - All status transitions are idempotent.
-- Subagent dispatch uses the **Agent tool** with `subagent_type`
-  literals: `engineer`, `test-writer`, `doc-writer`, `pm`,
-  `code-reviewer`, `test-reviewer`, `doc-reviewer`. This skill
-  does NOT use Agent Teams.
+- Subagent dispatch targets the seven roles by name: `engineer`,
+  `test-writer`, `doc-writer`, `pm`, `code-reviewer`,
+  `test-reviewer`, `doc-reviewer`. Each is spawned as an
+  individual subagent; this skill does not group them into a
+  multi-agent team.
 - Status Ownership is strict: this skill writes Epic and Task
   status only. It does not write Subtask, Plan, Feature, PRD,
   SRD, or Bug status.

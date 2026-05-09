@@ -29,7 +29,7 @@ You may presume the previous agents left the tests in a working state, you do no
 
 ### Step 1: Load the Full Test Suite
 
-Use Glob to find all test files in the project (e.g. `**/test_*.py`, `**/*.test.ts`, `**/*_test.go`, etc.).
+Find all test files in the project (e.g. `**/test_*.py`, `**/*.test.ts`, `**/*_test.go`, etc.).
 Read ALL of them — not just the changed ones.
 You need the full picture to identify cross-file duplication, redundancy, and parameterization opportunities.
 Changed files are your focus, but you can only spot bloat if you know what already exists elsewhere.

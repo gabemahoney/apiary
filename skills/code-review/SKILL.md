@@ -33,7 +33,7 @@ Note any linting issues that should be fixed.
 
 ### Step 2: Review Changed Files - Critical Eye
 
-For each changed file, use Read to load it and check for issues across these categories (in addition to any project specific best practice):
+For each changed file, read it and check for issues across these categories (in addition to any project specific best practice):
 
 #### 1. Dead/Obsolete Code
 - Commented-out code that should be removed

@@ -141,8 +141,8 @@ Task 1: Implement CSV export functionality
 
 ### 4. Dispatch Subagents to Break Tasks into Subtasks
 
-Dispatch role-specific subagents via the Agent tool to research and
-propose the Subtasks for this Epic. Your responsibilities are:
+Dispatch role-specific subagents to research and propose the
+Subtasks for this Epic. Your responsibilities are:
 
 - Surface design questions back to the caller.
   - If subagents propose different approaches to a problem, surface
@@ -158,13 +158,12 @@ propose the Subtasks for this Epic. Your responsibilities are:
 
 #### Subagent Composition
 
-If source code needs to be changed, dispatch the Engineer
-(`subagent_type: engineer`). Otherwise the Engineer is optional.
-If unit test code needs to be changed, dispatch the Test Writer
-(`subagent_type: test-writer`). Otherwise the Test Writer is optional.
-If docs need to be changed, dispatch the Doc Writer
-(`subagent_type: doc-writer`). Otherwise the Doc Writer is optional.
-Always dispatch the Product Manager (`subagent_type: pm`).
+If source code needs to be changed, dispatch the Engineer.
+Otherwise the Engineer is optional. If unit test code needs to be
+changed, dispatch the Test Writer. Otherwise the Test Writer is
+optional. If docs need to be changed, dispatch the Doc Writer.
+Otherwise the Doc Writer is optional. Always dispatch the Product
+Manager.
 
 **IMPORTANT**: You do not break Tasks into Subtasks yourself. That is
 the job of the dispatched subagents.
@@ -174,12 +173,12 @@ the job of the dispatched subagents.
 For the purposes of this skill, every dispatched subagent is a
 **read-only researcher**. Subagents MUST NEVER create, update, or
 delete tickets. Each subagent returns its proposed Subtask titles and
-bodies as text in the Agent tool's response. Only this skill (the
+bodies as text in its dispatch response. Only this skill (the
 calling skill) writes tickets.
 
-Dispatch each role via the Agent tool with the appropriate
-`subagent_type` literal — `engineer`, `test-writer`, `doc-writer`, or
-`pm`. Do not use any Agent-Teams API for role dispatch in this skill.
+Dispatch each role — `engineer`, `test-writer`, `doc-writer`, or
+`pm` — as an individual subagent. This skill does not group them
+into a multi-agent team.
 
 Include the following restriction at the top of every dispatch prompt:
 
@@ -188,8 +187,7 @@ You are a READ-ONLY researcher for the write-epic skill. You must NEVER
 create, update, or delete tickets. Do not call any bees ticket-mutation
 commands. Your job is to research the codebase and the supplied context,
 then report your proposed Subtasks back as the text body of your final
-response (the Agent tool's tool-result). Only the calling skill writes
-tickets.
+response. Only the calling skill writes tickets.
 ```
 
 Include the following Subtasks guidance in every dispatch prompt:
@@ -223,7 +221,7 @@ writing them to the ticket backend in step 5.
 
 ##### Roles
 
-- **Engineer** (`subagent_type: engineer`)
+- **Engineer**
   - Model: Claude Sonnet
   - Responsibilities:
     - Proposing implementation Subtasks for a Task (if required).
@@ -239,7 +237,7 @@ writing them to the ticket backend in step 5.
       engineering best practices). Skip if `omitted`.
     - Propose Subtasks for each logical implementation step. There may
       be one or many implementation Subtasks. Return them as text.
-- **Test Writer** (`subagent_type: test-writer`)
+- **Test Writer**
   - Model: Claude Sonnet
   - Responsibilities:
     - Proposing testing Subtasks for a Task (if required).
@@ -267,7 +265,7 @@ writing them to the ticket backend in step 5.
         before completing — i.e., fix broken tests.
       - If the agent cannot get 100% unit tests passing, it should
         report the failure to the calling skill.
-- **Doc Writer** (`subagent_type: doc-writer`)
+- **Doc Writer**
   - Model: Claude Sonnet
   - Responsibilities:
     - Proposing documentation Subtasks for a Task (if required).
@@ -289,7 +287,7 @@ writing them to the ticket backend in step 5.
           contributor docs). Skip if `omitted`.
         - Propose a Subtask for each architecture doc that needs to be
           updated based on the work done in this Task.
-- **Product Manager** (`subagent_type: pm`)
+- **Product Manager**
   - Model: Claude Opus
   - Responsibilities:
     - Reviewing proposed Tasks against the PRD and SRD attached to the
@@ -341,10 +339,10 @@ Specific files, functions, and changes required. Include line numbers where know
 
 #### Task Loop
 Work through each Task sequentially. For each Task, dispatch the
-required role subagents via the Agent tool, collect their proposed
-Subtasks from the response text, and run the PM subagent to review the
-proposals. Plan Subtasks one Task at a time, **without asking the user
-for permission**. Only stop to review with the user once all Tasks are
+required role subagents, collect their proposed Subtasks from the
+response text, and run the PM subagent to review the proposals.
+Plan Subtasks one Task at a time, **without asking the user for
+permission**. Only stop to review with the user once all Tasks are
 done.
 
 ### 5. Review and Write

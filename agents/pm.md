@@ -57,5 +57,3 @@ This subagent ships with `model: opus` as the default, but the runtime model is 
   - Any incomplete work.
   - Any cross-Task / cross-Epic interaction issues discovered during the wider-view check, and the recommended resolution.
   - Any scope, design, or alignment concerns for the orchestrating execution skill to weigh.
-
-- **Shell-command etiquette.** When running shell commands, use one literal command per Bash invocation. Don't append diagnostic tails like `; echo exit=$?` or `&& echo done` — the Bash tool already reports exit status. Avoid embedded newlines, `$VAR` / `$?` / `$(...)`, backticks, redirects mid-chain, and compound commands (`&&`, `||`, `;`, pipes between commands) when a simple one works. If you need a multi-step script, write it to a file via the `Write` tool and run the file rather than passing it inline via `-c` or a heredoc. Before reaching for shell, check whether a first-class tool fits — `Read` for inspecting a file, `Grep` for searching files, separate `Bash` calls for multi-step logic — and prefer that over shell control flow (loops, branches, polling, command substitution, chained pipelines). Reach for shell only when no tool fits.
