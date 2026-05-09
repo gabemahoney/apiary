@@ -24,7 +24,7 @@ If no code files were changed, output "No code files to review" and exit.
 ### Step 0: Understand project best practices
 Find any engineering best practices and architecture documentation and understand them. 
 Your job is to provide feedback in any case where the work done deviates from the guidance therein.
-**Human Pro Tip**: Place references to you project specific best practices documents in `project/.Claude.md`
+Project-specific best practices live in the `## Documentation Locations` section of `apiary.md` under `Engineering best practices`. Read those references and apply them to your review.
 
 ### Step 1: Run Linter
 

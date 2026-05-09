@@ -43,7 +43,7 @@ Architecture docs are for LLM codegen agents as a "cheat sheet" to understand th
 
 ### 0. Understand Project Documentation Standards
 
-Find any documentation standards, style guides, or writing conventions in the project (e.g. `CONTRIBUTING.md`, `docs/standards.md`, architecture docs, or references in `CLAUDE.md`).
+Find any documentation standards, style guides, or writing conventions in the project. The canonical place to look is the `## Documentation Locations` section of `apiary.md` (specifically the `Doc writing guide` and `Maintained Documentation` references). The project may also have standalone files like `CONTRIBUTING.md`, `docs/standards.md`, or architecture docs — follow whatever paths `apiary.md` points at.
 Your job is to flag gaps where the work done deviates from whatever standards are defined.
 
 ### 1. Understand What Changed
