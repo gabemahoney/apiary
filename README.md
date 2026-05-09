@@ -23,7 +23,7 @@ Ask Claude Code to install the Apiary skills. You have two options — pick one.
 
 > "Install the Apiary skills from `~/projects/apiary/skills` into `<absolute path to target repo>/.claude/skills`."
 
-In either case, Claude will copy each skill directory (`project-setup`, `new-feature`, `write-prd`, `write-srd`, `write-plan`, `write-epic`, `develop-epic`, `do-bee`, `new-bug`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
+In either case, Claude will copy each skill directory (`project-setup`, `new-feature`, `write-prd`, `write-srd`, `write-plan`, `write-epic`, `develop-feature`, `develop-epic`, `new-bug`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
 
 ### 2b. Install the subagents
 
@@ -85,13 +85,19 @@ Run `/write-plan` with the Feature ticket id to develop a plan for building the 
 - The Plan is stored in the Plans store, with its source reference pointing back at the Feature so `develop-feature` can find the Plan from the Feature later.
 - `/write-plan` automatically chains into `/write-epic` for each Epic in dependency order, so a single command produces a fully decomposed Plan with Epics, Tasks, and Subtasks.
 
-### Do Bee
-Run `/do-bee` with the Feature bee to build the feature.
-It will create a full Claude Team to do the work.
+### Develop Feature
+Run `/develop-feature` against a Feature ticket id to build the feature end-to-end.
+
+- The Feature must already have a Plan. If it doesn't, run `/write-plan` first.
+- The skill walks the Plan's Epics in dependency order, dispatching `/develop-epic` (see the `### Develop Epic` subsection below) for each one.
+- Between Epics, you'll be prompted to continue or pause so you can inspect progress before the next Epic starts.
+- At the end, the combined deferred review feedback from all Epics is presented to you in one place.
+- Once the run is complete, the skill suggests marking the Feature `done` (user-driven) and running `/teardown_worktree` to merge.
+
 > Tip:
-> - Run `/configure-worktree` first to do the work in an isolated worktree
+> - Run `/configure_worktree` first to do the work in an isolated worktree
 > - Run your own tests
-> - Run `/teardown-worktree` to merge back to main
+> - Run `/teardown_worktree` to merge back to main
 
 ### Develop Epic
 Run `/develop-epic` against an Epic in status `ready` to execute it end-to-end.
