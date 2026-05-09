@@ -54,7 +54,7 @@ This subagent ships with `model: opus` as the default, but the runtime model is 
 
   If the Plan's source-reference pointer is missing or does not resolve to a Feature with PRD/SRD children, surface that as an out-of-spec setup condition in the report rather than improvising a spec source — the orchestrating execution skill decides how to proceed.
 
-- **External-reference Features.** When the Feature's `reference_materials` is non-empty and points at an external URL (e.g., GitHub Issue, Linear ticket, internal bug tracker, etc.), fetch the upstream content via `WebFetch` and treat it as additional spec context alongside the PRD/SRD. If `WebFetch` cannot reach the URL (network policy, auth-gated source, etc.), surface the failure in the PM's report rather than guessing.
+- **External-reference Features.** When the Feature's `source_references` is non-empty and points at an external URL (e.g., GitHub Issue, Linear ticket, internal bug tracker, etc.), fetch the upstream content via `WebFetch` and treat it as additional spec context alongside the PRD/SRD. If `WebFetch` cannot reach the URL (network policy, auth-gated source, etc.), surface the failure in the PM's report rather than guessing.
 
 - Make sure the Test Writer and Doc Writer have reviewed the Engineer's work. The Engineer's output needs review by the rest of the team — verify via the Subtasks' status transitions and the diff, not via messaging handoff.
 - Review quality of Task and Subtask efforts. Surface a recommendation to the orchestrating execution skill on whether the Task is ready to advance; the orchestrating skill makes the final call.

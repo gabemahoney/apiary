@@ -140,16 +140,16 @@ Task 1: Implement CSV export functionality
   - Exported CSV files open correctly in Excel/Google Sheets
 ```
 
-### 4. Create Task Team to Break Tasks into Subtasks
+### 4. Dispatch Subagents to Break Tasks into Subtasks
 
-Form a team to write the Subtasks for this Epic. Your responsibilities
-are:
+Dispatch role-specific subagents via the Agent tool to research and
+propose the Subtasks for this Epic. Your responsibilities are:
 
 - Surface design questions back to the caller.
-  - If the team proposes different approaches to a problem, surface
+  - If subagents propose different approaches to a problem, surface
     this back up to the caller with `AskUserQuestion`.
-- Coordinate the team and ensure all work is complete. The Product
-  Manager has final authority on quality and completeness.
+- Coordinate the subagents and ensure all work is complete. The
+  Product Manager has final authority on quality and completeness.
 - Carry forward architectural decisions:
   - If the caller provides architectural decisions or constraints
     (e.g., "make parameter X optional with fallback Y"), explicitly
@@ -157,35 +157,43 @@ are:
   - Do not paraphrase or partially apply — use the caller's exact
     specification.
 
-#### Team Composition
+#### Subagent Composition
 
-If source code needs to be changed, include the Engineer. Otherwise the
-Engineer is optional.
-If unit test code needs to be changed, include the Test Writer.
-Otherwise the Test Writer is optional.
-If docs need to be changed, include the Doc Writer. Otherwise the Doc
-Writer is optional.
-Always spawn the Product Manager.
+If source code needs to be changed, dispatch the Engineer
+(`subagent_type: engineer`). Otherwise the Engineer is optional.
+If unit test code needs to be changed, dispatch the Test Writer
+(`subagent_type: test-writer`). Otherwise the Test Writer is optional.
+If docs need to be changed, dispatch the Doc Writer
+(`subagent_type: doc-writer`). Otherwise the Doc Writer is optional.
+Always dispatch the Product Manager (`subagent_type: pm`).
 
-**IMPORTANT**: You do not break Tasks into Subtasks. That is the job of
-the team.
+**IMPORTANT**: You do not break Tasks into Subtasks yourself. That is
+the job of the dispatched subagents.
 
-**CRITICAL — Subagent permissions**: Spawn ALL team members with
-`mode: "plan"`. Team members are read-only researchers. They must never
-create, update, or delete tickets. Only YOU (the team lead) write
-tickets.
+#### CRITICAL — Subagent permissions
 
-When spawning team members, include the following restriction in each
-teammate's spawn prompt:
+For the purposes of this skill, every dispatched subagent is a
+**read-only researcher**. Subagents MUST NEVER create, update, or
+delete tickets. Each subagent returns its proposed Subtask titles and
+bodies as text in the Agent tool's response. Only this skill (the
+calling skill) writes tickets.
+
+Dispatch each role via the Agent tool with the appropriate
+`subagent_type` literal — `engineer`, `test-writer`, `doc-writer`, or
+`pm`. Do not use any Agent-Teams API for role dispatch in this skill.
+
+Include the following restriction at the top of every dispatch prompt:
 
 ```prompt
-You are a READ-ONLY researcher. You must NEVER create, update, or delete tickets.
-Your job is to research the codebase and report your proposed Subtasks back via SendMessage as text.
-Only the team lead writes tickets.
+You are a READ-ONLY researcher for the write-epic skill. You must NEVER
+create, update, or delete tickets. Do not call any bees ticket-mutation
+commands. Your job is to research the codebase and the supplied context,
+then report your proposed Subtasks back as the text body of your final
+response (the Agent tool's tool-result). Only the calling skill writes
+tickets.
 ```
 
-Also include the following Subtasks guidance in each teammate's spawn
-prompt:
+Include the following Subtasks guidance in every dispatch prompt:
 
 ```prompt
 Subtasks represent discrete sets of work required to achieve the parent Task's outcome.
@@ -210,15 +218,19 @@ acceptance criteria:
 - All API tests pass after updates.
 ```
 
+Each subagent's response text is the source of truth for its proposed
+Subtasks; this skill is responsible for taking those proposals and
+writing them to the ticket backend in step 5.
+
 ##### Roles
 
-- **Engineer**
+- **Engineer** (`subagent_type: engineer`)
   - Model: Claude Sonnet
   - Responsibilities:
-    - Writing implementation Subtasks for a Task (if required).
+    - Proposing implementation Subtasks for a Task (if required).
       Tasks that only involve research (no code or doc changes) may
       omit all of these Subtasks.
-  - Instructions:
+  - Instructions (embed in dispatch prompt):
     - Review any relevant internal architecture docs referenced in
       `apiary.md` under "Documentation Locations" (Maintained →
       contributor docs). Skip categories marked `omitted`.
@@ -226,22 +238,22 @@ acceptance criteria:
     - Review the engineering best practices guide referenced in
       `apiary.md` under "Documentation Locations" (Reference →
       engineering best practices). Skip if `omitted`.
-    - Write Subtasks for each logical implementation step. There may
-      be one or many implementation Subtasks.
-- **Test Writer**
+    - Propose Subtasks for each logical implementation step. There may
+      be one or many implementation Subtasks. Return them as text.
+- **Test Writer** (`subagent_type: test-writer`)
   - Model: Claude Sonnet
   - Responsibilities:
-    - Writing testing Subtasks for a Task (if required).
-  - Instructions:
+    - Proposing testing Subtasks for a Task (if required).
+  - Instructions (embed in dispatch prompt):
     - Use the test writing guide referenced in `apiary.md` under
       "Documentation Locations" (Reference → test guide). Skip if
       `omitted`.
     - Use the test review guide referenced in `apiary.md` under
       "Documentation Locations" (Reference → test guide). Skip if
       `omitted`.
-    - Write or modify any required unit tests.
-    - Write or modify any required integration tests.
-    - Add a Subtask **for each test file or logical group of test
+    - Propose Subtasks covering any required unit tests.
+    - Propose Subtasks covering any required integration tests.
+    - Propose a Subtask **for each test file or logical group of test
       files** that needs to be modified based on the work described by
       the Engineer. The Subtask provides high-level instructions to:
       - Update any tests that cover the work done in the parent Task.
@@ -249,17 +261,18 @@ acceptance criteria:
         the parent Task.
       - Add any tests to cover functionality that is currently not
         tested based on the work done in the parent Task.
-    - Add a final Subtask to run the full unit test suite and fix any
-      failures. Integration tests are handled by the calling skill.
+    - Propose a final Subtask to run the full unit test suite and fix
+      any failures. Integration tests are handled by the calling
+      skill.
       - This Subtask tells the agent to ensure 100% unit tests passing
         before completing — i.e., fix broken tests.
       - If the agent cannot get 100% unit tests passing, it should
-        report the failure to the team lead.
-- **Doc Writer**
+        report the failure to the calling skill.
+- **Doc Writer** (`subagent_type: doc-writer`)
   - Model: Claude Sonnet
   - Responsibilities:
-    - Writing documentation Subtasks for a Task (if required).
-  - Instructions:
+    - Proposing documentation Subtasks for a Task (if required).
+  - Instructions (embed in dispatch prompt):
     - Use the doc writing guide referenced in `apiary.md` under
       "Documentation Locations" (Reference → doc writing guide). Skip
       if `omitted`.
@@ -268,29 +281,29 @@ acceptance criteria:
         - Review the customer-facing docs referenced in `apiary.md`
           under "Documentation Locations" (Maintained → customer-facing
           docs). Skip if `omitted`.
-        - Write a Subtask describing how the customer-facing docs
+        - Propose a Subtask describing how the customer-facing docs
           should be updated based on the work done in this Task.
     - Architecture docs:
       - If the Task modifies source code:
         - Review the internal architecture docs referenced in
           `apiary.md` under "Documentation Locations" (Maintained →
           contributor docs). Skip if `omitted`.
-        - Write a Subtask for each architecture doc that needs to be
+        - Propose a Subtask for each architecture doc that needs to be
           updated based on the work done in this Task.
-- **Product Manager**
+- **Product Manager** (`subagent_type: pm`)
   - Model: Claude Opus
   - Responsibilities:
-    - Reviewing Tasks against the PRD and SRD attached to the parent
-      Feature ticket.
+    - Reviewing proposed Tasks against the PRD and SRD attached to the
+      parent Feature ticket.
     - Ensuring that the work being described meets the requirements.
-  - Instructions:
-    - The team lead will provide the PRD and SRD content (and any
-      other Feature-level docs) fetched in step 2 via the Plan →
-      Feature source-reference chain. Read them. Do NOT assume the
-      docs are attached to the parent Plan or Epic — they live on the
-      Feature ticket and have already been resolved for you.
-    - Review each Task and its Subtasks to ensure that the work
-      proposed:
+  - Instructions (embed in dispatch prompt):
+    - This skill will provide the PRD and SRD content (and any other
+      Feature-level docs) fetched in step 2 via the Plan → Feature
+      source-reference chain. Read them. Do NOT assume the docs are
+      attached to the parent Plan or Epic — they live on the Feature
+      ticket and have already been resolved for you.
+    - Review each proposed Task and its proposed Subtasks to ensure
+      that the work:
       - Aligns with the requirements in the PRD/SRD.
       - Does not introduce more functionality than asked for.
         - e.g., the PRD calls for no legacy support but the Engineer
@@ -302,8 +315,8 @@ acceptance criteria:
         - The work covers all functionality required by the Epic.
         - The work does not introduce any functionality not required
           or explicitly disallowed in the Epic.
-    - Review the Subtasks created by the Test Writer.
-      - Ensure they have done their best to create one Subtask per
+    - Review the Subtasks proposed by the Test Writer.
+      - Ensure they have done their best to propose one Subtask per
         test file that needs to be changed.
 
 #### Mandatory Subtask Description Template
@@ -328,10 +341,12 @@ Specific files, functions, and changes required. Include line numbers where know
 ```
 
 #### Task Loop
-Spawn one persistent team to handle all Tasks. Work through each Task
-sequentially with the same team, planning Subtasks one Task at a time,
-**without asking the user for permission**. Only stop to review with
-the user once all Tasks are done.
+Work through each Task sequentially. For each Task, dispatch the
+required role subagents via the Agent tool, collect their proposed
+Subtasks from the response text, and run the PM subagent to review the
+proposals. Plan Subtasks one Task at a time, **without asking the user
+for permission**. Only stop to review with the user once all Tasks are
+done.
 
 ### 5. Review and Write
 

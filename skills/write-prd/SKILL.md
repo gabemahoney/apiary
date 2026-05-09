@@ -1,6 +1,6 @@
 ---
 name: write-prd
-description: Write a Product Requirements Document (PRD) for a development effort. Adds or modifies a PRD doc as a t1 Doc child of a Feature ticket in the Features store so downstream skills (write-srd, req-review, hatch-epic) can consume it.
+description: Write a Product Requirements Document (PRD) for a development effort. Adds or modifies a PRD doc as a t1 Doc child of a Feature ticket in the Features store so downstream skills (write-srd, req-review, write-plan) can consume it.
 ---
 
 # Write PRD
@@ -13,7 +13,7 @@ effort. Downstream skills will consume it:
 
 - `/write-srd` — turns the PRD into software requirements
 - `/req-review` — reviews the PRD for completeness and executability
-- `/hatch-epic` — breaks the work into Epics, Tasks, and Subtasks
+- `/write-plan` — creates a Plan in the Plans store with Epics; auto-chains into `/write-epic` to add Tasks and Subtasks
 
 The PRD must be thorough enough that an agent swarm can execute the work
 autonomously, without needing to ask the user clarifying questions.
