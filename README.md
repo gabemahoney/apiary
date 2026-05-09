@@ -23,7 +23,7 @@ Ask Claude Code to install the Apiary skills. You have two options — pick one.
 
 > "Install the Apiary skills from `~/projects/apiary/skills` into `<absolute path to target repo>/.claude/skills`."
 
-In either case, Claude will copy each skill directory (`project-setup`, `new-feature`, `write-prd`, `write-srd`, `make-plan`, `hatch-epic`, `do-bee`, `new-bug`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
+In either case, Claude will copy each skill directory (`project-setup`, `new-feature`, `write-prd`, `write-srd`, `write-plan`, `write-epic`, `do-bee`, `new-bug`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
 
 The repo also ships project-setup templates under `~/projects/apiary/apiary-templates/`. To make them available globally, copy that directory to `~/.claude/apiary-templates/` (or copy individual files into an existing directory there). Templates are plain markdown — author your own or edit the shipped ones to fit your team.
 
@@ -66,8 +66,10 @@ The SRD is stored as a t1 Doc child of the Feature ticket.
 
 ### Write Plan
 Run `/write-plan` with the Feature ticket id to develop a plan for building the feature.
-The plan is stored in the Plans store.
-> Note: `/write-plan` is not yet shipped — a later Epic delivers it. The README documents the shipping flow.
+
+- The skill hard-gates on the Feature being `ready`. If the Feature is still `draft`, you'll be sent back to `/req-review` (or asked to manually mark the Feature `ready`) before planning can proceed.
+- The Plan is stored in the Plans store, with its source reference pointing back at the Feature so `develop-feature` can find the Plan from the Feature later.
+- `/write-plan` automatically chains into `/write-epic` for each Epic in dependency order, so a single command produces a fully decomposed Plan with Epics, Tasks, and Subtasks.
 
 ### Do Bee
 Run `/do-bee` with the Feature bee to build the feature.
