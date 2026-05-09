@@ -38,6 +38,8 @@ When the command finishes, you'll have:
 
 Each store is configured up front with status values appropriate to its lifecycle, so you don't have to think about state machines while you're working.
 
+`/project-setup` also discovers the git repos involved in your project, handling both single-repo and multi-repo layouts. For each repo it detects the stack and proposes build commands (compile/type-check, format, lint, narrow test, full test) for you to confirm or override. The confirmed commands are stored per-repo in `apiary.md` so later skills can run them without guessing.
+
 
 ## Workflow
 

@@ -107,10 +107,120 @@ For each store:
 Use whichever backend tools and CLI are available; the skill stays
 backend-agnostic so the LLM running it picks the right calls.
 
-## 6. Write apiary.md
+## 6. Repo Discovery
 
-Write `<project_root>/apiary.md` with exactly these three top-level
-sections, in this order:
+Find the git repos that belong to this project. They drive the per-repo
+build commands written in step 8.
+
+1. Scan the project root for `.git` directories, walking 1–2 levels deep.
+   Skip vendored directories: `node_modules`, `.venv`, `target`, `dist`,
+   `build`, `.tox`.
+2. Branch on what you found:
+   - **One or more repos found.** List the relative paths to the user,
+     then `AskUserQuestion`: "Does this project touch any other git
+     repos not listed?" If yes, ask for additional paths (absolute or
+     project-root-relative) and add them to the set.
+   - **No repos found.** `AskUserQuestion`: "Does your project use one
+     or more git repos?" If yes, ask for paths and add them. If no,
+     record an empty list and continue — the project has no build
+     commands to configure.
+3. Normalize every path to be relative to the declared project root —
+   e.g., `./`, `./backend`, `./frontend`, `./packages/api`.
+   Deduplicate.
+4. Hold the resulting list in working memory; the next two steps consume
+   it. Do **not** add a `## Repos` section to `apiary.md` — repos appear
+   implicitly via `### <relative-path>` headings under `## Build
+   Commands`.
+
+**Idempotency.** On rerun, compare the freshly-discovered set against
+the `### <relative-path>` headings under any existing `## Build
+Commands` section in `apiary.md`. Use `AskUserQuestion` before adding
+newly-found repos or removing repos that no longer exist.
+
+## 7. Stack Detection
+
+For each repo path collected in step 6, inspect manifest files at the
+repo root and resolve to a stack:
+
+| Manifest                                 | Stack             | Notes                                                              |
+|------------------------------------------|-------------------|--------------------------------------------------------------------|
+| `Cargo.toml`                             | Rust              | Note `[workspace]` (workspace vs single crate)                     |
+| `package.json` + `tsconfig.json`         | Node/TypeScript   | Detect test runner from `jest.config.*`, `vitest.config.*`, `package.json` |
+| `package.json` (no `tsconfig.json`)      | Node/JavaScript   | Same test-runner detection                                         |
+| `pyproject.toml` or `setup.py`           | Python            | If `poetry.lock` is present, prefix commands with `poetry run`     |
+| `go.mod`                                 | Go                | Standard go toolchain                                              |
+| `pom.xml`                                | Java/Maven        |                                                                    |
+| `build.gradle` or `build.gradle.kts`     | Java/Gradle       |                                                                    |
+| (none of the above)                      | unknown           | Skip proposals — ask the user manually for each command in step 8 |
+
+For each detected stack, propose sensible defaults across these five
+fixed slots: **Compile/type-check**, **Format**, **Lint**, **Narrow
+test**, **Full test**. Anchors (one short-form per stack):
+
+- **Python+poetry** — `poetry run mypy .`, `poetry run black .`, `poetry run ruff check .`, `poetry run pytest <path>`, `poetry run pytest`
+- **Rust** — `cargo check`, `cargo fmt`, `cargo clippy`, `cargo test <path>`, `cargo test`
+- **Node/TS** — `tsc --noEmit`, `prettier --write .`, `eslint .`, `vitest run <path>` or `jest <path>`, `vitest run` or `jest`
+- **Go** — `go vet ./...` or `go build ./...`, `gofmt -w .`, `go vet ./...`, `go test <path>`, `go test ./...`
+- **Java/Maven** — `mvn compile`, `mvn spotless:apply` (or omitted), `mvn checkstyle:check` (or omitted), `mvn test -Dtest=<path>`, `mvn test`
+- **Java/Gradle** — equivalent idiomatic commands (`gradle compileJava`, `gradle spotlessApply`, `gradle check`, `gradle test --tests <path>`, `gradle test`)
+
+Compile/type-check may legitimately be `omitted` for languages without
+static analysis (e.g., plain JS without `tsc --noEmit`). Still propose a
+sensible default and let the user choose `omitted` in step 8.
+
+The **Narrow test** slot must be expressed as a template that takes a
+`<path>` argument. The **Full test** slot is the same idea without
+`<path>`.
+
+## 8. Build Commands
+
+Confirm and write per-repo build commands.
+
+1. **Confirm each command with the user.** For each repo, present the
+   five proposed commands. The five fixed slot labels are
+   `Compile/type-check`, `Format`, `Lint`, `Narrow test`, `Full test`.
+   The user can accept, override, or set any slot to `omitted`.
+2. **Validation rules.**
+   - `Compile/type-check` may be `omitted` without comment.
+   - The other four are expected, but the user may still omit any of
+     them.
+   - If `Full test` is set to `omitted`, emit a non-blocking warning
+     explaining that this disables a key quality gate consumed by
+     `develop-epic` and `fix-bug`. Do not block.
+3. **Write `## Build Commands` to `apiary.md`** placed after `## New
+   Bug` (and before any later sections future skills may add). Use this
+   exact format:
+
+   ```
+   ## Build Commands
+
+   ### <relative-path>
+   - **Compile/type-check**: `<command>` | omitted
+   - **Format**: `<command>` | omitted
+   - **Lint**: `<command>` | omitted
+   - **Narrow test**: `<command-with-<path>>` | omitted
+   - **Full test**: `<command>` | omitted
+   ```
+
+   Repeat the H3 block per repo in discovery order. Use the literal word
+   `omitted` (no backticks) when omitted; backtick-quote real commands.
+   Preserve every other `##` section verbatim.
+
+4. **Idempotency on rerun.** Reuse the same compare-and-confirm pattern
+   the skill uses for stores. If a `## Build Commands` section already
+   exists, parse the existing per-repo blocks and use them as the
+   proposal baseline (rather than the freshly-detected stack defaults).
+   Per repo, per slot: ask only on differences or explicit re-review.
+   Setting a slot to its current value is a no-op — don't rewrite the
+   file with no semantic change.
+
+5. **Generic language.** Don't hard-code backend-specific tool names;
+   pick whatever file edit tool is available to update `apiary.md`.
+
+## 9. Write apiary.md
+
+Write `<project_root>/apiary.md` with these top-level sections, in this
+order:
 
 ```
 # Apiary Configuration
@@ -123,14 +233,19 @@ sections, in this order:
 
 ## New Bug
 - source_references: <resolved value from interview>
+
+## Build Commands
+<per-repo blocks from step 8>
 ```
 
 The `## Project Root` line is the only absolute path in the file. Any
-future paths added by later skills must be relative to that root.
+other paths in the file — including the `### <relative-path>` headings
+under `## Build Commands` — must be relative to that root.
 
-If you are updating an existing `apiary.md`, edit only the sections above
-and preserve any other `##` sections verbatim — they belong to skills
-that haven't been written yet.
+If you are updating an existing `apiary.md`, edit only the sections this
+skill owns (`## Project Root`, `## New Feature`, `## New Bug`, `## Build
+Commands`) and preserve any other `##` sections verbatim — they belong
+to skills that haven't been written yet.
 
 # What comes next
 
