@@ -23,10 +23,20 @@ Ask Claude Code to install the Apiary skills. You have two options — pick one.
 
 > "Install the Apiary skills from `~/projects/apiary/skills` into `<absolute path to target repo>/.claude/skills`."
 
-In either case, Claude will copy each skill directory (`apiary-setup`, `idea`, `write-prd`, `write-srd`, `make-plan`, `hatch-epic`, `do-bee`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
+In either case, Claude will copy each skill directory (`project-setup`, `idea`, `write-prd`, `write-srd`, `make-plan`, `hatch-epic`, `do-bee`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
 
 ### 3. Configure
-Run `/apiary-setup`
+Run `/project-setup` to bootstrap a project for the Apiary workflow. The command is interview-driven: it asks you a small set of questions and uses your answers to set things up. It is safe to re-run on an already-configured project — it detects what already exists, surfaces any drift, and only changes things you explicitly approve.
+
+When the command finishes, you'll have:
+
+- An `apiary.md` file at the project root that records your answers and acts as the manifest later skills read from.
+- Three stores ready to hold work:
+  - **Features** — tracks feature ideas through the requirements lifecycle, from initial draft to published.
+  - **Plans** — tracks the planned work that delivers features, broken into nested levels of granularity, from draft to done.
+  - **Bugs** — tracks defects from the moment they're filed through to resolution.
+
+Each store is configured up front with status values appropriate to its lifecycle, so you don't have to think about state machines while you're working.
 
 
 ## Workflow
@@ -69,5 +79,5 @@ or wholesale with your own guidelines.
 
 **Note:** These guidelines are enforced across all repos.
 Documents describing repo-specific guidelines should be defined in a repo-specific Claude.md file. 
-`/apiary-setup` configures these repo-specific entries but does not modify the above-listed skills.
+`/project-setup` configures these repo-specific entries but does not modify the above-listed skills.
 
