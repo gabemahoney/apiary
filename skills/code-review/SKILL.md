@@ -5,106 +5,101 @@ description: Perform code review of changed files after task completion. Returns
 
 ## Overview
 
-This skill performs code review on files changed during a Task. 
-It returns a list of improvement work items for the caller to review, 
-Be thorough but not pedantic - focus on substance over style.
+This skill performs code review on files changed during a Task. It
+returns a list of improvement work items for the caller to review.
+The skill is a thin orchestrator: it loads the project's
+engineering best practices from the docs `apiary.md` points at, then
+applies that guidance to the changed code.
+
+Be thorough but not pedantic — focus on substance over style.
 
 ## Parameters
 
-You will receive some instructions on which set of work to review. It might be a Bees ticket idea, or a git worktree.
+You will receive some instructions on which set of work to review.
+It might be a Bees ticket id, or a git worktree.
 
 ## Your Mission
 
-Analyze changed code files and return a focused list of actionable improvement work items.
-Understand the work context from the user input.
-Review all commits and changed files.
-- Focus only on source code files. Ignore natural language documentation and unit test code.
-If no code files were changed, output "No code files to review" and exit.
+Analyze changed code files and return a focused list of actionable
+improvement work items.
 
-### Step 0: Understand project best practices
-Find any engineering best practices and architecture documentation and understand them. 
-Your job is to provide feedback in any case where the work done deviates from the guidance therein.
-Project-specific best practices live in the `## Documentation Locations` section of `apiary.md` under `Engineering best practices`. Read those references and apply them to your review.
+- Understand the work context from the user input.
+- Review all commits and changed files.
+- Focus only on source code files. Ignore natural-language
+  documentation and unit-test code.
+- If no code files were changed, output "No code files to review"
+  and exit.
 
-### Step 1: Run Linter
+### Step 0: Load project engineering best practices
 
-If the project has linters/formatters configured (ruff, black, eslint, etc.), run them:
-Note any linting issues that should be fixed.
+1. Read `apiary.md` `## Documentation Locations`.
+2. Find the `Reference` entry for `Engineering best practices`.
+3. If a path is configured, read that document; it is the
+   review checklist for this run. Apply each rule it states to the
+   changed files.
+4. If the entry is `omitted`, missing, or unreadable, warn the user
+   in your output that no engineering best practices doc was
+   configured and fall back to the minimal generic check in Step 2.
+   Do **not** substitute a hardcoded full opinion set — that
+   defeats the purpose of the indirection.
 
-### Step 2: Review Changed Files - Critical Eye
+### Step 1: Run linters / formatters (if configured)
 
-For each changed file, read it and check for issues across these categories (in addition to any project specific best practice):
+If `apiary.md` `## Build Commands` configures a lint or format
+command for the affected repo, run it. Note any issues that should
+be fixed.
 
-#### 1. Dead/Obsolete Code
-- Commented-out code that should be removed
-- Unused functions, variables, or imports
-- Old implementations left behind
-- Debugging code (print statements, console.log, TODO comments)
+If no lint command is configured, skip this step.
 
-#### 2. Architecture & Design
-- Inconsistent interfaces (does this match existing patterns?)
-- Inappropriate mixing of concerns (business logic, API, data access should be separated)
-- Unnecessary abstractions (YAGNI - You Aren't Gonna Need It)
-- Inconsistent patterns with the rest of the codebase
+### Step 2: Review changed files
 
-#### 3. Security & Correctness (CRITICAL)
+For each changed file, read it and apply the rules from the
+engineering best practices doc loaded in Step 0.
 
-Check for security vulnerabilities:
-- Input validation: All user inputs should be validated (Pydantic models, type checks)
-- SQL queries: Must use parameterized queries (?, :param), never f-strings
-- File paths: Use Path(), validate against workspace
-- API keys: Loaded from environment/config, never hardcoded
-- Authentication: Proper checks on protected endpoints
-- Error messages: No sensitive data in error responses
+If no best-practices doc was configured, fall back to a minimal
+generic check only:
 
-#### 4. Code Quality
-- Long/complex functions (>50 lines, deep nesting >3 levels)
-- Repeated code blocks (DRY violations)
-- Magic numbers/strings (should be named constants)
-- Poor variable/function names (unclear purpose)
-- Missing comments for complex logic
-- Bare except clauses (anti-pattern)
+- Correctness — does the code do what it claims to do?
+- Obvious anti-patterns — dead / commented-out code, secrets in
+  source, unparameterized queries against untrusted input,
+  swallowed exceptions, missing error handling on critical paths.
 
-#### 5. Error Handling
-- Bare except clauses (`except:` instead of specific exceptions)
-- Resources not properly cleaned up (files/connections should use context managers)
-- Missing error handling in critical paths
-- Poor error messages (not actionable for users)
+That fallback is intentionally narrow. Anything richer should come
+from the project's configured guidance doc.
 
-#### 6. Performance
-- Database queries in loops (N+1 problem)
-- Loading entire files into memory (should stream)
-- No connection pooling for databases
-- Synchronous I/O in async functions
-- Missing cache invalidation
-
-### Step 8: Prioritize and Filter
-
-Focus on important issues only:
-- **Include:** Security vulnerabilities, logic errors, missing tests, architecture problems
-- **Exclude:** Trivial style issues, minor naming nitpicks, personal preferences
+### Step 3: Prioritize and filter
 
 Each work item should be:
-1. Actionable (can become a standalone Task)
-2. Specific (includes file:line where applicable)
-3. Important (not trivial)
-4. Concise (one line description)
-5. Applicable (understand requirements and dont aim for more than is needed)
 
-NOTE: It is expected that many times you will return no important issues.
-This is OK. Don't feel obliged to report things. Only report if there is something important.
-In fact, if you keep reporting things it will cause an infinite loop which is very bad!
+1. Actionable — can become a standalone Task
+2. Specific — includes `file:line` where applicable
+3. Important — not trivial
+4. Concise — one-line description
+5. Applicable — within the requirements; do not aim beyond what is
+   needed
 
-### Step 9: Generate Work Item List
+It is expected that many runs will return no items. That is OK —
+do not invent issues. Reporting filler items risks an infinite
+review loop, which is bad.
 
-Output a simple numbered list directly in your response:
+### Step 4: Generate work-item list
+
+Output a simple numbered list directly in your response, in the
+shape:
 
 ```markdown
-## Code Review Work items
+## Code Review Work Items
 
-1. Fix SQL injection in transactions.py:85 - use parameterized queries instead of f-strings
-2. Add input validation to cache.py:45 endpoint - validate user input format
-3. Refactor process_transactions() in llm_categorizer.py:120 - function is 60 lines, extract helper functions
-4. Remove commented-out code in llm_categorizer.py:200-210
+1. <file:line> — <one-line description of the issue and the fix>
+2. ...
 ```
 
+If no items: output the heading and "No issues found." If the
+guidance doc was missing, prefix the list (or the no-issues line)
+with a single warning line, e.g.:
+
+```
+Note: no `Engineering best practices` doc configured in apiary.md
+`## Documentation Locations`. Reviewed against minimal generic
+checks only.
+```

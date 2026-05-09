@@ -6,106 +6,107 @@ description: Review test files for quality, coverage, and correctness after task
 ## Overview
 
 This skill reviews test files changed during some period of work.
-It returns a list of improvement work items for the caller to review.
-Be thorough but not pedantic - focus on substance over style.
+It returns a list of improvement work items for the caller to
+review. The skill is a thin orchestrator: it loads the project's
+test review guide (and, if helpful, test writing guide) from the
+docs `apiary.md` points at, then applies that guidance to the
+changed tests.
+
+Be thorough but not pedantic — focus on substance over style.
 
 ## Parameters
 
-You will receive some instructions on which set of work to review. It might be a Bees ticket idea, or a git worktree.
+You will receive some instructions on which set of work to review.
+It might be a Bees ticket id, or a git worktree.
 
 ## Your Mission
 
-Analyze changed test files and return a focused list of actionable improvement work items.
-Understand the work context from the user input.
-Review all commits and changed test files.
-- Focus only on test files. Ignore source code files and natural language documentation.
-If no test files were changed, output "No test files to review" and exit.
+Analyze changed test files and return a focused list of actionable
+improvement work items.
 
-### Step 0: Understand project best practices
+- Understand the work context from the user input.
+- Review all commits and changed test files.
+- Focus only on test files. Ignore source code files and natural
+  language documentation.
+- If no test files were changed, output "No test files to review"
+  and exit.
+- You may presume previous agents left the tests in a working
+  state; you do not need to run them.
 
-Find any testing best practices and architecture documentation and understand them.
-Your job is to provide feedback where test work deviates from the guidance therein.
-You may presume the previous agents left the tests in a working state, you do not need to run them.
+### Step 0: Load project test review guide
 
-### Step 1: Load the Full Test Suite
+1. Read `apiary.md` `## Documentation Locations`.
+2. Find the `Reference` entries for `Test review guide` and
+   `Test writing guide`.
+3. If a `Test review guide` path is configured, read that
+   document; it is the review checklist for this run. Apply each
+   rule it states to the changed tests.
+4. If a `Test writing guide` is also configured, read it for
+   additional context (the writing guide describes what *good* tests
+   look like — useful when judging gaps).
+5. If neither is configured, warn the user in your output that no
+   test guidance docs were configured and fall back to the minimal
+   generic check in Step 2. Do **not** substitute a hardcoded full
+   opinion set — that defeats the purpose of the indirection.
 
-Find all test files in the project (e.g. `**/test_*.py`, `**/*.test.ts`, `**/*_test.go`, etc.).
-Read ALL of them — not just the changed ones.
-You need the full picture to identify cross-file duplication, redundancy, and parameterization opportunities.
-Changed files are your focus, but you can only spot bloat if you know what already exists elsewhere.
+### Step 1: Load the full test suite
 
-### Step 2: Review Changed Test Files - Critical Eye
+Find all test files in the project and read all of them — not just
+the changed ones. You need the full picture to identify cross-file
+duplication, redundancy, and parameterization opportunities.
+Changed files are your focus, but you can only spot bloat if you
+know what already exists elsewhere.
 
-With the full suite loaded, review the changed files and check for issues:
+### Step 2: Review changed test files
 
-#### 1. Coverage Gaps
-- New functions or behaviors in the codebase with no corresponding tests
-- Missing edge cases (empty inputs, null/None, boundary values, max/min)
-- Missing error/exception cases (only happy path tested)
-- Missing negative tests (things that should fail but aren't verified)
+With the full suite loaded, review the changed files and apply the
+rules from the test review guide loaded in Step 0.
 
-#### 2. Test Correctness
-- Tests that assert the wrong thing (incorrect expectations)
-- Tests that would pass even if the code is broken (vacuous tests)
-- Tests checking implementation details instead of behavior
-- Mocks/stubs that don't accurately reflect real dependencies
-- Assertions that are too loose (e.g., `assert result is not None` when you should check the value)
+If no guidance doc was configured, fall back to a minimal generic
+check only:
 
-#### 3. Test Structure & Quality
-- Tests that do too much in one test (should be split)
-- Poor test names (unclear what behavior is being verified)
-- Missing or incorrect setup/teardown
-- Shared mutable state between tests (causes flakiness)
-- Tests that depend on execution order
+- Correctness — do the assertions actually verify the claimed
+  behavior?
+- Obvious anti-patterns — tests with no assertions, swallowed
+  failures, real network / filesystem I/O without mocking,
+  hardcoded sleeps, tests of code that no longer exists.
 
-#### 4. Bloat & Redundancy (HIGH PRIORITY)
-This is one of the most common and damaging issues in test suites. Be aggressive here.
-- **Parameterization opportunities**: Multiple test functions that run the same logic with different inputs — these should be collapsed into a single parameterized test (`@pytest.mark.parametrize`, `test.each`, etc.). Even 2-3 near-identical tests are a candidate.
-- **Duplicate coverage**: Tests that assert the same behavior already covered elsewhere — find and flag them specifically
-- **Copy-paste tests**: Blocks of nearly identical setup/assertion code repeated across tests — extract shared fixtures or helpers
-- **Over-specified tests**: Tests that assert many things that are already covered by other tests; trim to what's unique
-- When flagging these, always cite the specific test names and line numbers so the fix is unambiguous
+That fallback is intentionally narrow. Anything richer should come
+from the project's configured guidance doc.
 
-#### 5. Stale/Obsolete Tests
-- Old tests that are no longer valid given code changes
-- Tests that test code which no longer exists
-
-#### 6. Test Anti-patterns
-- No assertions (test always passes)
-- `except` that swallows failures silently
-- Hardcoded sleep/delays (use mocks or event-based waits)
-- External I/O in unit tests (network calls, file system) without mocking
-- Tests that are too tightly coupled to internal implementation
-
-### Step 3: Prioritize and Filter
-
-Focus on important issues only:
-- **Include:** Missing coverage for new code, incorrect assertions, flaky patterns, stale tests
-- **Exclude:** Minor style issues, trivial naming nitpicks, personal preferences
+### Step 3: Prioritize and filter
 
 Each work item should be:
-1. Actionable (can become a standalone Task)
-2. Specific (includes file:line where applicable)
-3. Important (not trivial)
-4. Concise (one line description)
-5. Applicable (understand requirements and don't aim for more than is needed)
 
-NOTE: It is expected that many times you will return no important issues.
-This is OK. Don't feel obliged to report things. Only report if there is something important.
-In fact, if you keep reporting things it will cause an infinite loop which is very bad!
+1. Actionable — can become a standalone Task
+2. Specific — includes `file:line` where applicable
+3. Important — not trivial
+4. Concise — one-line description
+5. Applicable — within the requirements; do not aim beyond what is
+   needed
 
-### Step 4: Generate Work Item List
+It is expected that many runs will return no items. That is OK —
+do not invent issues. Reporting filler items risks an infinite
+review loop, which is bad.
 
-Output a simple numbered list directly in your response:
+### Step 4: Generate work-item list
+
+Output a simple numbered list directly in your response, in the
+shape:
 
 ```markdown
 ## Test Review Work Items
 
-1. Parameterize test_validates_empty/test_validates_null/test_validates_whitespace in test_input.py:10-40 - identical logic, different inputs
-2. Remove test_create_returns_data() in test_orders.py:88 - duplicate of test_create_order():55 which already asserts the same fields
-3. Fix incorrect assertion in test_cache.py:88 - expects 200 but endpoint returns 201 on create
-4. Remove test_legacy_flow() in test_api.py:200 - tests deleted endpoint, always passes vacuously
-5. Mock external HTTP call in test_fetcher.py:55 - test makes real network request, causes flakiness
+1. <file:line> — <one-line description of the issue and the fix>
+2. ...
 ```
 
+If no items: output the heading and "No issues found." If the
+guidance doc was missing, prefix the list (or the no-issues line)
+with a single warning line, e.g.:
 
+```
+Note: no `Test review guide` doc configured in apiary.md
+`## Documentation Locations`. Reviewed against minimal generic
+checks only.
+```
