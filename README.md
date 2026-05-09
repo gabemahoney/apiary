@@ -25,6 +25,8 @@ Ask Claude Code to install the Apiary skills. You have two options — pick one.
 
 In either case, Claude will copy each skill directory (`project-setup`, `idea`, `write-prd`, `write-srd`, `make-plan`, `hatch-epic`, `do-bee`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
 
+The repo also ships project-setup templates under `~/projects/apiary/apiary-templates/`. To make them available globally, copy that directory to `~/.claude/apiary-templates/` (or copy individual files into an existing directory there). Templates are plain markdown — author your own or edit the shipped ones to fit your team.
+
 ### 3. Configure
 Run `/project-setup` to bootstrap a project for the Apiary workflow. The command is interview-driven: it asks you a small set of questions and uses your answers to set things up. It is safe to re-run on an already-configured project — it detects what already exists, surfaces any drift, and only changes things you explicitly approve.
 
@@ -39,6 +41,8 @@ When the command finishes, you'll have:
 Each store is configured up front with status values appropriate to its lifecycle, so you don't have to think about state machines while you're working.
 
 `/project-setup` also discovers the git repos involved in your project, handling both single-repo and multi-repo layouts. For each repo it detects the stack and proposes build commands (compile/type-check, format, lint, narrow test, full test) for you to confirm or override. The confirmed commands are stored per-repo in `apiary.md` so later skills can run them without guessing.
+
+A few additional conveniences: `/project-setup` accepts a named template from `~/.claude/apiary-templates/` (e.g., `public-github`) to preseed the interview — templates are plain markdown you can author or customize. The interview also captures Documentation Locations, split into Reference docs (consulted by skills as guides) and Maintained docs (skills update these); categories you skip are recorded as `omitted`. Re-running `/project-setup` re-detects environment factors (e.g., GitHub visibility) and prompts before updating saved configuration, with no changes when nothing has drifted.
 
 
 ## Workflow
