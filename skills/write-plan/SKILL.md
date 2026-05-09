@@ -250,7 +250,7 @@ Bad examples:
 When all Epics are designed, present them to the user for final review.
 
 - Output as markdown: title, description, dependencies for each Epic.
-- **Use `AskUserQuestion`** to ask: proceed with creation, modify Epics, or cancel.
+- **Ask the user**: proceed with creation, modify Epics, or cancel.
 - **Wait for approval.** Allow modifications if requested.
 
 ## Step 6: Create Epic tickets and wire dependencies

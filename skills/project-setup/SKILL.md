@@ -40,7 +40,7 @@ user how to install one and exit:
 - beads: https://github.com/steveyegge/beads
 
 If exactly one backend is available, use it. If both are available, ask the
-user which to use with `AskUserQuestion`.
+user which to use.
 
 # Steps
 
@@ -69,7 +69,7 @@ as an idempotent re-configuration:
 - Compare the parsed values to whatever the user provides in later
   steps (interview answers, template-resolved values, or re-detected
   environment factors).
-- For any drift, use `AskUserQuestion` to confirm before overwriting.
+- For any drift, ask the user to confirm before overwriting.
 - If nothing differs, report "already configured" and exit cleanly.
 
 **Factor-change detection on rerun.** For each factor listed in the
@@ -82,8 +82,8 @@ existing `## New Feature` / `## New Bug` decision tree:
    step 8, or fall through to "none" if no GitHub repo is configured).
 2. Compare the re-detected value against the persisted value on the
    factor line.
-3. If different, surface `<factor_name>: <old> → <new>` to the user via
-   `AskUserQuestion` and ask whether to update. Prompt per-factor — the
+3. If different, surface `<factor_name>: <old> → <new>` to the user and
+   ask whether to update. Ask per-factor — the
    user may accept some changes and reject others.
 4. On confirmation for a given factor, re-evaluate which `When ... =
    ...:` branch matches the new value, then rewrite both the factor
@@ -123,8 +123,8 @@ reads the template and follows its instructions.
   `/project-setup public-github`), treat that argument as the template
   name and load `~/.claude/apiary-templates/<name>.md`.
 - If no argument was provided and the templates directory contains one
-  or more `*.md` files, list them via `AskUserQuestion` and let the
-  user pick one or pick "no template (interview)".
+  or more `*.md` files, list them and ask the user to pick one or pick
+  "no template (interview)".
 - If the templates directory is empty or does not exist, fall through
   to interview mode — step 5 will collect the values directly from the
   user.
@@ -134,8 +134,8 @@ reads the template and follows its instructions.
 - Templates directory missing → graceful fallback to interview mode
   (step 5). Tell the user where templates are expected to live so they
   can add some later.
-- Named template not found → list the available templates and re-ask
-  the user via `AskUserQuestion`.
+- Named template not found → list the available templates and ask the
+  user again.
 - Template fails to parse (no `## New Feature Intake` heading, no `##
   New Bug Intake` heading, malformed `When ...:` branch, etc.) →
   report the parse error to the user and fall back to interview mode.
@@ -179,7 +179,7 @@ touched by templates — those remain owned by `project-setup` directly
 
 ## 5. Interview the user
 
-Use `AskUserQuestion` for choice prompts. Collect the minimum needed to
+Ask the user with choice prompts. Collect the minimum needed to
 populate `apiary.md`:
 
 - **Project root** — confirm or correct the path from step 1.
@@ -217,8 +217,8 @@ For each category:
 
 - If the template hardcoded a value, use it as-is.
 - If the template said "ask the user" for that category (or no
-  template applied), use `AskUserQuestion` to ask the user. Accept a
-  single path, a comma-separated list of paths, or skip.
+  template applied), ask the user. Accept a single path, a
+  comma-separated list of paths, or skip.
 - If the template did not list the category at all, default to the
   literal word `omitted` (no backticks).
 - If the user skips a category during interview, record `omitted`.
@@ -230,8 +230,8 @@ The Documentation Locations section sits between `## New Bug` and
 `## Build Commands` in the rendered apiary.md (step 11).
 
 Idempotency: parse any existing `## Documentation Locations` section
-in apiary.md (handled in step 2). Present per-category drift via
-`AskUserQuestion` and only change what the user approves.
+in apiary.md (handled in step 2). Present per-category drift to the
+user and only change what the user approves.
 
 ## 7. Create or reconcile the three stores
 
@@ -248,8 +248,8 @@ For each store:
 - If it does not exist, create it with the listed tiers and configure its
   status values.
 - If it exists with the listed configuration, leave it alone.
-- If it exists with different tiers or statuses, present the diff via
-  `AskUserQuestion` and only change what the user approves.
+- If it exists with different tiers or statuses, present the diff to
+  the user and only change what the user approves.
 
 Use whichever backend tools and CLI are available; the skill stays
 backend-agnostic so the LLM running it picks the right calls.
@@ -264,11 +264,11 @@ build commands written in step 10.
    `build`, `.tox`.
 2. Branch on what you found:
    - **One or more repos found.** List the relative paths to the user,
-     then `AskUserQuestion`: "Does this project touch any other git
-     repos not listed?" If yes, ask for additional paths (absolute or
+     then ask the user: "Does this project touch any other git repos
+     not listed?" If yes, ask for additional paths (absolute or
      project-root-relative) and add them to the set.
-   - **No repos found.** `AskUserQuestion`: "Does your project use one
-     or more git repos?" If yes, ask for paths and add them. If no,
+   - **No repos found.** Ask the user: "Does your project use one or
+     more git repos?" If yes, ask for paths and add them. If no,
      record an empty list and continue — the project has no build
      commands to configure.
 3. Normalize every path to be relative to the declared project root —
@@ -281,7 +281,7 @@ build commands written in step 10.
 
 **Idempotency.** On rerun, compare the freshly-discovered set against
 the `### <relative-path>` headings under any existing `## Build
-Commands` section in `apiary.md`. Use `AskUserQuestion` before adding
+Commands` section in `apiary.md`. Ask the user before adding
 newly-found repos or removing repos that no longer exist.
 
 ## 9. Stack Detection

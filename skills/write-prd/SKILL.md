@@ -88,8 +88,8 @@ Key questions to explore:
 - Are there performance or security constraints?
 - Does this depend on or affect other work?
 
-Use `AskUserQuestion` to gather information efficiently. Present options
-where possible rather than open-ended questions.
+Ask the user to gather information efficiently. Present options where
+possible rather than open-ended questions.
 
 #### Style Rules
 
@@ -193,7 +193,7 @@ Set its status to `draft` (idempotent — if a PRD already exists at
 
 ### 6. Next steps
 
-Use `AskUserQuestion` with:
+Ask the user:
 - Question: "PRD is saved at status `draft`. What next?"
 - Options:
   - "write-srd" — proceed to drafting the software requirements document

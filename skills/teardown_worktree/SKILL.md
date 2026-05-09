@@ -58,7 +58,7 @@ Resolution rules (walk up the parent chain as needed):
 - Plan → its source-reference ticket (= the Feature ID).
 - Feature → use as-is.
 
-If no ticket ID was provided, AskUserQuestion which Feature to tear down (offer the Features that have sibling worktrees on disk in any repo from Step 0).
+If no ticket ID was provided, ask the user which Feature to tear down (offer the Features that have sibling worktrees on disk in any repo from Step 0).
 
 Read the resolved Feature ticket's `status` field.
 
@@ -70,7 +70,7 @@ If the Feature's status is anything other than `done`:
 
   > This Feature is `<status>`. Teardown is gated on Feature == `done`. Promote the Feature to `done` first — typically by completing all Epics via `/develop-feature` and confirming, or by manually marking it `done` if you've validated it. Then re-run `/teardown-worktree`.
 
-- Use AskUserQuestion to confirm the abort with a single option: **"OK, I'll promote and re-run"**. Do NOT offer an "ignore gate and proceed anyway" option. There is no override.
+- Ask the user to confirm the abort with a single option: **"OK, I'll promote and re-run"**. Do NOT offer an "ignore gate and proceed anyway" option. There is no override.
 - Abort.
 
 **The skill MUST NOT update the Feature's status to `done` itself.** Status promotion is owned by `/develop-feature` close-out (or manual user action), never by this skill.
@@ -102,7 +102,7 @@ For each repo in the teardown set, run:
 git -C {worktree_path} status
 ```
 
-Collect the per-repo summaries into one consolidated overview, then ask the user once via AskUserQuestion how to handle uncommitted changes. Allow per-repo decisions if the situations differ.
+Collect the per-repo summaries into one consolidated overview, then ask the user once how to handle uncommitted changes. Allow per-repo decisions if the situations differ.
 
 Per-repo options:
 - **Commit them** — commit inside that worktree with a descriptive message.
@@ -124,7 +124,7 @@ For each repo in the teardown set, determine its target branch (typically the ma
 git -C {repo_root} rev-parse --abbrev-ref HEAD
 ```
 
-Build a per-repo merge plan and present it to the user via AskUserQuestion:
+Build a per-repo merge plan and present it to the user:
 
 ```
 Multi-repo merge plan for Feature <feature-id>:
@@ -189,7 +189,7 @@ For each repo in the teardown set:
 git -C {repo_root} worktree remove {worktree_path} --force
 ```
 
-Confirm branch deletion via AskUserQuestion (one consolidated prompt covering all repos in the teardown set). Then for each repo:
+Ask the user to confirm branch deletion (one consolidated prompt covering all repos in the teardown set). Then for each repo:
 
 ```bash
 git -C {repo_root} branch -d {normalized_ticket_id}

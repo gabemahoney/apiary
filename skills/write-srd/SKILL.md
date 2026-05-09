@@ -195,7 +195,7 @@ Before presenting the SRD, verify:
 
 ### 7. Next steps
 
-Use `AskUserQuestion` with:
+Ask the user:
 - Question: "SRD is saved at status `draft`. What next?"
 - Options:
   - "req-review" — review the SRD (and PRD) for completeness and promote

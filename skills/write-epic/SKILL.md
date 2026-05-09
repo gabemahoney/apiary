@@ -62,9 +62,8 @@ automatically by listing Epic-tier children in the `draft` state under
 that Feature/Plan. These are Epics that are written but whose children
 (Tasks) have not been written yet.
 
-If there are multiple, use `AskUserQuestion` with `multiSelect: false`
-to let the user pick ONE Epic. Review the dependency chain and
-recommend the one that makes the most sense:
+If there are multiple, ask the user to pick ONE Epic. Review the
+dependency chain and recommend the one that makes the most sense:
 
 - Question: "Which Epic do you want to write?"
 - Options:
@@ -147,7 +146,7 @@ propose the Subtasks for this Epic. Your responsibilities are:
 
 - Surface design questions back to the caller.
   - If subagents propose different approaches to a problem, surface
-    this back up to the caller with `AskUserQuestion`.
+    this back up to the caller and ask the user to decide.
 - Coordinate the subagents and ensure all work is complete. The
   Product Manager has final authority on quality and completeness.
 - Carry forward architectural decisions:

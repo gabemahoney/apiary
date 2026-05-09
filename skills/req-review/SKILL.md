@@ -15,8 +15,7 @@ given Feature, not a hardcoded PRD+SRD pair.
 
 # Inputs
 
-- A **Feature ticket ID**. If the user did not provide one, ask for it via
-  `AskUserQuestion`.
+- A **Feature ticket ID**. If the user did not provide one, ask the user for it.
 - From that Feature ticket, fetch **all t1 children** — these are the docs to review.
 
 # Status Ownership
@@ -78,7 +77,7 @@ For each t1 child of the Feature:
 6. **Implementation Readiness**: Assess whether an agent could implement without
    making assumptions.
 7. **Present findings to the user** in the Output Format below.
-8. After feedback resolves, ask via `AskUserQuestion`:
+8. After feedback resolves, ask the user:
    - Question: `"Mark [doc title] as ready?"`
    - Options: `"Yes, mark as ready"` / `"No, more work needed"`
    - On `"Yes"`: set the doc's status to `ready` (idempotent — if already `ready`,
@@ -89,7 +88,7 @@ For each t1 child of the Feature:
 ## Step 4: Promote the Feature
 
 After the per-doc loop completes, check whether **all** t1 children of the Feature
-are now `ready`. If yes, ask via `AskUserQuestion`:
+are now `ready`. If yes, ask the user:
 
 - Question: `"All docs are ready. Mark Feature as ready?"`
 - Options: `"Yes, mark Feature as ready"` / `"No, not yet"`

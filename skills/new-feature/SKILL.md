@@ -95,10 +95,9 @@ skills (notably `req-review` for `draft -> ready`).
 
 ## 6. Next-step prompt
 
-After the Feature ticket is created, use `AskUserQuestion` to present
-the canonical next-step options. The question text should be along the
-lines of: "Feature ticket created in `draft`. How would you like to
-proceed?"
+After the Feature ticket is created, ask the user about the canonical
+next-step options. The question text should be along the lines of:
+"Feature ticket created in `draft`. How would you like to proceed?"
 
 Options (use these labels exactly):
 

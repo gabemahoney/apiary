@@ -218,7 +218,7 @@ Once the bug is fixed and pre-close validation has passed:
 
 1. Present a concise summary of the changes (files changed, what was
    done, key behaviors).
-2. Ask the user "Is this bug fixed?" via `AskUserQuestion`.
+2. Ask the user "Is this bug fixed?"
    - **Yes** — create one git commit for the fix using system or
      project-defined git guidance, then update the Bug status to `done`
      (idempotent — skip if already `done`), emit the final summary

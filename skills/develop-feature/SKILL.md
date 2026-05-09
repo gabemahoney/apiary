@@ -63,7 +63,7 @@ no scratch state on disk.
 
 Accept the Feature ID as the sole argument. If omitted, query the
 ticket backend for Features with status `ready` or `active` and ask
-the user which one to work on via `AskUserQuestion`.
+the user which one to work on.
 
 ### Step 0: Read `apiary.md`
 
@@ -161,7 +161,7 @@ dispatches.
      for presentation.
 
 4. After each Epic completes (and before invoking the next one),
-   if any non-`done` Epics remain, use `AskUserQuestion`:
+   if any non-`done` Epics remain, ask the user:
 
    - Question: "Continue to next Epic `<id>` '`<title>`'?"
    - Options:
@@ -189,7 +189,7 @@ dispatches.
    accumulates the items but deliberately does not present them to
    the user, so suppressing this step would lose the information.
 
-3. **Ask about Feature -> `done`** via `AskUserQuestion`:
+3. **Ask about Feature -> `done`** — ask the user:
 
    - Question: "Mark Feature as done?"
    - Options:
@@ -238,7 +238,7 @@ dispatches.
   it prescribes contracts (status reads, status writes, the
   Plan-by-Feature source-reference query) and the LLM picks the
   tools available at runtime.
-- The skill never calls `AskUserQuestion` to surface deferred
-  review items individually — they are presented as an aggregated
-  block once at close-out.
+- The skill never asks the user about deferred review items
+  individually — they are presented as an aggregated block once at
+  close-out.
 - The skill never pushes to remote.

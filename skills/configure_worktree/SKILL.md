@@ -59,9 +59,9 @@ this Feature, drawing on:
 Use these signals to nominate a subset. If signals are ambiguous,
 present the full candidate list and let the user pick.
 
-**Always confirm with the user via `AskUserQuestion`** before creating
-worktrees. Present the proposed subset (formatted as a list of absolute
-paths) and let the user confirm or adjust.
+**Always confirm with the user** before creating worktrees. Present
+the proposed subset (formatted as a list of absolute paths) and let
+the user confirm or adjust.
 
 For single-repo projects (one `### <relative-path>` heading), still
 confirm but default the subset to that single repo.
@@ -78,7 +78,7 @@ Iterate over the user-confirmed affected-repos list. For each repo:
 Run `git status` inside each affected repo. Collect the dirty repos.
 
 If any repo has uncommitted changes, present a single per-repo summary
-to the user via `AskUserQuestion`:
+to the user:
 
 ```
 The following repos have uncommitted changes:
@@ -153,8 +153,8 @@ automatically because they live in git.
 
 ## Step 3: Ask the user for the agent's prompt
 
-Use `AskUserQuestion` to capture the full instruction string the spawned
-Claude session will receive on launch. This can be a slash-command
+Ask the user for the full instruction string the spawned Claude session
+will receive on launch. This can be a slash-command
 invocation (typically `/develop-feature <feature-id>`), a freeform task
 description, or any valid prompt.
 
@@ -193,8 +193,7 @@ signals are ambiguous, ask the user. The spawned session is expected to
 navigate between sibling worktrees as Tasks dictate.
 
 Alternative: if the user prefers, launch one session per affected
-worktree. Confirm via `AskUserQuestion` when more than one repo is
-affected.
+worktree. Ask the user to confirm when more than one repo is affected.
 
 ## Step 6: Report session status
 

@@ -12,7 +12,7 @@ do the work, runs a post-Tasks review cycle (code-reviewer,
 test-reviewer, doc-reviewer), and lands a **single commit per Epic**
 at close-out. It accumulates deferred reviewer feedback for the
 caller (typically `develop-feature`) — it never surfaces deferred
-items to the user via `AskUserQuestion`.
+items to the user.
 
 This skill drives the Epic and Task statuses through the generic
 flow `ready` -> `active` -> `done`. All transitions are idempotent.
@@ -247,9 +247,8 @@ remaining items in that lane are deferred.
 - Return the same accumulator to the caller (`develop-feature`,
   Epic 8) as the primary mechanism. Epic 8 owns user
   presentation.
-- Do **NOT** call `AskUserQuestion` to surface deferred items
-  here. `develop-epic` never asks the user about deferred review
-  feedback.
+- Do **NOT** ask the user about deferred items here. `develop-epic`
+  never surfaces deferred review feedback to the user.
 
 ### Step 6: Close-out (single commit per Epic)
 
