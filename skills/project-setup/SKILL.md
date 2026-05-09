@@ -155,12 +155,13 @@ reads the template and follows its instructions.
    the user for each (record 'omitted' if skipped)" — a category that
    step 6 will interview.
 3. For every factor listed in either intake section, detect the
-   current environment value. The skill stays backend-agnostic — pick
-   whatever tool fits the factor name. Examples (illustrative, not
-   exhaustive): `github_visibility` → `gh repo view --json visibility`
-   on a discovered repo path, or `"none"` if no GitHub repo is
-   configured. The factor's textual description in the template hints
-   at which tool to use.
+   current environment value. The skill does not prescribe a specific
+   tool — pick whatever fits the factor name; the factor's textual
+   description in the template hints at the appropriate detection
+   approach. (Illustrative example only: a `github_visibility` factor
+   would call out to a GitHub CLI on a discovered repo path, falling
+   through to `"none"` when no GitHub repo is configured. Substitute
+   whatever tool the factor implies on your system.)
 4. For each factor's detected value, match the appropriate `When
    <factor_name> = <value>:` branch. If multiple branches match (e.g.,
    `private or none` covers two values), pick the one whose value list

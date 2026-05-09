@@ -1,7 +1,7 @@
 # Apiary 🐝
 
 Apiary is an opinionated agentic workflow for taking an idea from inception to working software.
-It uses the [bees](https://github.com/gabemahoney/bees) ticket management system. Install that first.
+It works against a ticket-management backend — currently [bees](https://github.com/gabemahoney/bees) or [beads](https://github.com/steveyegge/beads), and any compatible backend the skills can speak to at runtime. Install one before continuing.
 
 ## Install
 
@@ -23,7 +23,7 @@ Ask Claude Code to install the Apiary skills. You have two options — pick one.
 
 > "Install the Apiary skills from `~/projects/apiary/skills` into `<absolute path to target repo>/.claude/skills`."
 
-In either case, Claude will copy each skill directory (`project-setup`, `new-feature`, `write-prd`, `write-srd`, `write-plan`, `write-epic`, `develop-feature`, `develop-epic`, `new-bug`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
+In either case, Claude will copy each skill directory — `project-setup`, `new-feature`, `write-prd`, `write-srd`, `write-plan`, `write-epic`, `develop-feature`, `develop-epic`, `new-bug`, `fix-bug`, `req-review`, `code-review`, `test-review`, `doc-review`, `configure_worktree`, `teardown_worktree`, `file-share` — into the chosen skills directory without disturbing any other skills already installed there.
 
 ### 2b. Install the subagents
 
@@ -42,13 +42,16 @@ Apiary also ships custom subagents under `~/projects/apiary/agents/` that the ex
 The repo also ships project-setup templates under `~/projects/apiary/apiary-templates/`. To make them available globally, copy that directory to `~/.claude/apiary-templates/` (or copy individual files into an existing directory there). Templates are plain markdown — author your own or edit the shipped ones to fit your team.
 
 ### 3. Configure
-Run `/project-setup` to bootstrap a project for the Apiary workflow. The command is interview-driven: it asks you a small set of questions and uses your answers to set things up. It is safe to re-run on an already-configured project — it detects what already exists, surfaces any drift, and only changes things you explicitly approve.
+Run `/project-setup` to bootstrap a project for the Apiary workflow.
+
+- **Interview-driven.** The command asks a small set of questions and uses your answers to set things up.
+- **Safe to re-run.** On an already-configured project it detects what exists, surfaces any drift, and only changes things you explicitly approve.
 
 When the command finishes, you'll have:
 
 - An `apiary.md` file at the project root that records your answers and acts as the manifest later skills read from.
 - Three stores ready to hold work:
-  - **Features** — tracks feature ideas through the requirements lifecycle, from initial draft to published.
+  - **Features** — feature ideas moving through the requirements lifecycle, from initial draft to published.
   - **Plans** — tracks the planned work that delivers features, broken into nested levels of granularity, from draft to done.
   - **Bugs** — tracks defects from the moment they're filed through to resolution.
 
@@ -62,6 +65,9 @@ A few additional conveniences: `/project-setup` accepts a named template from `~
 ## Workflow
 
 Every Apiary skill reads `apiary.md` first to discover the project's stores, repos, configured commands, and intake preferences.
+
+### Project Setup
+Run `/project-setup` once per project to bootstrap the Apiary workflow — see step 3 (Configure) above for the full description. Re-running it is safe: it detects existing state, surfaces drift, and only changes things you explicitly approve.
 
 ### Feature
 Run `/new-feature` to capture a new feature.
