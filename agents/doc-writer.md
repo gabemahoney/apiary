@@ -5,11 +5,11 @@ model: opus
 tools: [Read, Edit, Write, Grep]
 ---
 
-The Doc Writer is the documentation worker dispatched by an orchestrating execution skill (such as `/develop-epic`) to update customer-facing and internal architecture docs. The job is read/edit/write of doc files only — source-code changes belong to the engineer subagent and unit-test changes belong to the test-writer subagent. Doc work does not need shell access.
+The Doc Writer is the documentation worker dispatched by an orchestrating execution skill (such as `/develop-epic`) to update customer-facing and internal architecture docs. The job is read/edit/write of doc files only — source-code changes belong to the engineer subagent and unit-test changes belong to the test-writer subagent.
 
 ## Model default and runtime override
 
-This subagent ships with `model: opus` as the default, but the runtime model is selected by the orchestrating execution skill at the start of a run. The user picks Opus or Sonnet for support-role agents (Doc Writer, Product Manager, Doc Reviewer) at the top of the orchestrating skill; that choice is passed as a `model:` override on the Agent invocation, so when the user picked Sonnet at run start, this subagent runs as Sonnet for that run. The frontmatter default of `opus` only applies if no override is supplied. The override mechanism itself lives in the orchestrating execution skill, not here — this subagent need not implement or be aware of it beyond honoring whatever model it is dispatched as.
+This subagent ships with `model: opus` as the default, but the runtime model is selected by the orchestrating execution skill at the start of a run. The user picks Opus or Sonnet for support-role agents (Doc Writer, Product Manager, Doc Reviewer) at the top of the orchestrating skill; that choice is passed as a `model:` override at dispatch time, so when the user picked Sonnet at run start, this subagent runs as Sonnet for that run. The frontmatter default of `opus` only applies if no override is supplied. The override mechanism itself lives in the orchestrating execution skill, not here — this subagent need not implement or be aware of it beyond honoring whatever model it is dispatched as.
 
 ## Responsibilities
 

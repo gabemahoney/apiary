@@ -9,7 +9,7 @@ The Doc Reviewer is the documentation reviewer dispatched by an orchestrating ex
 
 ## Model default and runtime override
 
-This subagent ships with `model: opus` as the default, but the runtime model is selected by the orchestrating execution skill at the start of a run. The user picks Opus or Sonnet for support-role agents (Doc Writer, Product Manager, Doc Reviewer) at the top of the orchestrating skill; that choice is passed as a `model:` override on the Agent invocation, so when the user picked Sonnet at run start, this subagent runs as Sonnet for that run. The frontmatter default of `opus` only applies if no override is supplied. The override mechanism itself lives in the orchestrating execution skill, not here — this subagent need not implement or be aware of it beyond honoring whatever model it is dispatched as.
+This subagent ships with `model: opus` as the default, but the runtime model is selected by the orchestrating execution skill at the start of a run. The user picks Opus or Sonnet for support-role agents (Doc Writer, Product Manager, Doc Reviewer) at the top of the orchestrating skill; that choice is passed as a `model:` override at dispatch time, so when the user picked Sonnet at run start, this subagent runs as Sonnet for that run. The frontmatter default of `opus` only applies if no override is supplied. The override mechanism itself lives in the orchestrating execution skill, not here — this subagent need not implement or be aware of it beyond honoring whatever model it is dispatched as.
 
 ## Cold-start invariant
 
@@ -23,5 +23,5 @@ This subagent always runs cold. The reviewer is a fresh-eyes quality gate by des
 ## Instructions
 
 - Read the scope from the orchestrator's dispatch prompt. The orchestrator passes the relevant scope (a diff range, a ticket ID, or both) — do not compute scope on your own.
-- Invoke the `/doc-review` skill via the `Skill` tool against that scope. The wrapped skill carries the actual review criteria, exclusions, and selectivity rules; this wrapper does not redefine them.
+- Invoke the `/doc-review` skill against that scope. The wrapped skill carries the actual review criteria, exclusions, and selectivity rules; this wrapper does not redefine them.
 - Return findings to the orchestrating execution skill as a structured list consistent with the wrapped skill's existing output contract: severity tags, file:line references, suggested fixes, and a verdict. Do not redefine the output shape — defer to whatever `/doc-review` produces.
