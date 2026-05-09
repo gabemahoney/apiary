@@ -1,15 +1,15 @@
 ---
 name: write-prd
-description: Write a Product Requirements Document (PRD) for a development effort. Adds or modifies a PRD Bee to a Bee in the Ideas hive that downstream skills (write-srd, req-review, hatch-epic) can consume.
+description: Write a Product Requirements Document (PRD) for a development effort. Adds or modifies a PRD doc as a t1 Doc child of a Feature ticket in the Features store so downstream skills (write-srd, req-review, hatch-epic) can consume it.
 ---
 
 # Write PRD
 
 ## Overview
 
-The caller wants to write a PRD — a plain-english description of work to be done, stated as requirements. 
-The PRD is the origin document for a development effort.
-Downstream skills will consume it:
+The caller wants to write a PRD — a plain-english description of work to be
+done, stated as requirements. The PRD is the origin document for a development
+effort. Downstream skills will consume it:
 
 - `/write-srd` — turns the PRD into software requirements
 - `/req-review` — reviews the PRD for completeness and executability
@@ -18,19 +18,66 @@ Downstream skills will consume it:
 The PRD must be thorough enough that an agent swarm can execute the work
 autonomously, without needing to ask the user clarifying questions.
 
+## Status Ownership
+
+This skill creates the PRD doc with status `draft` (idempotent — setting
+`draft` when it is already `draft` is a no-op). It does NOT set the PRD to
+`ready` — that transition is owned by `/req-review`. It does NOT set the
+parent Feature ticket's status.
+
 ## Workflow
 
-### 1. Determine the Idea Bee
+### 0. Read `apiary.md`
 
-The PRD will be a child of a Bee in the Ideas hive.
-If the user did not provide a Bee id, ask it which Idea Bee you should build the PRD under.
+Read `<project_root>/apiary.md` first. It supplies:
 
-### 2. Gather Requirements
+- **`## New Feature` section** — declares whether a `source_references`
+  resolver is configured for Feature tickets (e.g., `github resolver`).
+  This is what tells you how source references on the parent Feature
+  ticket should be resolved.
+- **Documentation Locations** — `Reference` (engineering best practices,
+  test guide, doc writing guide). Categories listed as `omitted` are
+  skipped gracefully when referenced downstream. Pull the "doc writing
+  guide" location for use while drafting the PRD.
 
-You and the user may already have been chatting about and idea, if so, fill out the PRD body with as much
-information as you already have,
+If `apiary.md` is missing, emit a one-line notice ("apiary.md not found;
+proceeding without project context") and continue. Source-reference
+pre-population in step 2 will be skipped, and any doc writing guidance
+will fall back to defaults.
 
-Then, interview the user to understand the work. Ask focused questions to fill gaps so you can update the PRD.
+### 1. Determine the Feature ticket
+
+The PRD will be a t1 Doc child of a Feature ticket in the Features store.
+If the user did not provide a Feature ticket id, ask which Feature ticket
+the PRD should be written under. View the ticket to confirm it exists and
+to read its body before drafting.
+
+### 2. Pre-populate from source references
+
+If the parent Feature ticket has a source reference recorded AND
+`apiary.md`'s `## New Feature` section declares a resolver:
+
+- Use the configured resolver to fetch the referenced content (for
+  example, `gh issue view <id>` for `github resolver`). Seed the PRD
+  draft with that content as initial context for the body, problem
+  statement, and acceptance criteria — anything the source already
+  states.
+- If the source reference is absent, the resolver is not configured, or
+  the fetch fails, emit a one-line notice ("source reference not
+  resolved; proceeding with ticket body only") and continue with the
+  Feature ticket body as the only seed context.
+
+This step is gracefully optional — never block the PRD on an unresolved
+source reference.
+
+### 3. Gather Requirements
+
+You and the user may already have been chatting about a feature, and the
+source reference (if any) may have seeded the draft. Fill out the PRD body
+with as much information as you already have.
+
+Then, interview the user to understand the work. Ask focused questions to
+fill gaps so you can update the PRD.
 
 Key questions to explore:
 - What is the Problem Statement?
@@ -41,8 +88,8 @@ Key questions to explore:
 - Are there performance or security constraints?
 - Does this depend on or affect other work?
 
-Use `AskUserQuestion` to gather information efficiently. Present options where
-possible rather than open-ended questions.
+Use `AskUserQuestion` to gather information efficiently. Present options
+where possible rather than open-ended questions.
 
 #### Style Rules
 
@@ -51,7 +98,7 @@ possible rather than open-ended questions.
 - **Requirements, not solutions.** Describe what must be true, not how to build it.
 - **Specific and testable.** Every requirement should be verifiable.
 - **No user-story format required.** Just clear statements of what is needed.
-- **Do not number product requirement numbers. Use plan conversational English to describe the problem**
+- **Do not number product requirements.** Use plain conversational English to describe the problem.
 
 #### Required Sections
 
@@ -105,19 +152,12 @@ Unresolved decisions flagged for user review.
 Remove this section if there are none.
 ```
 
-### 3. Present and Iterate
+### 4. Present and Iterate
 
 After writing the PRD, present a summary to the user:
 - One-line description of each section
 - Call out any assumptions made
 - Highlight open questions
-
-Use `AskUserQuestion` with:
-- Question: "PRD is ready. How would you like to proceed?"
-- Options:
-  - "Looks good, save it"
-  - "I have changes to suggest"
-  - "Run /req-review on it"
 
 If the user has changes, iterate until they approve.
 
@@ -144,12 +184,23 @@ Before presenting the PRD, verify:
 - Specific file paths, function names, or line numbers
 - "How to build it" — only "what must be true"
 
-### 4. Write the PRD
+### 5. Write the PRD
 
-Add the PRD as a child to the Idea bee.
-Use the title "PRD".
-Set its status to `larva`.
+Add the PRD as a t1 Doc child of the Feature ticket. Use the title "PRD".
+Set its status to `draft` (idempotent — if a PRD already exists at
+`draft`, this is a no-op). Do NOT set the PRD to `ready`; that is
+`/req-review`'s job. Do NOT change the parent Feature ticket's status.
 
-### 5. Next steps
+### 6. Next steps
 
-Suggest the user run `/req-review <idea-bee-id>` to review and finalize the docs before they can be marked `pupa`.
+Use `AskUserQuestion` with:
+- Question: "PRD is saved at status `draft`. What next?"
+- Options:
+  - "write-srd" — proceed to drafting the software requirements document
+  - "req-review" — review the PRD for completeness and promote it to `ready`
+  - "mark as ready" — skip review and let `/req-review` handle the
+    transition later
+
+This skill itself never sets the PRD to `ready`. The "mark as ready"
+option is a hint to the user about the next state in the flow; the
+actual transition is owned by `/req-review`.

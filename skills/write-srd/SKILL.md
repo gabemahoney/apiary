@@ -1,6 +1,6 @@
 ---
 name: write-srd
-description: Write a Software Requirements Document (SRD) from a Product Requirements Document (PRD). Explores the codebase, then defines what must be true about the software without solving the problem.
+description: Write a Software Requirements Document (SRD) from a Product Requirements Document (PRD). Adds or modifies an SRD doc as a t1 Doc child of a Feature ticket in the Features store, alongside the PRD. Explores the codebase, then defines what must be true about the software without solving the problem.
 ---
 
 # Write SRD from PRD
@@ -11,17 +11,79 @@ Given a PRD, write a companion Software Requirements Document (SRD) that defines
 what must be true about the software for the PRD to be satisfied. The SRD does not
 solve the problem — it provides guidance on constraints the implementation must meet.
 
+The SRD is a t1 Doc child of the same Feature ticket the PRD is a child of (the PRD
+is a sibling, not the parent).
+
 Be definitive in the SRD. Do not present options unless you believe further research is needed
 - Flag such comments as **RESEARCH NEEDED**
 
+## Status Ownership
+
+This skill creates the SRD doc with status `draft` (idempotent — setting
+`draft` when it is already `draft` is a no-op). It does NOT set the SRD to
+`ready` — that transition is owned by `/req-review`. It does NOT set the
+parent Feature ticket's status.
+
 ## Input
 
-The user will provide either a Bee in the Idea hive, a PRD bee child of such a bee or nothing.
-If nothing, as them for the Bee in the Idea hive that has the PRD as a child.
+The user may invoke `/write-srd` with one of:
 
-## Process
+- A **Feature ticket ID** (most common) — find the PRD as a sibling t1 Doc
+  child of that Feature ticket.
+- A **PRD ticket ID** — walk up to the parent Feature ticket, then locate
+  the PRD (which is the ticket that was passed in).
+- **Nothing** — ask the user for the Feature ticket whose PRD child should
+  drive the SRD.
 
-### 1. Read the PRD
+In every case, the SRD is added as a t1 Doc child of the Feature ticket,
+alongside the PRD.
+
+## Workflow
+
+### 0. Read `apiary.md`
+
+Read `<project_root>/apiary.md` first. It supplies:
+
+- **`## New Feature` section** — declares whether a `source_references`
+  resolver is configured for Feature tickets (e.g., `github resolver`).
+  This is what tells you how source references on the parent Feature
+  ticket should be resolved when seeding the SRD draft.
+- **Documentation Locations** — `Reference` (engineering best practices,
+  test guide, doc writing guide). Categories listed as `omitted` are
+  skipped gracefully when referenced downstream. Pull the "doc writing
+  guide" location for use while drafting the SRD.
+
+If `apiary.md` is missing, emit a one-line notice ("apiary.md not found;
+proceeding without project context") and continue. Source-reference
+pre-population in step 2 will be skipped, and any doc writing guidance
+will fall back to defaults.
+
+### 1. Determine the Feature ticket and locate the PRD
+
+Resolve the Feature ticket and PRD according to the **Input** rules above.
+View the Feature ticket to confirm it exists and to read its body. View
+the PRD t1 Doc child as well — it is the primary source for the SRD.
+
+### 2. Pre-populate from source references
+
+If the parent Feature ticket has a source reference recorded AND
+`apiary.md`'s `## New Feature` section declares a resolver:
+
+- Use the configured resolver to fetch the referenced content (for
+  example, `gh issue view <id>` for `github resolver`). Seed the SRD
+  draft with anything the source already states about constraints,
+  affected components, data shapes, or non-functional requirements.
+- If the source reference is absent, the resolver is not configured, or
+  the fetch fails, emit a one-line notice ("source reference not
+  resolved; proceeding with PRD and ticket body only") and continue
+  using the PRD and Feature ticket body as the only seed context.
+
+This step is gracefully optional and never blocks the SRD on an
+unresolved source reference. It is **distinct from** "Read the PRD"
+(step 3): the PRD is a sibling t1 Doc, not the parent, so it is read
+separately from the parent Feature's source reference.
+
+### 3. Read the PRD
 
 Read the PRD ticket thoroughly. Understand:
 - What is being built
@@ -29,7 +91,7 @@ Read the PRD ticket thoroughly. Understand:
 - What edge cases exist
 - What acceptance criteria are defined
 
-### 2. Explore the Codebase
+### 4. Explore the Codebase
 
 Before writing anything, explore the codebase to understand:
 - **Architecture**: Top-level directory structure, module organization
@@ -98,7 +160,15 @@ The goal: an implementor who reads only the SRD test section should know exactly
 helpers to call, which fixtures to use, and where to put new tests — without hardcoding
 any YAML, JSON, or string literals in test files.
 
-### 4. Present to User
+### 5. Write the SRD
+
+Add the SRD as a t1 Doc child of the Feature ticket (sibling to the PRD).
+Use the title "SRD". Set its status to `draft` (idempotent — if an SRD
+already exists at `draft`, this is a no-op). Do NOT set the SRD to
+`ready`; that is `/req-review`'s job. Do NOT change the parent Feature
+ticket's status.
+
+### 6. Present to User
 
 After writing the SRD, present a summary of the requirement groups to the user.
 List each SR group with a one-line description.
@@ -123,12 +193,16 @@ Before presenting the SRD, verify:
 - [ ] No source code anywhere in the document
 - [ ] Requirements define "what must be true" not "how to implement"
 
-### 3. Write the SRD
+### 7. Next steps
 
-Write the SRD as a child of the Idea Bee.
-Use the title "SRD".
-Set its status to `larva`.
+Use `AskUserQuestion` with:
+- Question: "SRD is saved at status `draft`. What next?"
+- Options:
+  - "req-review" — review the SRD (and PRD) for completeness and promote
+    it to `ready`
+  - "mark as ready" — skip review and let `/req-review` handle the
+    transition later
 
-### 4. Next steps
-
-Suggest the user run `/req-review <idea-bee-id>` to review and finalize the docs before they can be marked `pupa`.
+This skill itself never sets the SRD to `ready`. The "mark as ready"
+option is a hint to the user about the next state in the flow; the
+actual transition is owned by `/req-review`.

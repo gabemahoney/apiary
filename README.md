@@ -23,7 +23,7 @@ Ask Claude Code to install the Apiary skills. You have two options — pick one.
 
 > "Install the Apiary skills from `~/projects/apiary/skills` into `<absolute path to target repo>/.claude/skills`."
 
-In either case, Claude will copy each skill directory (`project-setup`, `idea`, `write-prd`, `write-srd`, `make-plan`, `hatch-epic`, `do-bee`, `new-bug`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
+In either case, Claude will copy each skill directory (`project-setup`, `new-feature`, `write-prd`, `write-srd`, `make-plan`, `hatch-epic`, `do-bee`, `new-bug`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
 
 The repo also ships project-setup templates under `~/projects/apiary/apiary-templates/`. To make them available globally, copy that directory to `~/.claude/apiary-templates/` (or copy individual files into an existing directory there). Templates are plain markdown — author your own or edit the shipped ones to fit your team.
 
@@ -47,23 +47,27 @@ A few additional conveniences: `/project-setup` accepts a named template from `~
 
 ## Workflow
 
-### Idea
-Run `/idea` to jot down a new idea.
-It will be stored as a bee in the Ideas Hive.
+Every Apiary skill reads `apiary.md` first to discover the project's stores, repos, configured commands, and intake preferences.
+
+### Feature
+Run `/new-feature` to capture a new feature.
+It is stored as a Feature ticket in the Features store with status `draft`.
+`apiary.md` configures whether intake requests a source reference (e.g., a GitHub issue URL) so the ticket links back to the original report.
 
 ### Product Requirements Document
-Run `/write-prd` with the Idea bee to flesh out a PRD.
-The PRD will be stored as a child of the Idea bee.
-> Tip: Run `/req-review` on the Idea bee after the PRD is written multiple times until the feedback becomes trivial
+Run `/write-prd` with the Feature ticket id to flesh out a PRD.
+The PRD is stored as a t1 Doc child of the Feature ticket.
+> Tip: Run `/req-review` on the Feature ticket after the PRD is written, repeating until the feedback becomes trivial. `/req-review` walks through review feedback and promotes the docs and the Feature toward `ready`.
 
 ### Software Requirements Document
-Run `/write-srd` with the Idea bee to flesh out an SRD.
-The SRD will be stored as a child of the Idea bee.
-> Tip: Run `/req-review` on the Idea bee after the SRD is written multiple times until the feedback becomes trivial
+Run `/write-srd` with the Feature ticket id to flesh out an SRD.
+The SRD is stored as a t1 Doc child of the Feature ticket.
+> Tip: Run `/req-review` on the Feature ticket after the SRD is written, repeating until the feedback becomes trivial. `/req-review` walks through review feedback and promotes the docs and the Feature toward `ready`.
 
-### Make Plan
-Run `/make-plan` with the Idea bee to develop a plan for building the feature.
-The plan will be stored as a bee in the Plans Hive.
+### Write Plan
+Run `/write-plan` with the Feature ticket id to develop a plan for building the feature.
+The plan is stored in the Plans store.
+> Note: `/write-plan` is not yet shipped — a later Epic delivers it. The README documents the shipping flow.
 
 ### Do Bee
 Run `/do-bee` with the Feature bee to build the feature.
