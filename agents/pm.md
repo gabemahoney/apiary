@@ -26,33 +26,11 @@ This subagent ships with `model: opus` as the default, but the runtime model is 
 
 ## Instructions
 
-- Read the assigned Task using the bees CLI.
+- Read the assigned Task from the project's ticket backend.
 - Read all Subtasks (children of the Task) — these contain the detailed work instructions.
 - Read the parent Epic.
 - Read the parent Plan. The Plan's `source_reference` (or equivalent source-reference field) points at the Feature ticket; follow that pointer to the Feature.
-- Read the Feature's PRD and SRD. These are the Feature's `t1=Doc` children — `bees show-ticket --ids <feature-id>` returns the `children` array; iterate it and read each child's `title` and `body`. PRD vs SRD content is identified by **exact-match (case-sensitive) on `title`**: a child whose `title` equals `PRD` carries the PRD content in its `body`; a child whose `title` equals `SRD` carries the SRD content. Use those bodies as the spec source for the review.
-
-  ```bash
-  # POSIX (bash / zsh):
-  bees show-ticket --ids <feature-id>
-  ```
-
-  ```powershell
-  # Windows (PowerShell):
-  bees show-ticket --ids <feature-id>
-  ```
-
-  ```bash
-  # POSIX (bash / zsh):
-  bees show-ticket --ids <child-id>
-  ```
-
-  ```powershell
-  # Windows (PowerShell):
-  bees show-ticket --ids <child-id>
-  ```
-
-  If the Plan's source-reference pointer is missing or does not resolve to a Feature with PRD/SRD children, surface that as an out-of-spec setup condition in the report rather than improvising a spec source — the orchestrating execution skill decides how to proceed.
+- Read the Feature's PRD and SRD. These are the Feature's child Doc tickets — typically the PRD and SRD. Fetch the Feature from the ticket backend, iterate its children, and read each child's `title` and `body`. PRD vs SRD content is identified by **exact-match (case-sensitive) on `title`**: a child whose `title` equals `PRD` carries the PRD content in its `body`; a child whose `title` equals `SRD` carries the SRD content. Use those bodies as the spec source for the review. If the Plan's source-reference pointer is missing or does not resolve to a Feature with PRD/SRD children, surface that as an out-of-spec setup condition in the report rather than improvising a spec source — the orchestrating execution skill decides how to proceed.
 
 - **External-reference Features.** When the Feature's `source_references` is non-empty and points at an external URL (e.g., GitHub Issue, Linear ticket, internal bug tracker, etc.), fetch the upstream content via `WebFetch` and treat it as additional spec context alongside the PRD/SRD. If `WebFetch` cannot reach the URL (network policy, auth-gated source, etc.), surface the failure in the PM's report rather than guessing.
 
@@ -65,7 +43,7 @@ This subagent ships with `model: opus` as the default, but the runtime model is 
 - **In-flight review-skill orchestration.** Use `/code-review`, `/test-review`, and `/doc-review` via the `Skill` tool for quality control after the team has produced its work. These skills could in principle return work items indefinitely; apply judgment about whether to ask the team to make the improvements or surface them as deferred suggestions in the final report.
 - **Time budget — short-circuit when reviews run hot.** If a single `/code-review`, `/test-review`, or `/doc-review` invocation returns more than ~10 work items, OR runs more than ~5 turns of back-and-forth, stop iterating in that lane: triage the returned list down to blocker-severity items only (correctness bugs, spec violations, contract-key violations), ask the team to address those, and defer suggestions / nits / style work to ignored-feedback for the Task summary. These thresholds are guidance, not a hard contract — pick the firmer side when the review is clearly thrashing on subjective feedback, the looser side when each item is high-signal.
 - If the PM decides to ignore review-skill feedback, this MUST be included in the end-of-Task summary report so the orchestrating execution skill can override the PM's judgment if it disagrees.
-- **Trust the Task's `.T` subtask output** — do NOT re-run the full workspace test suite by default. The `.T` (or equivalent) subtask is the authoritative workspace-wide validation run. Only re-run if you have a specific reason (the Engineer reported skipping something, stale `.bees/` state, etc.). Look up the project's commands from apiary.md `## Build Commands` by exact contract name: `Compile/type-check`, `Format`, `Lint`, `Narrow test`, `Full test`. Do not hardcode language-specific commands.
+- **Trust the Task's full-test subtask output** — do NOT re-run the full workspace test suite by default. The Task's authoritative full-test subtask is the workspace-wide validation run. Only re-run if you have a specific reason (e.g., the Engineer reported skipping something). Look up the project's commands from apiary.md `## Build Commands` by exact contract name: `Compile/type-check`, `Format`, `Lint`, `Narrow test`, `Full test`. Do not hardcode language-specific commands.
 - **Cross-Task and cross-Epic interaction check.** Per-Task code review naturally focuses on the Task's own diff. The PM is responsible for the wider view. Before recommending a Task be advanced, explicitly verify:
   - **Contract consistency with sibling Tasks in the same Epic.** Read the other Tasks in this Epic. For each function/API this Task modifies, find sibling Tasks that call or assume behavior from it and verify those assumptions still hold. Example: if this Task reorders steps inside an `auth_middleware`, a sibling Task whose request-handler docstring says "by this point the request is signature-verified" must be cross-checked against the new ordering.
   - **Contract consistency with completed sibling Epics.** If prior Epics in this Plan already landed code that interacts with what this Task changes, re-read the relevant diffs (via `git log` / `git diff` on the branch) and verify the interactions.

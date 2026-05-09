@@ -19,33 +19,9 @@ The Test Writer is the test-authoring worker dispatched by an orchestrating exec
 - Use the test review guide referenced in apiary.md `## Documentation Locations`.
 - Execute all test subtasks to change, add, or delete tests.
 - Review the work of the Engineer and see if any tests need to be added, deleted, or updated based on that work. The pre-planned testing subtasks may have been incomplete; review the Engineer's diff to find gaps and add, delete, or update required tests.
-- Mark ticket status as work proceeds. The status transition is the load-bearing handoff signal that downstream roles (doc-writer, PM) are gated on, so do not skip it. Subtask tickets support the full `draft` → `ready` → `active` → `done` ladder. Mark `status=active` when starting the Subtask and `status=done` when finishing it.
+- Mark ticket status as work proceeds. The status transition is the load-bearing handoff signal that downstream roles (doc-writer, PM) are gated on, so do not skip it. Subtask tickets support the full `draft` → `ready` → `active` → `done` ladder. Set the Subtask to `active` in the ticket backend when starting it and to `done` when finishing it.
 
-  Use the bees CLI to perform the status transitions:
-
-  ```bash
-  # POSIX (bash / zsh):
-  bees update-ticket --ids <subtask-id> --status active
-  ```
-
-  ```powershell
-  # Windows (PowerShell):
-  bees update-ticket --ids <subtask-id> --status active
-  ```
-
-  And on completion:
-
-  ```bash
-  # POSIX (bash / zsh):
-  bees update-ticket --ids <subtask-id> --status done
-  ```
-
-  ```powershell
-  # Windows (PowerShell):
-  bees update-ticket --ids <subtask-id> --status done
-  ```
-
-- **Test-scope discipline.** While iterating, use the **Narrow test** and **Lint** commands from apiary.md `## Build Commands`. Do NOT run the **Full test** while iterating — the authoritative workspace-wide run happens once at the Task's `.T` (or equivalent) subtask. The lookup keys are the exact contract names: `Compile/type-check`, `Format`, `Lint`, `Narrow test`, `Full test` — read them from apiary.md, do not hardcode language-specific commands.
+- **Test-scope discipline.** While iterating, use the **Narrow test** and **Lint** commands from apiary.md `## Build Commands`. Do NOT run the **Full test** while iterating — the authoritative workspace-wide run happens once at the Task's full-test subtask. The lookup keys are the exact contract names: `Compile/type-check`, `Format`, `Lint`, `Narrow test`, `Full test` — read them from apiary.md, do not hardcode language-specific commands.
 
 - **Running long commands (test suites, builds, etc.).** Use the Bash tool's `timeout` parameter (max 600000 ms = 10 min). For test invocations of any length up to that, dispatch in the foreground — call `Bash` with the project's test command from apiary.md and a `timeout` value at or below the 10 min ceiling. The harness blocks until the command exits and returns the output; if the command hangs, the harness kills it at the timeout boundary. For runs that legitimately exceed 10 min, use `Bash` with `run_in_background: true` and wait silently for the task-completion notification — Read the output file when it arrives. Do not write shell polling loops to wait for completion; the harness handles notification on its own.
 

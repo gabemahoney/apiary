@@ -23,7 +23,7 @@ This subagent ships with `model: opus` as the default, but the runtime model is 
 - Execute any customer-facing docs subtasks.
 - Execute any internal architecture docs subtasks.
 - Review the work of the Engineer and see if any docs need to be updated based on that work. The pre-planned doc subtasks may have been incomplete; review the Engineer's diff to find gaps and update the customer-facing docs and internal architecture docs referenced in apiary.md `## Documentation Locations` accordingly.
-- Ensure ticket status transitions happen as work proceeds — the status transition is the load-bearing handoff signal that the PM is gated on, so do not skip it. `Bash` is not in this subagent's tool allowlist; status transitions are routed through the orchestrating execution skill rather than executed directly via the bees CLI. Subtask tickets support the full `draft` → `ready` → `active` → `done` ladder. The orchestrating execution skill marks the Subtask `status=active` when this subagent begins and `status=done` when it finishes.
+- Ensure ticket status transitions happen as work proceeds — the status transition is the load-bearing handoff signal that the PM is gated on, so do not skip it. `Bash` is not in this subagent's tool allowlist; status transitions are routed through the orchestrating execution skill rather than executed directly against the ticket backend. Subtask tickets support the full `draft` → `ready` → `active` → `done` ladder. The orchestrating execution skill marks the Subtask `active` when this subagent begins and `done` when it finishes.
 
 ## Path resolution via apiary.md keys
 
