@@ -23,7 +23,21 @@ Ask Claude Code to install the Apiary skills. You have two options — pick one.
 
 > "Install the Apiary skills from `~/projects/apiary/skills` into `<absolute path to target repo>/.claude/skills`."
 
-In either case, Claude will copy each skill directory (`project-setup`, `new-feature`, `write-prd`, `write-srd`, `write-plan`, `write-epic`, `do-bee`, `new-bug`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
+In either case, Claude will copy each skill directory (`project-setup`, `new-feature`, `write-prd`, `write-srd`, `write-plan`, `write-epic`, `develop-epic`, `do-bee`, `new-bug`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
+
+### 2b. Install the subagents
+
+Apiary also ships custom subagents under `~/projects/apiary/agents/` that the execution skills (e.g. `/develop-epic`) dispatch to do code, test, doc, review, and PM work. Pick the same scope you picked for the skills.
+
+**Option A — Global install (recommended for single-user machines).** Copy `~/projects/apiary/agents/*` to `~/.claude/agents/`.
+
+> "Install the Apiary subagents from `~/projects/apiary/agents` globally into `~/.claude/agents`."
+
+**Option B — Single-repo install.** Copy `~/projects/apiary/agents/*` to `<absolute path to target repo>/.claude/agents/`.
+
+> "Install the Apiary subagents from `~/projects/apiary/agents` into `<absolute path to target repo>/.claude/agents`."
+
+**Note:** Custom subagents load at session start. After installing or updating subagent definitions, run `/agents` in Claude Code (or restart the session) for the new subagents to be available — execution skills will hard-fail with an actionable message if any of the seven required subagent types (`engineer`, `test-writer`, `doc-writer`, `pm`, `code-reviewer`, `test-reviewer`, `doc-reviewer`) are missing at dispatch time.
 
 The repo also ships project-setup templates under `~/projects/apiary/apiary-templates/`. To make them available globally, copy that directory to `~/.claude/apiary-templates/` (or copy individual files into an existing directory there). Templates are plain markdown — author your own or edit the shipped ones to fit your team.
 
@@ -78,6 +92,16 @@ It will create a full Claude Team to do the work.
 > - Run `/configure-worktree` first to do the work in an isolated worktree
 > - Run your own tests
 > - Run `/teardown-worktree` to merge back to main
+
+### Develop Epic
+Run `/develop-epic` against an Epic in status `ready` to execute it end-to-end.
+
+- Subagents (Engineer, Test Writer, Doc Writer, PM) execute the Epic's Tasks per the plan.
+- After Tasks complete, a review cycle (`code-review`, `test-review`, `doc-review`) runs and any feedback is folded back in.
+- Close-out lands a single commit for the whole Epic.
+
+> Tip: Re-running `/develop-epic` on the same Epic resumes interrupted execution — the Epic stays `active` until close-out, so you can pick up where you left off.
+> Tip: The `agents/` directory must be installed (see Install section "2b") and Claude Code must be reloaded (`/agents` or restart the session) before subagents are dispatchable.
 
 ### Bugs
 Bugs follow a two-step flow:
