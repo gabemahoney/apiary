@@ -23,7 +23,7 @@ Ask Claude Code to install the Apiary skills. You have two options — pick one.
 
 > "Install the Apiary skills from `~/projects/apiary/skills` into `<absolute path to target repo>/.claude/skills`."
 
-In either case, Claude will copy each skill directory (`project-setup`, `idea`, `write-prd`, `write-srd`, `make-plan`, `hatch-epic`, `do-bee`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
+In either case, Claude will copy each skill directory (`project-setup`, `idea`, `write-prd`, `write-srd`, `make-plan`, `hatch-epic`, `do-bee`, `new-bug`, `fix-bug`, etc.) into the chosen skills directory without disturbing any other skills already installed there.
 
 The repo also ships project-setup templates under `~/projects/apiary/apiary-templates/`. To make them available globally, copy that directory to `~/.claude/apiary-templates/` (or copy individual files into an existing directory there). Templates are plain markdown — author your own or edit the shipped ones to fit your team.
 
@@ -73,10 +73,11 @@ It will create a full Claude Team to do the work.
 > - Run your own tests
 > - Run `/teardown-worktree` to merge back to main
 
-### Fix Bug
-You can tell your LLM to file a bug in the Bugs Hive, no skill needed.
-Run `/fix-bug` with the bug in the Bugs Hive to fix.
-It will create a smaller Claude Team to do the work.
+### Bugs
+Bugs follow a two-step flow:
+
+- Run `/new-bug` to file a Bug ticket in the Bugs store. The skill reads `apiary.md` and, when the New Bug section configures a source reference (e.g., a GitHub issue URL), prompts you for it so the ticket links back to the original report.
+- Run `/fix-bug` with the Bug ticket to work it. It supports resume — interrupting and re-invoking the skill picks up from where it left off — and ends with a confirm-fix prompt so you verify the bug is actually resolved before the ticket is closed out.
 
 
 ## Advanced Configuration
