@@ -92,12 +92,12 @@ Run `/develop-feature` against a Feature ticket id to build the feature end-to-e
 - The skill walks the Plan's Epics in dependency order, dispatching `/develop-epic` (see the `### Develop Epic` subsection below) for each one.
 - Between Epics, you'll be prompted to continue or pause so you can inspect progress before the next Epic starts.
 - At the end, the combined deferred review feedback from all Epics is presented to you in one place.
-- Once the run is complete, the skill suggests marking the Feature `done` (user-driven) and running `/teardown_worktree` to merge.
+- Once the run is complete, the skill suggests marking the Feature `done` (user-driven) and running `/teardown-worktree` to merge.
 
 > Tip:
-> - Run `/configure_worktree` first to do the work in an isolated worktree
+> - Run `/configure-worktree` first to do the work in an isolated worktree (see Worktrees below)
 > - Run your own tests
-> - Run `/teardown_worktree` to merge back to main
+> - Run `/teardown-worktree` to merge back to main when the Feature is `done`
 
 ### Develop Epic
 Run `/develop-epic` against an Epic in status `ready` to execute it end-to-end.
@@ -108,6 +108,13 @@ Run `/develop-epic` against an Epic in status `ready` to execute it end-to-end.
 
 > Tip: Re-running `/develop-epic` on the same Epic resumes interrupted execution — the Epic stays `active` until close-out, so you can pick up where you left off.
 > Tip: The `agents/` directory must be installed (see Install section "2b") and Claude Code must be reloaded (`/agents` or restart the session) before subagents are dispatchable.
+
+### Worktrees
+Apiary's worktree skills isolate Feature work in a git worktree (or a set of them) so you can iterate without disturbing the main checkout.
+
+- **Multi-repo aware**: `/configure-worktree` reads `apiary.md` to discover the repos involved in the project and creates a worktree in each repo the Feature touches (you confirm the affected subset). `/teardown-worktree` merges and cleans up across all of them.
+- **Feature-done gate**: `/teardown-worktree` refuses to merge until the Feature is `done`. If the Feature is still `active`, the skill asks you to promote it first — typically via `/develop-feature` close-out, or by manually marking it `done` after validating.
+- **Generic spawning**: `/configure-worktree` describes intent; the LLM picks the actual launch mechanism — waggle MCP if installed, tmux otherwise, or any equivalent. There is no hard waggle dependency.
 
 ### Bugs
 Bugs follow a two-step flow:

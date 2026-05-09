@@ -1,149 +1,220 @@
 ---
 name: teardown-worktree
-description: Merge and clean up a git worktree created by configure_worktree
+description: Merge and clean up the git worktree(s) created by configure_worktree for a Feature, after the Feature is `done`
 ---
 
 # Overview
 
-Merge a worktree branch back into the main repo, clean up the worktree directory, and kill the associated tmux session.
+Merge a Feature's worktree branch(es) back into each repo's target branch, clean up the worktree directories, and stop the launched session(s).
 
-**Important:** This skill must run from the **main repo**, not from inside the worktree. 
-If you are currently inside the worktree's tmux session, killing it would terminate the process mid-execution. See Step 1 for how to handle this.
+This skill is multi-repo aware via `apiary.md` and HARD-GATES on the Feature ticket having status `done`. It does NOT promote a Feature to `done` — that responsibility lives with `/develop-feature` close-out or manual user action.
+
+**Important:** This skill must run from the **main repo of the project**, not from inside a worktree. If you are currently inside a worktree's launched session, stopping that session would terminate the process mid-execution. See Step 1 for how to handle this.
 
 # Usage
 
 **Invocation patterns**:
-- `/teardown_worktree b.Yk9`
-- "Tear down the worktree for b.Yk9"
-- "Merge and clean up workspace for b.Yk9"
+- `/teardown-worktree <feature-id>`
+- `/teardown-worktree <task-id>` (skill walks up to the Feature)
+- "Tear down the worktree for `<feature-id>`"
+- "Merge and clean up the workspace for `<feature-id>`"
 
 # Steps
 
-## 0. Determine worktree
+## 0. Read apiary.md
 
-If worktree not passed, find available worktrees via git and AskUserQuestion which one to teardown.
+Locate `apiary.md` in the Project Root. If absent, abort:
+
+> `apiary.md` not found. Run `/project-setup` first.
+
+Parse the `## Build Commands` section. Each `### <relative-path>` heading names a repo participating in this project. Resolve each `<relative-path>` to an absolute path (relative to the Project Root). Keep this list — it drives the multi-repo iteration in later steps.
 
 ## 1. Detect Execution Context
 
-Determine whether Claude is currently running inside the target worktree:
+Determine whether the current working tree is inside a worktree spawned by `configure_worktree`:
 
 ```bash
 git rev-parse --show-toplevel
 ```
 
-Compare the output path against the normalized ticket ID pattern (`{normalized_ticket_id}`).
+If the resulting path matches `{repo_root}/../{normalized_ticket_id}` for any repo discovered in Step 0:
 
-**If running inside the worktree:**
-- Inform the user: "This skill must run from the main repo — teardown would kill this session."
+- Inform the user: "This skill must run from the project's main repo — teardown would stop this session."
 - Instruct them to:
   1. Attach to or open a Claude session in the main repo
-  2. Run `/teardown_worktree {ticket_id}` from there
+  2. Run `/teardown-worktree <feature-id>` from there
 - Abort.
 
-**If running from the main repo:** Continue.
+Otherwise continue.
 
-## 2. Identify the Worktree
+## 2. Resolve the Feature Ticket and HARD GATE on `done`
 
-If the user did not provide a ticket ID, ask them for one.
+The skill is invoked with a ticket ID. It may be a Feature, Plan, Epic, or Task ID. The skill must resolve to the **Feature ticket** — the canonical reference for teardown.
 
-Normalize ticket ID: Replace dots with underscores (e.g., `b.Yk9` → `b_Yk9`)
+Resolution rules (walk up the parent chain as needed):
 
-Confirm the worktree exists:
-```bash
-git worktree list
-```
+- Task → its parent Epic → that Epic's parent Plan → that Plan's source-reference ticket (= the Feature ID).
+- Epic → its parent Plan → that Plan's source-reference ticket (= the Feature ID).
+- Plan → its source-reference ticket (= the Feature ID).
+- Feature → use as-is.
 
-Also confirm the tmux session exists:
-```bash
-tmux list-sessions | grep "{normalized_ticket_id}"
-```
+If no ticket ID was provided, AskUserQuestion which Feature to tear down (offer the Features that have sibling worktrees on disk in any repo from Step 0).
 
-If neither exist, inform the user and abort.
+Read the resolved Feature ticket's `status` field.
 
-## 3. Check for Uncommitted Changes in the Worktree
+### HARD GATE: Feature must be `done`
+
+If the Feature's status is anything other than `done`:
+
+- Print:
+
+  > This Feature is `<status>`. Teardown is gated on Feature == `done`. Promote the Feature to `done` first — typically by completing all Epics via `/develop-feature` and confirming, or by manually marking it `done` if you've validated it. Then re-run `/teardown-worktree`.
+
+- Use AskUserQuestion to confirm the abort with a single option: **"OK, I'll promote and re-run"**. Do NOT offer an "ignore gate and proceed anyway" option. There is no override.
+- Abort.
+
+**The skill MUST NOT update the Feature's status to `done` itself.** Status promotion is owned by `/develop-feature` close-out (or manual user action), never by this skill.
+
+If the Feature status is `done`, continue.
+
+## 3. Build the Multi-Repo Teardown Set
+
+Normalize the Feature ID for filesystem use (e.g., replace dots with underscores: `f.X9Q` → `f_X9Q`). Refer to the result as `{normalized_ticket_id}`.
+
+For each repo discovered in Step 0:
+
+- Compute the candidate sibling worktree path: `{repo_root}/../{normalized_ticket_id}`.
+- Check whether it exists on disk and is registered as a worktree of `{repo_root}` (`git -C {repo_root} worktree list`).
+- If it exists, add `{repo_root}` to the **teardown set**.
+- If it does not exist, skip this repo (no worktree to tear down here).
+
+If the teardown set is empty, abort:
+
+> No worktrees found for `<feature-id>`. Nothing to tear down.
+
+Multi-repo note: each repo proceeds independently up to and through the merge. Per-repo failure semantics are described in Step 7.
+
+## 4. Per-Repo: Check for Uncommitted Changes
+
+For each repo in the teardown set, run:
 
 ```bash
 git -C {worktree_path} status
 ```
 
-If there are uncommitted changes:
-- Show what's changed
-- Use AskUserQuestion: "The worktree has uncommitted changes. What should I do?"
-  - Options: "Commit them" / "Discard them" / "Abort"
-- If commit: commit with a descriptive message inside the worktree.
-  **Important:** Exclude `auto_approve.sh` — it is gitignored and copied by configure_worktree, not a source change.
+Collect the per-repo summaries into one consolidated overview, then ask the user once via AskUserQuestion how to handle uncommitted changes. Allow per-repo decisions if the situations differ.
+
+Per-repo options:
+- **Commit them** — commit inside that worktree with a descriptive message.
+  Exclude `auto_approve.sh` (it is gitignored and copied by `configure_worktree`, not a source change):
   ```bash
   git -C {worktree_path} add -A -- ':!auto_approve.sh'
-  git -C {worktree_path} commit -m "uncommitted changes from {ticket_id}"
+  git -C {worktree_path} commit -m "uncommitted changes from <feature-id>"
   ```
-- If discard: `git -C {worktree_path} reset --hard HEAD`
-- If abort: stop.
+- **Discard them** — `git -C {worktree_path} reset --hard HEAD`
+- **Abort** — stop the entire teardown.
 
-## 4. Confirm Merge Target
+## 5. Per-Repo: Determine Target Branch and Confirm Merge Plan
 
-Determine the main repo's current branch:
+Each repo may have its own target branch (`main`, `master`, `develop`, …). Do NOT assume a single global target branch.
+
+For each repo in the teardown set, determine its target branch (typically the main repo's currently checked-out branch):
+
 ```bash
-git rev-parse --abbrev-ref HEAD
+git -C {repo_root} rev-parse --abbrev-ref HEAD
 ```
 
-Use AskUserQuestion to confirm:
-```
-Merge worktree branch into `{main_branch}`?
+Build a per-repo merge plan and present it to the user via AskUserQuestion:
 
-Worktree: {worktree_path}
-Target branch: {main_branch}
+```
+Multi-repo merge plan for Feature <feature-id>:
+
+  <repo-a-relative-path>: merge `{normalized_ticket_id}` into `<target-a>`
+  <repo-b-relative-path>: merge `{normalized_ticket_id}` into `<target-b>`
 
 Proceed?
 ```
 
-Options: Yes / No / No, let me specify a branch
+Options: **Yes** / **No** / **No, let me adjust target branches**.
 
-If the user specifies a different branch, use that instead.
+If the user adjusts, capture per-repo overrides and re-confirm.
 
-## 5. Merge the Worktree Branch
+## 6. Per-Repo: Merge the Worktree Branch
 
-The worktree branch name matches the normalized ticket ID (git worktree add creates a branch automatically). Merge it into the target branch from the main repo:
-
-```bash
-git merge {normalized_ticket_id} --no-ff -m "Merge worktree {ticket_id} into {main_branch}"
-```
-
-If merge conflicts occur:
-- Report the conflicting files
-- Use AskUserQuestion: "Merge conflicts detected. What should I do?"
-  - Options: "Abort the merge" / "I'll resolve manually"
-- If abort: `git merge --abort`, stop and tell the user to resolve manually before re-running teardown.
-
-## 6. Kill the tmux Session
-
-Only after a successful merge (or if no branch was merged), kill the tmux session:
+For each repo in the teardown set, from `{repo_root}`:
 
 ```bash
-tmux kill-session -t "{normalized_ticket_id}"
+git -C {repo_root} merge {normalized_ticket_id} --no-ff -m "Merge worktree <feature-id> into <target-branch>"
 ```
 
-## 7. Remove the Worktree
+### Conflict policy (multi-repo)
+
+If a merge conflict occurs in **any** repo:
+
+- Run `git -C {repo_root} merge --abort` for the conflicting repo.
+- **Abort the entire teardown.** Do not proceed with session-stop, worktree removal, or branch deletion in any repo — this avoids leaving the project in a partial-merge state.
+- Print a per-repo status report:
+
+  ```
+  Teardown aborted due to merge conflict.
+
+    <repo>     | merged | conflicted | not-attempted
+    ----------- | ------ | ---------- | -------------
+    <repo-a>   |   ✓    |            |
+    <repo-b>   |        |     ✓      |
+    <repo-c>   |        |            |       ✓
+  ```
+
+- Tell the user: "Resolve conflicts in `<repo>` and re-run `/teardown-worktree <feature-id>`. Already-merged repos will be detected as no-op on the next run."
+
+If all merges succeed, continue.
+
+## 7. Per-Repo: Stop the Launched Session
+
+For each repo in the teardown set, stop the session that `configure_worktree` launched for this Feature in that repo.
+
+**Do not hardcode a specific stop mechanism.** Inspect the project context to determine what `configure_worktree` originally used to launch the session, and use the corresponding stop mechanism. Examples:
+
+- If the session was launched via tmux, stop it with `tmux kill-session -t <session>` (where `<session>` matches the convention `configure_worktree` used — typically derived from `{normalized_ticket_id}` and possibly the repo name).
+- If the session was launched via the waggle MCP, use the waggle MCP teardown tool.
+- If launched via any other mechanism, use that mechanism's equivalent stop operation.
+
+Pick based on what `configure_worktree` actually used in this project. Prefer reading the project's `apiary.md` or any session-tracking artifact `configure_worktree` wrote, rather than guessing.
+
+## 8. Per-Repo: Remove the Worktree and Delete the Branch
+
+For each repo in the teardown set:
 
 ```bash
-git worktree remove {worktree_path} --force
+git -C {repo_root} worktree remove {worktree_path} --force
 ```
 
-Confirm branch deletion with AskUserQuestion. 
+Confirm branch deletion via AskUserQuestion (one consolidated prompt covering all repos in the teardown set). Then for each repo:
 
-Then delete the branch:
 ```bash
-git branch -d {normalized_ticket_id}
+git -C {repo_root} branch -d {normalized_ticket_id}
 ```
 
-If the branch delete fails (unmerged), warn the user and ask:
-- Options: "Force delete it" / "Leave the branch"
+If a branch delete fails (unmerged), warn per-repo and ask:
+- **Force delete it** (`git -C {repo_root} branch -D {normalized_ticket_id}`)
+- **Leave the branch**
+
+## 9. Final Report
+
+Per-repo outcomes in a table-like layout:
 
 ```
-✅ Worktree torn down successfully
+Teardown complete.
 
-Ticket:       {ticket_id}
-Merged into:  {main_branch}
-Worktree:     {worktree_path} (removed)
-tmux session: {normalized_ticket_id} (killed)
-Ticket status: finished
+Feature: `<feature-id>` (status: `done` — gate-checked, not modified)
+
+  Repo                 | Target branch | Merge      | Worktree removed | Session stopped
+  -------------------- | ------------- | ---------- | ---------------- | ---------------
+  <repo-a-rel-path>    | <target-a>    | merged     | yes              | yes
+  <repo-b-rel-path>    | <target-b>    | merged     | yes              | yes
+  <repo-c-rel-path>    | —             | skipped    | n/a              | n/a
+
+Feature `<feature-id>` was `done` and is now merged across <n> repos.
 ```
+
+The skill does **not** modify any ticket's status. The "status: `done`" in the report reflects what was *gate-checked* on entry, not a state transition performed by this skill.
