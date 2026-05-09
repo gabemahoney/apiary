@@ -16,7 +16,7 @@ Be thorough but not pedantic — focus on substance over style.
 ## Parameters
 
 You will receive some instructions on which set of work to review.
-It might be a Bees ticket id, or a git worktree.
+It might be a ticket id from the project's ticket backend, or a git worktree.
 
 ## Your Mission
 

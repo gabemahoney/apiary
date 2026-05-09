@@ -1,6 +1,6 @@
 ---
 name: write-prd
-description: Write a Product Requirements Document (PRD) for a development effort. Adds or modifies a PRD doc as a t1 Doc child of a Feature ticket in the Features store so downstream skills (write-srd, req-review, write-plan) can consume it.
+description: Write a Product Requirements Document (PRD) for a development effort. Adds or modifies a PRD doc as a Doc child of a Feature ticket in the Features store so downstream skills (write-srd, req-review, write-plan) can consume it.
 ---
 
 # Write PRD
@@ -47,7 +47,7 @@ will fall back to defaults.
 
 ### 1. Determine the Feature ticket
 
-The PRD will be a t1 Doc child of a Feature ticket in the Features store.
+The PRD will be a Doc child of a Feature ticket in the Features store.
 If the user did not provide a Feature ticket id, ask which Feature ticket
 the PRD should be written under. View the ticket to confirm it exists and
 to read its body before drafting.
@@ -186,7 +186,7 @@ Before presenting the PRD, verify:
 
 ### 5. Write the PRD
 
-Add the PRD as a t1 Doc child of the Feature ticket. Use the title "PRD".
+Add the PRD as a Doc child of the Feature ticket. Use the title "PRD".
 Set its status to `draft` (idempotent — if a PRD already exists at
 `draft`, this is a no-op). Do NOT set the PRD to `ready`; that is
 `/req-review`'s job. Do NOT change the parent Feature ticket's status.

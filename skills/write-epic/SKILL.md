@@ -87,7 +87,7 @@ intelligently.
   Plan's source reference IS the Feature ticket ID (set by the
   Plan-writing skill). Resolve it through the ticket backend to fetch
   the Feature ticket itself.
-- **Read all t1 Doc children of the Feature ticket** — typically a PRD
+- **Read all Doc children of the Feature ticket** — typically a PRD
   and an SRD, plus any mockups or supplementary docs. These supply the
   product- and software-level requirements that the Product Manager
   subagent will check Tasks against.
@@ -102,7 +102,7 @@ intelligently.
   Epic.
 
 If the source-reference resolver is not configured in `apiary.md`, the
-Feature ticket can't be fetched, or any t1 Doc child fails to load,
+Feature ticket can't be fetched, or any Doc child fails to load,
 emit a one-line notice ("Plan → Feature chain not fully resolved;
 proceeding with available context") and continue with whatever context
 did load. Pass whatever you have to the Product Manager subagent in
@@ -184,8 +184,8 @@ Include the following restriction at the top of every dispatch prompt:
 
 ```prompt
 You are a READ-ONLY researcher for the write-epic skill. You must NEVER
-create, update, or delete tickets. Do not call any bees ticket-mutation
-commands. Your job is to research the codebase and the supplied context,
+create, update, or delete tickets. Do not call any ticket-mutation
+commands on the backend. Your job is to research the codebase and the supplied context,
 then report your proposed Subtasks back as the text body of your final
 response. Only the calling skill writes tickets.
 ```

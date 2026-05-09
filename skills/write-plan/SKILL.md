@@ -7,8 +7,8 @@ disable-model-invocation: false
 # Feature Docs to Plan
 
 This skill operates against a **Feature ticket** in the Features store. The Features
-store is prescriptive: every t1 child of a Feature ticket is a document (PRD, SRD, or
-any other doc type the project uses). This skill reads **all** t1 children of the
+store is prescriptive: every direct child of a Feature ticket is a document (PRD, SRD,
+or any other doc type the project uses). This skill reads **all** Doc children of the
 given Feature, creates a Plan ticket in the Plans store, decomposes it into Epics, and
 then auto-chains into `write-epic` for each Epic.
 
@@ -70,11 +70,11 @@ backend for a store named `Plans`.
 - If it does not exist, **stop** with a clear message telling the user to run
   `/project-setup` to configure stores. This skill does NOT create stores.
 
-The Plans store is prescriptive. It has these child tiers:
+The Plans store is prescriptive. It has these nested child types:
 
-- t1 — Epic / Epics
-- t2 — Task / Tasks
-- t3 — Subtask / Subtasks
+- Epic / Epics — children of the Plan
+- Task / Tasks — children of an Epic
+- Subtask / Subtasks — children of a Task
 
 ## Step 2: Hard-gate — Feature must be `ready`
 
@@ -100,14 +100,14 @@ Read the Feature ticket's status:
 - **Any other value** — refuse with a one-line explanation that the Feature is in an
   unrecognized status and stop.
 
-## Step 3: Read the Feature's t1 docs
+## Step 3: Read the Feature's Doc children
 
-Fetch **all t1 children** of the Feature ticket. The Features store is prescriptive
-— every t1 child of a Feature is a document. Read each one in full.
+Fetch **all Doc children** of the Feature ticket. The Features store is prescriptive
+— every direct child of a Feature is a document. Read each one in full.
 
 These docs (PRD, SRD, mockups, any other doc type the project uses) are the
 **primary input** for planning. Do not hardcode "PRD and SRD only" — load whatever
-t1 docs the Feature has.
+Doc children the Feature has.
 
 For each doc:
 
@@ -132,8 +132,8 @@ If the Feature ticket has a source reference recorded **and** `apiary.md`'s
   `gh issue view <id>` for a `github resolver`). Add the fetched content to the
   working context as additional planning input.
 - If the reference is absent, the resolver is not configured, or the fetch fails,
-  emit a one-line notice ("source reference not resolved; proceeding with t1 docs
-  only") and continue.
+  emit a one-line notice ("source reference not resolved; proceeding with Doc
+  children only") and continue.
 
 ## Step 4: Create the Plan ticket
 
@@ -144,14 +144,11 @@ Goal: Create one Plan ticket in the Plans store to track the work.
 - **Status** — `draft` (its children, the Epics, have not been written yet). This
   step is idempotent.
 - **Source reference** — set the Plan's source reference to point at the **Feature
-  ticket ID** (so downstream skills can trace Plan → Feature). Use the source-reference
-  mechanism appropriate to the ticket backend in use:
-
-  - For a `bees` backend, set resolver = `bees`, value = `<feature-id>` (e.g.,
-    `b.xyz`).
-  - For a `beads` backend, set resolver = `beads`, value = `<feature-id>` (e.g.,
-    `bd-xxx`).
-  - For other backends, use the equivalent built-in cross-store reference resolver.
+  ticket ID** (so downstream skills can trace Plan → Feature). Use whichever
+  cross-store reference mechanism the backend exposes — typically a resolver/value
+  pair where the resolver is the backend's own identifier and the value is the
+  Feature's ticket ID. If no built-in cross-store resolver is available, fall back
+  to the backend's equivalent reference field.
 
   Use generic phrasing in any user-facing output: "store the Feature's ticket ID as
   the Plan's source reference". Do **not** describe this back-pointer as an
@@ -257,7 +254,7 @@ When all Epics are designed, present them to the user for final review.
 
 ### Create Epics
 
-Create t1 Epic children under the Plan ticket with status `draft` (their children,
+Create Epic children under the Plan ticket with status `draft` (their children,
 the Tasks, have not been written yet).
 
 **NOTE**: If the Plan is small, there may only be one Epic. You do not need to make

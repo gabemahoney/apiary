@@ -237,10 +237,10 @@ user and only change what the user approves.
 
 Target configuration:
 
-| Store    | Child tiers                                     | Status values                                  |
+| Store    | Nested child types                              | Status values                                  |
 |----------|-------------------------------------------------|------------------------------------------------|
-| Features | t1: Doc / Docs                                  | `draft`, `ready`, `active`, `done`, `published` |
-| Plans    | t1: Epic / Epics; t2: Task / Tasks; t3: Subtask / Subtasks | `draft`, `ready`, `active`, `done`             |
+| Features | Doc / Docs                                      | `draft`, `ready`, `active`, `done`, `published` |
+| Plans    | Epic / Epics → Task / Tasks → Subtask / Subtasks | `draft`, `ready`, `active`, `done`             |
 | Bugs    | (none)                                          | `open`, `active`, `done`, `published`          |
 
 For each store:

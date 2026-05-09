@@ -52,7 +52,7 @@ this Feature, drawing on:
 
 - The Feature ticket description (title + body).
 - The parent Plan body, if reachable from the Feature.
-- The Feature's PRD/SRD references (the t1 Doc children of the Feature
+- The Feature's PRD/SRD references (the Doc children of the Feature
   ticket reachable via the Plan → Feature source-ref chain).
 - Epic / Task descriptions if already loaded into context.
 

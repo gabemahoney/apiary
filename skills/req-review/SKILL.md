@@ -9,29 +9,29 @@ Your role is to help the user get a Feature ticket's requirement documents into 
 enough state that they can be executed autonomously by a swarm of agents.
 
 This skill operates against a **Feature ticket** in the Features store. The Features
-store is prescriptive: every t1 child of a Feature ticket is a document (PRD, SRD, or
-any other doc type the project uses). This skill reviews **all** t1 children of the
+store is prescriptive: every direct child of a Feature ticket is a document (PRD, SRD, or
+any other doc type the project uses). This skill reviews **all** Doc children of the
 given Feature, not a hardcoded PRD+SRD pair.
 
 # Inputs
 
 - A **Feature ticket ID**. If the user did not provide one, ask the user for it.
-- From that Feature ticket, fetch **all t1 children** — these are the docs to review.
+- From that Feature ticket, fetch **all Doc children** — these are the docs to review.
 
 # Status Ownership
 
 This skill explicitly OWNS the following status transitions:
 
-- Each t1 doc (PRD, SRD, or any other doc type): `draft → ready`
-- Feature ticket: `draft → ready` (only after all t1 children are `ready`, and only on
+- Each Doc child (PRD, SRD, or any other doc type): `draft → ready`
+- Feature ticket: `draft → ready` (only after all Doc children are `ready`, and only on
   user confirmation)
 
 This skill explicitly does NOT set:
 
 - Feature ticket → `active`
 - Feature ticket → `done`
-- Any t1 doc beyond `ready` (e.g., not to `active` or `done`)
-- Any non-Feature, non-t1-doc ticket type
+- Any Doc child beyond `ready` (e.g., not to `active` or `done`)
+- Any non-Feature, non-Doc-child ticket type
 
 All status writes are **idempotent**: if a doc or Feature is already `ready`, the skill
 does not re-write the status, and re-running this skill on a fully-`ready` Feature is a
@@ -50,7 +50,7 @@ Locations section relevant to where docs live or are referenced, take note of it
 ## Step 1: Resolve the Feature ticket
 
 If the user did not give you a Feature ticket ID, ask for one. Fetch the Feature
-ticket and list its **t1 children** — the docs to review.
+ticket and list its **Doc children** — the docs to review.
 
 ## Step 2: Review Code Base
 
@@ -59,7 +59,7 @@ existing project docs so your review is grounded in the codebase, not just the d
 
 ## Step 3: Per-doc review loop
 
-For each t1 child of the Feature:
+For each Doc child of the Feature:
 
 1. **Skip-if-ready (resume support)**: If the doc's status is already `ready`, skip
    the review step by default — do not re-review. The user MAY explicitly request a
@@ -68,7 +68,7 @@ For each t1 child of the Feature:
 2. **Pick the checklist** based on the doc's title/role:
    - PRD-style doc → use the PRD checklist below.
    - SRD-style doc → use the SRD checklist below.
-   - Any other t1 doc type → use the **General Doc** checklist below (which delegates
+   - Any other doc type → use the **General Doc** checklist below (which delegates
      to the top-level Success Criteria — "is this doc clear, complete, and
      actionable?" — plus heuristics common to all docs).
 3. **Structure Check**: Verify the doc has clear sections, headers, and organization.
@@ -87,7 +87,7 @@ For each t1 child of the Feature:
 
 ## Step 4: Promote the Feature
 
-After the per-doc loop completes, check whether **all** t1 children of the Feature
+After the per-doc loop completes, check whether **all** Doc children of the Feature
 are now `ready`. If yes, ask the user:
 
 - Question: `"All docs are ready. Mark Feature as ready?"`
@@ -96,7 +96,7 @@ are now `ready`. If yes, ask the user:
   `ready`, no-op).
 - On `"No"`: leave the Feature in `draft`.
 
-If not all t1 children are `ready`, do not prompt to promote the Feature. Tell the
+If not all Doc children are `ready`, do not prompt to promote the Feature. Tell the
 user which docs are still in `draft` and stop.
 
 ## Step 5: Closing recommendation
@@ -150,9 +150,9 @@ These are the cross-cutting heuristics applied to every doc, regardless of type:
 - [ ] Security requirements specified or explicitly omitted
 - [ ] Testing strategy specified or explicitly omitted
 
-## For any other t1 doc type (General Doc fallback)
+## For any other doc type (General Doc fallback)
 
-When a t1 child is neither a PRD nor an SRD, fall back to the cross-cutting Success
+When a Doc child is neither a PRD nor an SRD, fall back to the cross-cutting Success
 Criteria above plus this general checklist. The driving question: **"Is this doc
 clear, complete, and actionable?"**
 

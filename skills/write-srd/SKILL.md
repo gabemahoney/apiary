@@ -1,6 +1,6 @@
 ---
 name: write-srd
-description: Write a Software Requirements Document (SRD) from a Product Requirements Document (PRD). Adds or modifies an SRD doc as a t1 Doc child of a Feature ticket in the Features store, alongside the PRD. Explores the codebase, then defines what must be true about the software without solving the problem.
+description: Write a Software Requirements Document (SRD) from a Product Requirements Document (PRD). Adds or modifies an SRD doc as a Doc child of a Feature ticket in the Features store, alongside the PRD. Explores the codebase, then defines what must be true about the software without solving the problem.
 ---
 
 # Write SRD from PRD
@@ -11,7 +11,7 @@ Given a PRD, write a companion Software Requirements Document (SRD) that defines
 what must be true about the software for the PRD to be satisfied. The SRD does not
 solve the problem — it provides guidance on constraints the implementation must meet.
 
-The SRD is a t1 Doc child of the same Feature ticket the PRD is a child of (the PRD
+The SRD is a Doc child of the same Feature ticket the PRD is a child of (the PRD
 is a sibling, not the parent).
 
 Be definitive in the SRD. Do not present options unless you believe further research is needed
@@ -28,14 +28,14 @@ parent Feature ticket's status.
 
 The user may invoke `/write-srd` with one of:
 
-- A **Feature ticket ID** (most common) — find the PRD as a sibling t1 Doc
+- A **Feature ticket ID** (most common) — find the PRD as a sibling Doc
   child of that Feature ticket.
 - A **PRD ticket ID** — walk up to the parent Feature ticket, then locate
   the PRD (which is the ticket that was passed in).
 - **Nothing** — ask the user for the Feature ticket whose PRD child should
   drive the SRD.
 
-In every case, the SRD is added as a t1 Doc child of the Feature ticket,
+In every case, the SRD is added as a Doc child of the Feature ticket,
 alongside the PRD.
 
 ## Workflow
@@ -62,7 +62,7 @@ will fall back to defaults.
 
 Resolve the Feature ticket and PRD according to the **Input** rules above.
 View the Feature ticket to confirm it exists and to read its body. View
-the PRD t1 Doc child as well — it is the primary source for the SRD.
+the PRD Doc child as well — it is the primary source for the SRD.
 
 ### 2. Pre-populate from source references
 
@@ -80,7 +80,7 @@ If the parent Feature ticket has a source reference recorded AND
 
 This step is gracefully optional and never blocks the SRD on an
 unresolved source reference. It is **distinct from** "Read the PRD"
-(step 3): the PRD is a sibling t1 Doc, not the parent, so it is read
+(step 3): the PRD is a sibling Doc, not the parent, so it is read
 separately from the parent Feature's source reference.
 
 ### 3. Read the PRD
@@ -162,7 +162,7 @@ any YAML, JSON, or string literals in test files.
 
 ### 5. Write the SRD
 
-Add the SRD as a t1 Doc child of the Feature ticket (sibling to the PRD).
+Add the SRD as a Doc child of the Feature ticket (sibling to the PRD).
 Use the title "SRD". Set its status to `draft` (idempotent — if an SRD
 already exists at `draft`, this is a no-op). Do NOT set the SRD to
 `ready`; that is `/req-review`'s job. Do NOT change the parent Feature
