@@ -96,41 +96,12 @@ Dispatch subagents to fix the bug. Spawn `engineer` if source code needs to chan
 
 ### 4. Review Loop
 
-Once the team is done, form a review team to check their work.
+Once the team is done, dispatch the appropriate reviewers based on which
+writers ran in step 3:
 
-- If you invoked the Engineer in the first team, invoke the Code Reviewer
-  in this team.
-- If you invoked the Test Writer in the first team, invoke the Test
-  Reviewer in this team.
-- If you invoked the Doc Writer in the first team, invoke the Doc
-  Reviewer in this team.
-
-Reviewer agents:
-
-- Code Reviewer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Review the output of the Engineer
-    - Provide feedback where the work of the Engineer was not up to
-      standards
-  - Instructions:
-    - Invoke the `/code-review` skill
-- Test Reviewer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Review the output of the Test Writer
-    - Provide feedback where the work of the Test Writer was not up to
-      standards
-  - Instructions:
-    - Invoke the `/test-review` skill
-- Doc Reviewer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Review the output of the Doc Writer
-    - Provide feedback where the work of the Doc Writer was not up to
-      standards
-  - Instructions:
-    - Invoke the `/doc-review` skill
+- If the Engineer ran, dispatch `code-reviewer` (which wraps `/code-review`).
+- If the Test Writer ran, dispatch `test-reviewer` (which wraps `/test-review`).
+- If the Doc Writer ran, dispatch `doc-reviewer` (which wraps `/doc-review`).
 
 Get the feedback and make a judgement call about whether the suggested
 work must be done.
