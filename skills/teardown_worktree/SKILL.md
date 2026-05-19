@@ -105,10 +105,9 @@ git -C {worktree_path} status
 Collect the per-repo summaries into one consolidated overview, then ask the user once how to handle uncommitted changes. Allow per-repo decisions if the situations differ.
 
 Per-repo options:
-- **Commit them** — commit inside that worktree with a descriptive message.
-  Exclude `auto_approve.sh` (it is gitignored and copied by `configure_worktree`, not a source change):
+- **Commit them** — commit inside that worktree with a descriptive message:
   ```bash
-  git -C {worktree_path} add -A -- ':!auto_approve.sh'
+  git -C {worktree_path} add -A
   git -C {worktree_path} commit -m "uncommitted changes from <feature-id>"
   ```
 - **Discard them** — `git -C {worktree_path} reset --hard HEAD`

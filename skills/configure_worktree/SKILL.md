@@ -132,25 +132,6 @@ Multi-repo example, two cases:
 Detect the collision case before creating worktrees and pick the
 disambiguating form when needed.
 
-### Step 2c: Propagate auto_approve.sh per repo
-
-`auto_approve.sh` is gitignored and must be copied into each new
-worktree. For each affected repo, look up the source-of-truth
-`auto_approve.sh`:
-
-1. First, try the sibling "main checkout for this repo" — the
-   conventional sibling directory holding the user's primary working
-   copy of this repo. If a directory matching that convention exists
-   beside the repo and has an `auto_approve.sh`, copy it.
-2. Otherwise, fall back to the affected repo root itself:
-   `cp {affected_repo_root}/auto_approve.sh {worktree_path}/auto_approve.sh`.
-
-If neither source has the file, skip silently for that repo — the
-worktree just won't have one.
-
-`docker/`, `.claude/`, and any other tracked support files are present
-automatically because they live in git.
-
 ## Step 3: Ask the user for the agent's prompt
 
 Ask the user for the full instruction string the spawned Claude session
