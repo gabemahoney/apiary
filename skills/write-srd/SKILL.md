@@ -162,10 +162,8 @@ any YAML, JSON, or string literals in test files.
 ### 5. Write the SRD
 
 Add the SRD as a Doc child of the Feature ticket (sibling to the PRD).
-Use the title "SRD". Set its status to `draft` (idempotent — if an SRD
-already exists at `draft`, this is a no-op). Do NOT set the SRD to
-`ready`; that is `/req-review`'s job. Do NOT change the parent Feature
-ticket's status.
+Use the title "SRD" by default; note that downstream consumers identify SRD content by what's in the body, not by exact-matching this title.
+Set its status to `draft` (idempotent — if an SRD already exists at `draft`, this is a no-op). Do NOT set the SRD to `ready`; that is `/req-review`'s job. Do NOT change the parent Feature ticket's status.
 
 ### 6. Present to User
 
