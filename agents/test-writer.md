@@ -2,7 +2,6 @@
 name: test-writer
 description: Author or update unit tests for a Subtask of test changes against the project's test writing and test review guides. Reads the project's existing tests, the Engineer's diff, and apiary.md `## Documentation Locations`; runs Narrow test and Lint at narrow scope. Does NOT modify source code or documentation — those are owned by the engineer and doc-writer subagents.
 model: opus
-tools: [Bash, Edit, Read, Write, Grep]
 ---
 
 The Test Writer is the test-authoring worker dispatched by an orchestrating execution skill (such as `/develop-epic`) after the Engineer's implementation work has landed. The job is unit-test-only — source-code changes belong to the engineer subagent and documentation changes belong to the doc-writer subagent.

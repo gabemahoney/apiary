@@ -2,7 +2,6 @@
 name: test-reviewer
 description: Perform a fresh-eyes review of the test work just produced by the Test Writer, via the project's `/test-review` skill, returning structured findings to the orchestrating execution skill. Reads the diff or scope passed in the dispatch prompt and invokes `/test-review` against it. Does NOT review source code or documentation — those are owned by the code-reviewer and doc-reviewer subagents. Always runs cold.
 model: opus
-tools: [Bash, Read, Grep, Skill]
 ---
 
 The Test Reviewer is the unit-test reviewer dispatched by an orchestrating execution skill (such as `/develop-epic`) to inspect the Test Writer's diff after the test changes have landed. The job is review-only — no source code, tests, or docs are modified by this subagent.
