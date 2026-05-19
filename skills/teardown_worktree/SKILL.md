@@ -1,6 +1,6 @@
 ---
 name: teardown-worktree
-description: Merge and clean up the git worktree(s) created by configure_worktree for a Feature, after the Feature is `done`
+description: Merge and clean up the git worktree(s) created by configure-worktree for a Feature, after the Feature is `done`
 ---
 
 # Overview
@@ -31,7 +31,7 @@ Parse the `## Build Commands` section. Each `### <relative-path>` heading names 
 
 ## 1. Detect Execution Context
 
-Determine whether the current working tree is inside a worktree spawned by `configure_worktree`:
+Determine whether the current working tree is inside a worktree spawned by `configure-worktree`:
 
 ```bash
 git rev-parse --show-toplevel
@@ -170,15 +170,15 @@ If all merges succeed, continue.
 
 ## 7. Per-Repo: Stop the Launched Session
 
-For each repo in the teardown set, stop the session that `configure_worktree` launched for this Feature in that repo.
+For each repo in the teardown set, stop the session that `configure-worktree` launched for this Feature in that repo.
 
-**Do not hardcode a specific stop mechanism.** Inspect the project context to determine what `configure_worktree` originally used to launch the session, and use the corresponding stop mechanism. Examples:
+**Do not hardcode a specific stop mechanism.** Inspect the project context to determine what `configure-worktree` originally used to launch the session, and use the corresponding stop mechanism. Examples:
 
-- If the session was launched via tmux, stop it with `tmux kill-session -t <session>` (where `<session>` matches the convention `configure_worktree` used — typically derived from `{normalized_ticket_id}` and possibly the repo name).
+- If the session was launched via tmux, stop it with `tmux kill-session -t <session>` (where `<session>` matches the convention `configure-worktree` used — typically derived from `{normalized_ticket_id}` and possibly the repo name).
 - If the session was launched via the waggle MCP, use the waggle MCP teardown tool.
 - If launched via any other mechanism, use that mechanism's equivalent stop operation.
 
-Pick based on convention: configure_worktree labels each session with the normalized ticket ID (and repo name in multi-repo setups). Try the available mechanism's lookup first (waggle session-list, `tmux has-session`, etc.) and fall back to the next mechanism if absent.
+Pick based on convention: configure-worktree labels each session with the normalized ticket ID (and repo name in multi-repo setups). Try the available mechanism's lookup first (waggle session-list, `tmux has-session`, etc.) and fall back to the next mechanism if absent.
 
 ## 8. Per-Repo: Remove the Worktree and Delete the Branch
 
