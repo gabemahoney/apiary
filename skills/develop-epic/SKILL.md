@@ -26,6 +26,8 @@ This skill OWNS, and only OWNS, these transitions:
 - Task -> `active` (idempotent; on Task entry)
 - Task -> `done` (idempotent; after Task's Subtasks done and Format +
   Full test pass)
+- Subtask -> `active` (immediately before dispatching each subagent)
+- Subtask -> `done` (immediately after the subagent returns successfully)
 
 This skill does NOT touch:
 
@@ -34,14 +36,6 @@ This skill does NOT touch:
 - Feature status (owned by Feature-level skills)
 - PRD/SRD status
 - Bug status
-- Subtask status owned by the dispatched subagents that perform
-  their own backend writes (`engineer`, `test-writer`) — they
-  read at `ready`, set `active` on start, and `done` on
-  completion. The `doc-writer` subagent does not write to the
-  ticket backend directly, so for `doc-writer` Subtasks this
-  skill writes `active` on dispatch and `done` after the subagent
-  returns; the handoff contract is identical from the
-  reviewer/PM perspective.
 
 `draft` and `ready` are not written by this skill.
 
@@ -145,16 +139,10 @@ For each Task that is not `done`:
    - Documentation Subtasks -> dispatch the Doc Writer
 
    Pass the Subtask body, Documentation Locations, and Build
-   Commands from `apiary.md` into each spawn prompt. The dispatched
-   subagent OWNS its Subtask status transitions when it writes to
-   the ticket backend directly: `engineer` and `test-writer` write
-   the Subtask `→ active` / `→ done` transitions themselves. The
-   `doc-writer` subagent does not write to the ticket backend, so
-   this skill marks `doc-writer` Subtasks `active` immediately
-   before dispatch and `done` immediately after the subagent
-   returns. The handoff is the same either way — this skill does
-   not second-guess Subtask status transitions performed by
-   `engineer` or `test-writer`.
+   Commands from `apiary.md` into each spawn prompt. This skill
+   writes Subtask `→ active` immediately before dispatching each
+   subagent and Subtask `→ done` immediately after the subagent
+   returns successfully.
 
    Track which subagent types ran during this Epic — the set is
    used to gate reviewer dispatch in step 5.
