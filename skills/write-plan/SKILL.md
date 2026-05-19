@@ -293,10 +293,6 @@ Common dependency patterns:
 Once all Epics are created and the dependency graph is wired, set the Plan ticket's
 status to `ready` (idempotent — if it is already `ready`, no-op).
 
-Each Epic remains in `draft` at this point. This skill MUST NOT set Epics to
-`ready`, `active`, or `done`. This skill MUST NOT set the Plan to `active` or
-`done`. Those transitions belong to downstream skills.
-
 ## Step 8: Report
 
 Output a markdown summary:

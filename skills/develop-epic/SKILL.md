@@ -115,9 +115,7 @@ description updates needed."
 
 ### Step 3: Mark Epic active (idempotent)
 
-Set Epic -> `active`. No-op if it is already `active`. Do NOT
-touch Plan or Feature status. Do NOT touch any other ticket
-beyond the Epic itself.
+Set Epic -> `active`. No-op if it is already `active`.
 
 ### Step 4: Per-Task loop (in dependency order)
 
@@ -271,19 +269,3 @@ Otherwise:
    directly, or stop here.
    ```
 
-## Constraints
-
-- Generic backend language only. The skill speaks of Epics, Tasks,
-  Subtasks, Plans, Features, PRDs, SRDs, and tickets.
-- Generic statuses only: `draft`, `ready`, `active`, `done`.
-- All status transitions are idempotent.
-- Subagent dispatch targets the seven roles by name: `engineer`,
-  `test-writer`, `doc-writer`, `pm`, `code-reviewer`,
-  `test-reviewer`, `doc-reviewer`. Each is spawned as an
-  individual subagent; this skill does not group them into a
-  multi-agent team.
-- Status Ownership is strict: this skill writes Epic and Task
-  status only. It does not write Subtask, Plan, Feature, PRD,
-  SRD, or Bug status.
-- No `git push` under any code path.
-- Exactly one commit per Epic, created at close-out (step 6).

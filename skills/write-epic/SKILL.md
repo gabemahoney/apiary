@@ -257,22 +257,6 @@ status, the write is a no-op.
 - Each Subtask → `ready` (create at `ready`, or set to `ready` after
   creation; the Subtask is written and has no children).
 
-##### Status Ownership reminder
-
-This skill MUST NOT, under any circumstance:
-
-- Set the Epic to `active` or `done`.
-- Set any Task to `active` or `done`.
-- Set any Subtask to `active` or `done`.
-- Touch the parent Plan's status — that's owned by the Plan-writing
-  skill and the Feature-execution skill.
-- Touch the Feature ticket's status — that's owned by Feature-level
-  skills.
-
-If you find yourself reaching for a non-`ready` status, stop. That
-transition belongs to a downstream skill (e.g., the Epic-execution
-skill in a later phase).
-
 Show the Tasks you just wrote to the user in detail and ask whether
 they want modifications.
 
@@ -290,5 +274,3 @@ they want modifications.
   automatically by executors)
 - [ ] Testing Subtasks support maximum parallelization on execution by
   making one Subtask per test file to be modified
-- [ ] All Tasks and Subtasks are at status `ready`; the Epic is at
-  status `ready`; nothing is at `active` or `done`

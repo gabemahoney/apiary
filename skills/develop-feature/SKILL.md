@@ -227,18 +227,3 @@ dispatches.
   Features and their Plans. It does not act on PRDs, SRDs, Bugs,
   or any other top-level ticket type.
 
-## Constraints
-
-- Generic backend language only. The skill speaks of Features,
-  Plans, Epics, Tasks, Subtasks, source references, and tickets.
-- Generic statuses only: `draft`, `ready`, `active`, `done`,
-  `published`.
-- All status transitions are idempotent.
-- The skill does not prescribe specific ticket-backend tool names;
-  it prescribes contracts (status reads, status writes, the
-  Plan-by-Feature source-reference query) and the LLM picks the
-  tools available at runtime.
-- The skill never asks the user about deferred review items
-  individually — they are presented as an aggregated block once at
-  close-out.
-- The skill never pushes to remote.
