@@ -179,7 +179,7 @@ For each repo in the teardown set, stop the session that `configure_worktree` la
 - If the session was launched via the waggle MCP, use the waggle MCP teardown tool.
 - If launched via any other mechanism, use that mechanism's equivalent stop operation.
 
-Pick based on what `configure_worktree` actually used in this project. Prefer reading the project's `apiary.md` or any session-tracking artifact `configure_worktree` wrote, rather than guessing.
+Pick based on convention: configure_worktree labels each session with the normalized ticket ID (and repo name in multi-repo setups). Try the available mechanism's lookup first (waggle session-list, `tmux has-session`, etc.) and fall back to the next mechanism if absent.
 
 ## 8. Per-Repo: Remove the Worktree and Delete the Branch
 
