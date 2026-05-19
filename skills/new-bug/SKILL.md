@@ -62,10 +62,14 @@ Branch on the resolved `source_references` value from step 2:
 
 - **`github resolver`** (or another configured resolver) — ask the user
   for the input value the resolver expects (for example, a GitHub issue
-  URL or issue number). Use the appropriate tool to fetch the issue
-  (e.g., `gh issue view <id>`) and use the issue title and body to
-  populate the Bug ticket. Record the input value as a source reference
-  on the Bug.
+  URL or issue number). Record the input value as a source reference on
+  the Bug, tagged with the resolver type.
+
+  Optional pre-population: if the resolved content is fetchable cheaply
+  (e.g., `gh issue view <id>` for a GitHub issue), use the title and
+  body to pre-fill the Bug title and body. If the fetch fails for any
+  reason, gracefully skip pre-population and continue with an interview
+  for the title, description, and reproduction steps — do not error out.
 - **`none, interview user`** — ask the user for a short title, a
   description, and any reproduction steps. Use those answers to populate
   the Bug ticket. No source reference is recorded.
