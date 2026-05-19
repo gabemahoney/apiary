@@ -38,9 +38,9 @@ of specific documentation gaps as work items.
 
 ### Step 1: Identify maintained docs
 
-From `apiary.md` `## Documentation Locations` `Maintained
-Documentation`, find the paths for `Customer-facing docs` and
-`Contributor docs`. Skip categories marked `omitted`.
+Read the `Customer-facing docs` and `Contributor docs` entries from
+`apiary.md` `## Documentation Locations`. Skip categories marked
+`omitted`.
 
 These are the documents that may need to be updated as a result of
 the changed code.
