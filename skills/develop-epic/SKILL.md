@@ -1,6 +1,6 @@
 ---
 name: develop-epic
-description: Execute one Epic end-to-end via subagents, with PM oversight, review cycle, and a single commit
+description: Execute one Epic end-to-end via subagents, with PM oversight, review cycle, and one commit per affected repo (collapses to one commit for single-repo projects)
 ---
 
 ## Overview
@@ -9,7 +9,8 @@ description: Execute one Epic end-to-end via subagents, with PM oversight, revie
 one Epic in dependency order, dispatches subagents (engineer,
 test-writer, doc-writer, plus a per-Task pm) to do the work, runs
 a post-Tasks review cycle (code-reviewer, test-reviewer,
-doc-reviewer), and lands a **single commit per Epic** at close-out.
+doc-reviewer), and lands **one commit per affected repo per Epic** at
+close-out (collapses to a single commit for single-repo projects).
 It accumulates deferred reviewer feedback for the caller (typically
 `develop-feature`) — it never surfaces deferred items to the user.
 
@@ -100,14 +101,21 @@ This step runs **once at Epic entry** and is **skipped on resume**
 
 For each completed `up_dependencies` Epic:
 
-1. Walk the git log/diff covering changes since that Epic landed
-   (use `git log` and `git diff` against the merge base or recorded
-   commit, scoped to the project root recorded in `apiary.md`).
-2. Read this Epic's Task and Subtask descriptions.
-3. Where descriptions reference outdated reality — renamed files,
-   removed functions, changed APIs, restructured modules — update
-   the Task or Subtask body in place to match the new reality. Use
-   the project's ticket-update mechanism for these edits.
+1. For each repo in the project's repo set (the `### <relative-path>`
+   headings under `apiary.md`'s `## Build Commands`):
+   - Look up that Epic's recorded (repo, commit_sha) pair for this
+     repo. If the Epic recorded no sha for this repo, skip — the
+     dependency didn't touch this repo.
+   - Walk `git -C <repo> log <sha>..HEAD` and
+     `git -C <repo> diff <sha>..HEAD` to capture the changes that
+     have landed in this repo since the dependency Epic.
+2. Aggregate the per-repo diffs into a working summary.
+3. Read this Epic's Task and Subtask descriptions.
+4. Where descriptions reference outdated reality — renamed files,
+   removed functions, changed APIs, restructured modules — across
+   any of the repos, update the Task or Subtask body in place to
+   match the new reality. Use the project's ticket-update mechanism
+   for these edits.
 
 Print a short summary of which Tasks/Subtasks were refreshed and
 what changed. If nothing was stale, say "codebase sync: no
@@ -240,16 +248,29 @@ Otherwise:
 2. **On Full test fail:** do **NOT** commit. Surface the failure
    to the user and stop. Epic stays `active`.
 
-3. **On Full test pass — single commit per Epic:**
+3. **On Full test pass — one commit per affected repo, per Epic:**
 
-   - Stage every modified file under the project's git repo(s).
-     Use `git add -A` (or the per-repo equivalent) so this captures
-     skill changes, source code, tests, docs, and — if the ticket
-     store lives inside this repo — the ticket store contents.
-   - Create **ONE commit** covering the entire Epic. The commit
-     message names the Epic ID, the Epic title, and lists the
-     completed Task IDs.
+   For each repo in the project's repo set with staged or modified
+   changes after sub-step 1:
+
+   - Stage every modified file in that repo with
+     `git -C <repo> add -A`. If the ticket store lives inside the
+     repo, include its contents.
+   - Create one commit in that repo. Every repo's commit uses the
+     same Epic-named message format: Epic ID, Epic title, completed
+     Task IDs. For a single-repo project this collapses to one
+     commit, preserving the simple-case contract.
    - **NEVER** push to remote. This skill commits only.
+
+   If any per-repo commit fails (pre-commit hook rejection, etc.),
+   do NOT roll back commits already created in earlier repos.
+   Surface the per-repo commit status; the user fixes the failing
+   repo and re-runs `develop-epic` — already-committed repos show
+   no staged changes and the loop is a no-op there.
+
+   After all per-repo commits succeed, record the resulting
+   (repo, commit_sha) pairs on the Epic ticket so downstream Epics
+   can locate the per-repo merge bases in Step 2.
 
 4. **Set Epic -> `done`** (idempotent). Do NOT touch Plan or
    Feature status under any code path.

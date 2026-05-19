@@ -7,8 +7,8 @@ description: Fix a bug described in a Bug ticket
 
 The user will either call without arguments or with a Bug ID.
 
-- If called without arguments, find all Bug tickets for this repo and present
-  them, asking which one to fix.
+- If called without arguments, list all open Bug tickets in the project's
+  Bugs store and ask which one to fix.
 - If called with a Bug ID, find it in the Bugs store. If it is not in the
   Bugs store, tell the user and ask whether to continue.
 
