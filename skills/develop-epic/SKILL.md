@@ -222,9 +222,7 @@ For each item, `develop-epic` decides:
 - **Defer** — keep the item but do not act on it. Add a record to
   the deferred-feedback accumulator (see below).
 
-**Iteration cap.** Cap the review/fix loop at **2 iterations per
-lane** (engineer, test, doc). After two passes in a lane, all
-remaining items in that lane are deferred.
+**Stalemate exit.** Continue the review/fix loop in a lane while the reviewer's feedback is substantively changing across iterations. When iteration N's feedback is substantively unchanged from iteration N-1's, the lane is stalemated. Add unresolved items in that lane to the deferred-feedback accumulator with an explicit `impasse: true` flag (alongside `reviewer`, `item_text`, `reason_deferred`) so `develop-feature` can render them distinctly.
 
 **Deferred-feedback contract** (load-bearing for the caller):
 

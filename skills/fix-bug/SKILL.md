@@ -143,8 +143,8 @@ work must be done.
     reviewer feedback.
 - If not, move on to Final Review but you MUST share the ignored
   feedback for review.
-- Note: this could create an infinite loop, so you may ignore feedback
-  so long as you present it in Final Review.
+
+Loop until the reviewer's feedback in iteration N is substantively unchanged from iteration N-1 — at that point, the lane is stalemated. Stalemated items flow into the existing **Final Review** payload that is returned to the caller. Do not prompt the caller mid-flight; the caller decides what to do with impasse items when it receives the work package.
 
 ### 5. Testing the bug
 
