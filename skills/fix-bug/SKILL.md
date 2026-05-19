@@ -92,53 +92,7 @@ confirmation.
 **IMPORTANT: You must stay in `delegate` mode. Do not take on work,
 delegate work to team members.**
 
-The team may consist of any of the following agents:
-
-- Engineer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Executing implementation work for the bug fix (if required)
-  - Instructions:
-    - Read the Bug description from the ticket backend
-    - Review any relevant internal architecture docs referenced in
-      `apiary.md` under "Documentation Locations" (Maintained →
-      contributor docs). Skip categories marked `omitted`.
-    - Review the existing code to determine the current state
-    - Review the engineering best practices guide referenced in
-      `apiary.md` under "Documentation Locations" (Reference →
-      engineering best practices). Skip if `omitted`.
-    - Modify any source code required to fix the bug
-- Test Writer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Executing testing work for the bug fix (if required)
-  - Instructions:
-    - Use the test guide referenced in `apiary.md` under
-      "Documentation Locations" (Reference → test guide) for both
-      writing standards and review criteria. Skip if `omitted`.
-    - Review the work of the Engineer and see if any tests need to be
-      added, deleted, or updated based on that work
-      - Review the work of the Engineer to find any gaps, then add,
-        delete, or update required tests
-- Doc Writer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Execute documentation work for the bug fix (if required)
-  - Instructions:
-    - Use the doc writing guide referenced in `apiary.md` under
-      "Documentation Locations" (Reference → doc writing guide). Skip
-      if `omitted`.
-    - Review the customer-facing docs referenced in `apiary.md` under
-      "Documentation Locations" (Maintained → customer-facing docs)
-      and see if they need any updates. Skip if `omitted`.
-    - Review the internal architecture docs referenced in `apiary.md`
-      under "Documentation Locations" (Maintained → contributor docs)
-      and see if they need any updates. Skip if `omitted`.
-    - Review the work of the Engineer and see if any docs need to be
-      updated based on that work
-      - Review the work of the Engineer to find any gaps, then update
-        docs
-    - Update any docs that require updating
+Dispatch subagents to fix the bug. Spawn `engineer` if source code needs to change, `test-writer` if tests need to change, `doc-writer` if docs need to change. Always spawn `doc-writer`. Pass the Bug body and resolved source-reference content.
 
 ### 4. Review Loop
 
