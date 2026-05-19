@@ -72,30 +72,7 @@ as an idempotent re-configuration:
 - For any drift, ask the user to confirm before overwriting.
 - If nothing differs, report "already configured" and exit cleanly.
 
-**Factor-change detection on rerun.** For each factor listed in the
-existing `## New Feature` / `## New Bug` decision tree:
-
-1. Re-detect the factor's current environment value using the same
-   generic-language detection used when a template is applied (the LLM
-   picks the appropriate tool — for example, for `github_visibility`,
-   run `gh repo view --json visibility` from a repo path discovered in
-   step 8, or fall through to "none" if no GitHub repo is configured).
-2. Compare the re-detected value against the persisted value on the
-   factor line.
-3. If different, surface `<factor_name>: <old> → <new>` to the user and
-   ask whether to update. Ask per-factor — the
-   user may accept some changes and reject others.
-4. On confirmation for a given factor, re-evaluate which `When ... =
-   ...:` branch matches the new value, then rewrite both the factor
-   line and the matched branch's `- source_references: ...` line in
-   the `## New Feature` and `## New Bug` sections (a factor may appear
-   in both — update wherever it is referenced).
-5. If no factor changed, this concern is a no-op; the other idempotency
-   paths in this step (drift on Documentation Locations, build commands
-   in step 10, etc.) continue normally.
-6. This factor-change detection reuses the same compare-and-confirm
-   pattern that drives the rest of step 2's idempotency — it does not
-   introduce a parallel control flow.
+On rerun, re-detect each factor's current value. If changed, ask the user before updating apiary.md.
 
 Treat the level-2 (`##`) headings as section markers. Preserve any unknown
 sections you encounter — future skills will append more sections, and this
@@ -140,37 +117,7 @@ reads the template and follows its instructions.
   New Bug Intake` heading, malformed `When ...:` branch, etc.) →
   report the parse error to the user and fall back to interview mode.
 
-**Resolution pipeline.** Once a template loads cleanly:
-
-1. Parse the template's `## New Feature Intake` and `## New Bug Intake`
-   sections. Each section may carry a plain-english rationale
-   paragraph, zero or more factor lines (`- <factor_name>:
-   <description>`), and one or more `When <factor_name> = <value>:`
-   branches whose body contains a `- source_references: <resolver>`
-   line.
-2. Parse the optional `## Documentation Locations` section. Each
-   bullet under `### Reference Documentation` or `### Maintained
-   Documentation` is either a hardcoded path (or comma-separated list
-   of paths), the literal `omitted`, or — when the template says "Ask
-   the user for each (record 'omitted' if skipped)" — a category that
-   step 6 will interview.
-3. For every factor listed in either intake section, detect the
-   current environment value. The skill does not prescribe a specific
-   tool — pick whatever fits the factor name; the factor's textual
-   description in the template hints at the appropriate detection
-   approach. (Illustrative example only: a `github_visibility` factor
-   would call out to a GitHub CLI on a discovered repo path, falling
-   through to `"none"` when no GitHub repo is configured. Substitute
-   whatever tool the factor implies on your system.)
-4. For each factor's detected value, match the appropriate `When
-   <factor_name> = <value>:` branch. If multiple branches match (e.g.,
-   `private or none` covers two values), pick the one whose value list
-   contains the detected value. If no branch matches, fall back to
-   asking the user.
-5. Carry the resolved factor-value pairs and matched branch contents
-   into step 11 — they become the rendered decision-tree shape in
-   `## New Feature` and `## New Bug` (factor lines + matched
-   `When ...:` branch with its `source_references` line).
+**Resolution pipeline.** Read the template. Detect each factor's current value. Match each factor to a `When ... = <value>:` branch.
 
 Stores, status values, repo discovery, and build commands are NOT
 touched by templates — those remain owned by `project-setup` directly
@@ -300,16 +247,7 @@ repo root and resolve to a stack:
 | `build.gradle` or `build.gradle.kts`     | Java/Gradle       |                                                                    |
 | (none of the above)                      | unknown           | Skip proposals — ask the user manually for each command in step 10 |
 
-For each detected stack, propose sensible defaults across these five
-fixed slots: **Compile/type-check**, **Format**, **Lint**, **Narrow
-test**, **Full test**. Anchors (one short-form per stack):
-
-- **Python+poetry** — `poetry run mypy .`, `poetry run black .`, `poetry run ruff check .`, `poetry run pytest <path>`, `poetry run pytest`
-- **Rust** — `cargo check`, `cargo fmt`, `cargo clippy`, `cargo test <path>`, `cargo test`
-- **Node/TS** — `tsc --noEmit`, `prettier --write .`, `eslint .`, `vitest run <path>` or `jest <path>`, `vitest run` or `jest`
-- **Go** — `go vet ./...` or `go build ./...`, `gofmt -w .`, `go vet ./...`, `go test <path>`, `go test ./...`
-- **Java/Maven** — `mvn compile`, `mvn spotless:apply` (or omitted), `mvn checkstyle:check` (or omitted), `mvn test -Dtest=<path>`, `mvn test`
-- **Java/Gradle** — equivalent idiomatic commands (`gradle compileJava`, `gradle spotlessApply`, `gradle check`, `gradle test --tests <path>`, `gradle test`)
+Detect the stack from manifest files. Propose sensible default commands; confirm with the user.
 
 Compile/type-check may legitimately be `omitted` for languages without
 static analysis (e.g., plain JS without `tsc --noEmit`). Still propose a
@@ -388,47 +326,36 @@ order:
 <per-repo blocks from step 10>
 ```
 
-### Decision-tree shape for `## New Feature` and `## New Bug`
+### Complete `apiary.md` Example
 
-The full shape (when a template was applied with one or more factors):
+```markdown
+# Apiary Configuration
 
-```
+## Project Root
+/Users/example/projects/my-project
+
 ## New Feature
 
-<plain-english rationale paragraph (optional)>
+Public GitHub repos typically receive feature requests and bug reports as GitHub Issues
+from external contributors. Private repos usually don't have this external intake channel,
+so features are captured through direct conversation with the user.
 
-- <factor_name>: <current value>
+- github_visibility: public
 
-When <factor_name> = <value>:
-  - source_references: <resolver>
-When <factor_name> = <other_value>:
+When github_visibility = public:
+  - source_references: github resolver
+When github_visibility = private or none:
   - source_references: none, interview user
-```
 
-The factor list captures the re-detected current value of each factor
-(from step 4's resolution pipeline, or the persisted value when no
-factor changed on rerun). The `When ...:` branches are copied verbatim
-from the template. Both the matched branch and the alternate branches
-are written — they document how the value would change if the
-environment changed.
+## New Bug
 
-The degenerate shape (interview mode, no factors): the section
-collapses to a single resolved branch, no factor list, no `When ...:`
-lines. This satisfies the rule that no "ask user" placeholders persist
-in apiary.md:
+- github_visibility: public
 
-```
-## New Feature
+When github_visibility = public:
+  - source_references: github resolver
+When github_visibility = private or none:
+  - source_references: none, interview user
 
-- source_references: <resolved value, e.g., "none, interview user" or "github resolver">
-```
-
-Both shapes are valid apiary.md content. The skill MUST handle both
-cases when reading and writing.
-
-### Documentation Locations shape
-
-```
 ## Documentation Locations
 
 ### Reference
@@ -439,24 +366,18 @@ cases when reading and writing.
 ### Maintained
 - **Contributor docs**: docs/architecture/
 - **Customer-facing docs**: README.md, docs/user-guide.md
+
+## Build Commands
+
+### ./
+- **Compile/type-check**: `poetry run mypy .`
+- **Format**: `poetry run black .`
+- **Lint**: `poetry run ruff check .`
+- **Narrow test**: `poetry run pytest <path>`
+- **Full test**: `poetry run pytest`
 ```
 
-Multiple paths per category are written as comma-separated values on
-the bullet line. Skipped categories are recorded as the literal word
-`omitted` (no backticks).
-
-### Path rules and idempotency
-
-The `## Project Root` line is the only absolute path in the file. Any
-other paths in the file — including the `### <relative-path>` headings
-under `## Build Commands` and any paths under `## Documentation
-Locations` — must be relative to that root.
-
-If you are updating an existing `apiary.md`, edit only the sections
-this skill owns (`## Project Root`, `## New Feature`, `## New Bug`,
-`## Documentation Locations`, `## Build Commands`) and preserve any
-other `##` sections verbatim — they belong to skills that haven't
-been written yet.
+Write apiary.md to the project root in this format. Preserve unknown sections you encounter on rerun.
 
 # What comes next
 
