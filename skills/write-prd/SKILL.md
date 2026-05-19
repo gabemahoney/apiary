@@ -198,9 +198,10 @@ Ask the user:
 - Options:
   - "write-srd" — proceed to drafting the software requirements document
   - "req-review" — review the PRD for completeness and promote it to `ready`
-  - "mark as ready" — skip review and let `/req-review` handle the
-    transition later
-
-This skill itself never sets the PRD to `ready`. The "mark as ready"
-option is a hint to the user about the next state in the flow; the
-actual transition is owned by `/req-review`.
+  - "mark as ready" — escape hatch. The user takes responsibility for
+    promoting the Feature to `ready` themselves (typically by manually
+    marking it via the ticket backend). **This skill does NOT set any
+    status to `ready`** — PRD `draft → ready` and Feature `draft → ready`
+    are both owned by `/req-review`. Selecting this option skips both
+    the in-skill next-step and `/req-review`; the user assumes
+    responsibility for the gate `/write-plan` enforces.
