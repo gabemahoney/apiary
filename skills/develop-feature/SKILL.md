@@ -204,10 +204,10 @@ dispatches.
 4. **Suggest the next step.** Print:
 
    ```
-   Test your Feature, then run `/teardown_worktree` when ready.
+   Test your Feature, then run `/teardown-worktree` when ready.
    ```
 
-   Do not invoke `/teardown_worktree` automatically — worktree
+   Do not invoke `/teardown-worktree` automatically — worktree
    teardown is owned by a separate skill and runs on the user's
    timeline.
 
@@ -219,7 +219,7 @@ dispatches.
   Full test suite per Task and at Epic close-out. This skill never
   runs them.
 - **Worktrees.** Worktree setup and teardown are owned by separate
-  skills (`/configure_worktree`, `/teardown_worktree`). This skill
+  skills (`/configure-worktree`, `/teardown-worktree`). This skill
   never touches worktrees.
 - **Epic, Task, and Subtask status.** Owned by `/develop-epic` and
   its subagents. This skill never writes them.
