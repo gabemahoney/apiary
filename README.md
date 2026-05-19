@@ -130,10 +130,19 @@ Bugs follow a two-step flow:
 
 
 ## Advanced Configuration
-Apiary provides default `/code-review`, `/test-review` and `doc-review` skills. Feel free to replace this in part 
-or wholesale with your own guidelines.
 
-**Note:** These guidelines are enforced across all repos.
-Documents describing repo-specific guidelines should be defined in a repo-specific Claude.md file. 
-`/project-setup` configures these repo-specific entries but does not modify the above-listed skills.
+Apiary provides default `/code-review`, `/test-review`, and `/doc-review` skills.
+They are driven by guidance docs you point at from `apiary.md` `## Documentation
+Locations` — see the "Reference docs" section produced by `/project-setup`.
+
+To customize per-project guidance:
+
+- Edit `apiary.md` and point the `Engineering best practices`, `Test guide`, and
+  `Doc writing guide` keys at your own docs (or set them to `omitted` to fall
+  back to the skills' minimal generic checks).
+- The shipped defaults under `~/.claude/apiary-templates/default-*.md` are a
+  reasonable starting point — copy them into your project and edit, or swap in
+  your own.
+
+The review skills do not read CLAUDE.md.
 
