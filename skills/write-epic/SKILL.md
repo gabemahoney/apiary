@@ -313,27 +313,6 @@ writing them to the ticket backend in step 5.
       - Ensure they have done their best to propose one Subtask per
         test file that needs to be changed.
 
-#### Mandatory Subtask Description Template
-
-Every Subtask description MUST include all of the following sections.
-Do not omit any section. Do not use abbreviated or one-line
-descriptions.
-
-```
-## Context
-Why this Subtask exists and what preconditions are assumed.
-
-## What Needs to Change
-Specific files, functions, and changes required. Include line numbers where known.
-
-## Key Files
-- path/to/file.py — what changes here
-
-## Acceptance Criteria
-- Observable, testable conditions that confirm the Subtask is complete
-- Be specific: "function X returns Y" not "function works correctly"
-```
-
 #### Task Loop
 Work through each Task sequentially. For each Task, dispatch the
 required role subagents, collect their proposed Subtasks from the
@@ -399,7 +378,6 @@ they want modifications.
   (implementation must complete first)
 - [ ] Testing Subtasks have up-dependencies on implementation/add-tests
   (implementation and test creation must complete first)
-- [ ] All descriptions follow the mandatory Subtask template
 - [ ] NO git commit Subtasks created (commits are handled
   automatically by executors)
 - [ ] Testing Subtasks support maximum parallelization on execution by
