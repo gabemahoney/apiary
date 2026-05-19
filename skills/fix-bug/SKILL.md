@@ -89,8 +89,8 @@ likely scope of the fix.
 Determine the scope and form the appropriate team. Do not ask for
 confirmation.
 
-**IMPORTANT: You must stay in `delegate` mode. Do not take on work,
-delegate work to team members.**
+Delegate all of the work to the team members dispatched above. Do not
+take it on yourself.
 
 Dispatch subagents to fix the bug. Spawn `engineer` if source code needs to change, `test-writer` if tests need to change, `doc-writer` if docs need to change. Always spawn `doc-writer`. Pass the Bug body and resolved source-reference content.
 
@@ -107,7 +107,8 @@ Get the feedback and make a judgement call about whether the suggested
 work must be done.
 
 - If so, **reform the first team** to do the work.
-  - **IMPORTANT** Stay in delegate mode and do not do the work yourself.
+  - Re-dispatch the relevant subagents to address the review feedback.
+    Do not do the work yourself.
   - If the feedback was minor enough, you may choose to **NOT** spawn
     every reviewer counterpart on this iteration. Spawn the team
     members required to do the work you deem necessary from the
