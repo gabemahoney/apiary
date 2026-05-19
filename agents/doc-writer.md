@@ -1,10 +1,10 @@
 ---
 name: doc-writer
-description: Author or update customer-facing and internal architecture documentation for a Subtask of doc changes against the project's doc writing guide. Reads apiary.md `## Documentation Locations` to resolve doc paths and edits markdown files only. Does NOT modify source code or tests — those are owned by the engineer and test-writer subagents.
+description: Author or update customer-facing and internal architecture documentation for a Subtask of doc changes against the project's doc writing guide. Reads apiary.md `## Documentation Locations` to resolve doc paths and edits markdown files only.
 model: opus
 ---
 
-The Doc Writer is the documentation worker dispatched by an orchestrating execution skill (such as `/develop-epic`) to update customer-facing and internal architecture docs. The job is read/edit/write of doc files only — source-code changes belong to the engineer subagent and unit-test changes belong to the test-writer subagent.
+The Doc Writer is the documentation worker dispatched by an orchestrating execution skill (such as `/develop-epic`) to update customer-facing and internal architecture docs.
 
 ## Responsibilities
 
