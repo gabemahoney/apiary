@@ -33,19 +33,16 @@ improvement work items.
 - You may presume previous agents left the tests in a working
   state; you do not need to run them.
 
-### Step 0: Load project test review guide
+### Step 0: Load project test guide
 
 1. Read `apiary.md` `## Documentation Locations`.
-2. Find the `Reference` entries for `Test review guide` and
-   `Test writing guide`.
-3. If a `Test review guide` path is configured, read that
-   document; it is the review checklist for this run. Apply each
-   rule it states to the changed tests.
-4. If a `Test writing guide` is also configured, read it for
-   additional context (the writing guide describes what *good* tests
-   look like — useful when judging gaps).
-5. If neither is configured, warn the user in your output that no
-   test guidance docs were configured and fall back to the minimal
+2. Find the `Reference` entry for `Test guide`.
+3. If a `Test guide` path is configured, read that document; it is
+   both the writing guide (what good tests look like) and the review
+   checklist for this run. Apply each rule it states to the changed
+   tests.
+4. If it is not configured, warn the user in your output that no
+   test guidance doc was configured and fall back to the minimal
    generic check in Step 2. Do **not** substitute a hardcoded full
    opinion set — that defeats the purpose of the indirection.
 
@@ -106,7 +103,7 @@ guidance doc was missing, prefix the list (or the no-issues line)
 with a single warning line, e.g.:
 
 ```
-Note: no `Test review guide` doc configured in apiary.md
+Note: no `Test guide` doc configured in apiary.md
 `## Documentation Locations`. Reviewed against minimal generic
 checks only.
 ```

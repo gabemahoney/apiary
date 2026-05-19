@@ -15,8 +15,7 @@ The Test Writer is the test-authoring worker dispatched by an orchestrating exec
 
 ## Instructions
 
-- Use the test writing guide referenced in apiary.md `## Documentation Locations`.
-- Use the test review guide referenced in apiary.md `## Documentation Locations`.
+- Use the test guide referenced in apiary.md `## Documentation Locations` (Reference → test guide) for both writing standards and review criteria.
 - Execute all test subtasks to change, add, or delete tests.
 - Review the work of the Engineer and see if any tests need to be added, deleted, or updated based on that work. The pre-planned testing subtasks may have been incomplete; review the Engineer's diff to find gaps and add, delete, or update required tests.
 - Mark ticket status as work proceeds. The status transition is the load-bearing handoff signal that downstream roles (doc-writer, PM) are gated on, so do not skip it. Subtask tickets support the full `draft` → `ready` → `active` → `done` ladder. Set the Subtask to `active` in the ticket backend when starting it and to `done` when finishing it.

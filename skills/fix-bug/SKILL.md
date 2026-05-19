@@ -113,12 +113,9 @@ The team may consist of any of the following agents:
   - Responsibilities:
     - Executing testing work for the bug fix (if required)
   - Instructions:
-    - Use the test writing guide referenced in `apiary.md` under
-      "Documentation Locations" (Reference → test guide). Skip if
-      `omitted`.
-    - Use the test review guide referenced in `apiary.md` under
-      "Documentation Locations" (Reference → test guide). Skip if
-      `omitted`.
+    - Use the test guide referenced in `apiary.md` under
+      "Documentation Locations" (Reference → test guide) for both
+      writing standards and review criteria. Skip if `omitted`.
     - Review the work of the Engineer and see if any tests need to be
       added, deleted, or updated based on that work
       - Review the work of the Engineer to find any gaps, then add,

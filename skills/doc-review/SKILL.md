@@ -23,19 +23,16 @@ It might be a ticket id from the project's ticket backend, or a git worktree.
 Analyze what changed, compare against current docs, return a list
 of specific documentation gaps as work items.
 
-### Step 0: Load project doc review guide
+### Step 0: Load project doc writing guide
 
 1. Read `apiary.md` `## Documentation Locations`.
-2. Find the `Reference` entries for `Doc review guide` and
-   `Doc writing guide`.
-3. If a `Doc review guide` path is configured, read that document;
-   it is the review checklist for this run. Apply each rule it
-   states to the project's docs.
-4. If a `Doc writing guide` is also configured, read it for
-   additional context (the writing guide describes what *good* docs
-   look like — useful when judging gaps).
-5. If neither is configured, warn the user in your output that no
-   doc guidance docs were configured and fall back to the minimal
+2. Find the `Reference` entry for `Doc writing guide`.
+3. If a `Doc writing guide` path is configured, read that document;
+   it is both the style guide (what good docs look like) and the
+   review checklist for this run. Apply each rule it states to the
+   project's docs.
+4. If it is not configured, warn the user in your output that no
+   doc guidance doc was configured and fall back to the minimal
    generic check in Step 3. Do **not** substitute a hardcoded full
    opinion set — that defeats the purpose of the indirection.
 
@@ -104,7 +101,7 @@ found." If the guidance doc was missing, prefix the list (or the
 no-issues line) with a single warning line, e.g.:
 
 ```
-Note: no `Doc review guide` doc configured in apiary.md
+Note: no `Doc writing guide` doc configured in apiary.md
 `## Documentation Locations`. Reviewed against minimal generic
 checks only.
 ```

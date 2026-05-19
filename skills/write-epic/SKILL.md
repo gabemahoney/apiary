@@ -242,12 +242,9 @@ writing them to the ticket backend in step 5.
   - Responsibilities:
     - Proposing testing Subtasks for a Task (if required).
   - Instructions (embed in dispatch prompt):
-    - Use the test writing guide referenced in `apiary.md` under
-      "Documentation Locations" (Reference → test guide). Skip if
-      `omitted`.
-    - Use the test review guide referenced in `apiary.md` under
-      "Documentation Locations" (Reference → test guide). Skip if
-      `omitted`.
+    - Use the test guide referenced in `apiary.md` under
+      "Documentation Locations" (Reference → test guide) for both
+      writing standards and review criteria. Skip if `omitted`.
     - Propose Subtasks covering any required unit tests.
     - Propose Subtasks covering any required integration tests.
     - Propose a Subtask **for each test file or logical group of test

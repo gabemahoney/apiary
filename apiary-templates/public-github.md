@@ -28,10 +28,8 @@ Defaults below point at the guidance docs shipped under
 docs once you have them; record `omitted` for any category you do
 not want to enforce.
 - **Engineering best practices**: ../apiary-templates/default-engineering-best-practices.md
-- **Test writing guide**: ../apiary-templates/default-test-writing-guide.md
-- **Test review guide**: ../apiary-templates/default-test-review-guide.md
+- **Test guide**: ../apiary-templates/default-test-guide.md
 - **Doc writing guide**: ../apiary-templates/default-doc-writing-guide.md
-- **Doc review guide**: ../apiary-templates/default-doc-review-guide.md
 
 ### Maintained Documentation
 Ask the user for each (record "omitted" if skipped):
