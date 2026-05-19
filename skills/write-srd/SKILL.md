@@ -101,8 +101,7 @@ Before writing anything, explore the codebase to understand:
 - **Test fixtures**: How tests are structured, what helpers/factories exist, what constants are centralized
 - **Configuration**: How config is loaded, validated, and accessed
 
-Use the Explore agent for this research. Be thorough — the SRD must reference
-real modules, patterns, and conventions from the actual codebase.
+Explore the codebase before drafting — read top-level structure, the modules the PRD will touch, and existing patterns for similar features. Be thorough; the SRD must reference real modules and conventions from the actual codebase.
 
 #### Style Rules
 
