@@ -22,7 +22,7 @@ When github_visibility = private or none:
 
 ## Documentation Locations
 
-### Reference Documentation
+### Reference
 Defaults below point at the guidance docs shipped under
 `apiary-templates/`. Edit these paths to point at your project's own
 docs once you have them; record `omitted` for any category you do
@@ -31,7 +31,7 @@ not want to enforce.
 - **Test guide**: ../apiary-templates/default-test-guide.md
 - **Doc writing guide**: ../apiary-templates/default-doc-writing-guide.md
 
-### Maintained Documentation
+### Maintained
 Ask the user for each (record "omitted" if skipped):
 - Contributor docs
 - Customer-facing docs
