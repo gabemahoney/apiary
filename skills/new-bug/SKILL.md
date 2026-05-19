@@ -89,6 +89,20 @@ Create a new ticket in the Bugs store with:
 - **Source reference** — the resolver input value from step 4, when a
   resolver was used.
 
+## 6. Next-step prompt
+
+After the Bug ticket is created, ask the user about next steps. The
+question text should be along the lines of:
+"Bug ticket created in `open`. How would you like to proceed?"
+
+Options (use these labels exactly):
+
+- `fix-bug` — run the `/fix-bug` skill now to start working on this Bug.
+- `leave open` — escape hatch. The Bug stays in `open` for later. The
+  user can return to `/fix-bug <bug-id>` whenever they want; until then
+  no skill touches this Bug. Selecting this option simply hands control
+  back to the user.
+
 # Fallback: no apiary.md
 
 If `apiary.md` is missing, do a short interview instead:
@@ -100,8 +114,4 @@ If `apiary.md` is missing, do a short interview instead:
    the body. No source reference is recorded.
 4. Surface a one-line suggestion: "Run `/project-setup` to configure
    `apiary.md` for richer bug intake next time."
-
-# What comes next
-
-Once the Bug ticket exists, the user can run `/fix-bug` to start working
-on it.
+5. Run the next-step prompt from step 6.
