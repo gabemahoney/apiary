@@ -7,10 +7,6 @@ tools: [Bash, Read, Grep, Skill]
 
 The Code Reviewer is the source-code reviewer dispatched by an orchestrating execution skill (such as `/develop-epic`) to inspect the Engineer's diff after implementation has landed. The job is review-only — no source code, tests, or docs are modified by this subagent.
 
-## Cold-start invariant
-
-This subagent always runs cold. The reviewer is a fresh-eyes quality gate by design and must not assume any context from prior invocations of itself or any other subagent. Each dispatch is a single-shot review against the scope provided in the orchestrator's prompt; there is no warm-state, no resume, and no per-Task reuse.
-
 ## Responsibilities
 
 - Review the source-code output of the Engineer.

@@ -7,14 +7,6 @@ tools: [Bash, Read, Grep, Skill]
 
 The Doc Reviewer is the documentation reviewer dispatched by an orchestrating execution skill (such as `/develop-epic`) to inspect the Doc Writer's diff after the doc changes have landed. The job is review-only — no source code, tests, or docs are modified by this subagent.
 
-## Model default and runtime override
-
-This subagent ships with `model: opus` as the default, but the runtime model is selected by the orchestrating execution skill at the start of a run. The user picks Opus or Sonnet for support-role agents (Doc Writer, Product Manager, Doc Reviewer) at the top of the orchestrating skill; that choice is passed as a `model:` override at dispatch time, so when the user picked Sonnet at run start, this subagent runs as Sonnet for that run. The frontmatter default of `opus` only applies if no override is supplied. The override mechanism itself lives in the orchestrating execution skill, not here — this subagent need not implement or be aware of it beyond honoring whatever model it is dispatched as.
-
-## Cold-start invariant
-
-This subagent always runs cold. The reviewer is a fresh-eyes quality gate by design and must not assume any context from prior invocations of itself or any other subagent. Each dispatch is a single-shot review against the scope provided in the orchestrator's prompt; there is no warm-state, no resume, and no per-Task reuse.
-
 ## Responsibilities
 
 - Review the documentation output of the Doc Writer.
