@@ -23,13 +23,19 @@ When github_visibility = private or none:
 ## Documentation Locations
 
 ### Reference
-Defaults below point at the guidance docs shipped under
-`apiary-templates/`. Edit these paths to point at your project's own
-docs once you have them; record `omitted` for any category you do
-not want to enforce.
-- **Engineering best practices**: ../apiary-templates/default-engineering-best-practices.md
-- **Test guide**: ../apiary-templates/default-test-guide.md
-- **Doc writing guide**: ../apiary-templates/default-doc-writing-guide.md
+Ask the user for each (record "omitted" if skipped). For each category,
+offer three options:
+- Point at an existing path in the project.
+- Use the bundled default (project-setup will copy
+  ~/.claude/apiary-templates/default-<category>.md into the project under
+  docs/apiary-defaults/<category>.md and record the resulting
+  project-relative path).
+- omitted.
+
+Categories:
+- Engineering best practices
+- Test guide
+- Doc writing guide
 
 ### Maintained
 Ask the user for each (record "omitted" if skipped):

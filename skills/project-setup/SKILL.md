@@ -170,6 +170,28 @@ For each category:
   literal word `omitted` (no backticks).
 - If the user skips a category during interview, record `omitted`.
 
+**Bundled-default branch (Reference categories only).** When a Reference
+category's interview prompt offers "use the bundled default" and the
+user picks it, do the following before writing the path:
+
+1. Ensure `<project_root>/docs/apiary-defaults/` exists; create it if
+   missing.
+2. Copy `~/.claude/apiary-templates/default-<category>.md` to
+   `<project_root>/docs/apiary-defaults/<category>.md`. The `<category>`
+   slug is the lowercase, hyphen-separated form of the category name
+   (e.g., `engineering-best-practices`). If the destination already
+   exists, ask the user whether to overwrite or keep the existing file.
+3. Record the project-relative path
+   `docs/apiary-defaults/<category>.md` in the `### Reference` bullet
+   for that category.
+
+If the bundled default source file is missing from
+`~/.claude/apiary-templates/`, surface the gap and fall back to asking
+the user for an in-project path (or `omitted`).
+
+All paths recorded in `apiary.md` must be project-relative. Do not
+write `..`-relative or absolute paths.
+
 Multiple paths per category are written on the bullet line as a single
 comma-separated value (matching the PRD example).
 
@@ -360,7 +382,7 @@ When github_visibility = private or none:
 
 ### Reference
 - **Engineering best practices**: docs/best-practices.md, docs/coding-standards.md
-- **Test guide**: docs/testing-guide.md
+- **Test guide**: docs/apiary-defaults/test-guide.md
 - **Doc writing guide**: omitted
 
 ### Maintained
