@@ -1,6 +1,6 @@
 ---
 name: write-plan
-description: Read documents from a Feature ticket and create a Plan in the Plans store, decomposed into Epics. Auto-chains into write-epic for each Epic.
+description: Read documents from a Feature ticket and create a Plan in the Plans store, decomposed into Epics. Auto-chains into write-epic for each Epic, then runs a fresh-eyes review of the resulting plan tree.
 disable-model-invocation: false
 ---
 
@@ -316,3 +316,71 @@ invoke `/write-epic <epic-id>` for each Epic.
 This auto-chain preserves the original one-command UX: the user invokes `write-plan`
 once and receives a Plan with every Epic decomposed into Tasks (and Subtasks, per
 `write-epic`'s behavior).
+
+## Step 10: Fresh-eyes review of the whole plan
+
+After the auto-chain into `/write-epic` has completed and every Epic has its Tasks
+and Subtasks, run one fresh-eyes review of the full planning tree before the skill
+exits.
+
+The same agent that decomposed the Feature into Epics also drove `/write-epic` to
+produce Tasks and Subtasks. Bias compounds. A reviewer that has not seen any of the
+prior reasoning catches things the planning agent will not.
+
+### Gather the full review context
+
+Fetch and assemble:
+
+- The Feature's Doc children (PRD, SRD, and anything else under the Feature). Embed
+  each in full.
+- The Plan ticket body.
+- Every Epic ticket body and its `up_dependencies` wiring.
+- Every Task ticket body under each Epic.
+- Every Subtask ticket body under each Task.
+
+The reviewer reads what the prompt embeds; it does not call the ticket backend
+itself.
+
+### Dispatch the reviewer
+
+Dispatch a single `Agent` tool call with `subagent_type: "general-purpose"` and
+`run_in_background=true`. One-shot per run. Do not create a custom subagent file.
+Wait for the dispatch to complete (you will be notified) before the skill exits —
+do not return control to the user until the findings are in hand and rendered.
+
+The dispatch prompt embeds the full review context above and asks the reviewer to
+read it cold and answer questions like: *Is the problem well understood? Is the
+solution the right one? Is the approach solid? Is the Epic decomposition sensible?
+Are the Tasks and Subtasks well-scoped? Are there missing risks or alternatives?*
+Phrase the request as a fresh-reader sanity check, not a checklist.
+
+Ask the reviewer to return a numbered list of findings as plain prose. Each finding
+should cite the artifact it applies to (PRD section, SRD section, Plan body, Epic
+ID, Task ID, or Subtask ID), describe the issue in one or two sentences, and
+optionally suggest a direction. **No severity tags. No verdict trailer.**
+
+### Surface findings to the user
+
+When findings come back, the orchestrator MUST surface them verbatim to the user
+in the next assistant turn — do not summarize them away, do not silently move past
+them, do not auto-proceed without showing the findings. The findings are the
+load-bearing output of this step; the orchestrator's next action after dispatch is
+to render them.
+
+Render the numbered findings list with this preamble:
+
+> Fresh-eyes review of the plan surfaced N findings. Read these before treating
+> the plan as final — if you want to revise, re-invoke `/write-plan` (or revise
+> tickets manually); otherwise the plan is ready for `/develop-feature` or
+> `/develop-epic`.
+
+### Out of scope for this step
+
+- No automatic loop and no re-dispatch of the reviewer within this run.
+- No automatic routing of findings back into the writer skills.
+- No `AskUserQuestion` gate forcing approve/revise. The user reads the findings
+  inline and chooses their next step implicitly.
+
+Re-running `/write-plan` on the same Feature does not get blocked by previous
+reviews — Step 10 always runs at the end of the chain and produces a fresh findings
+list.

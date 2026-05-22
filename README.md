@@ -90,6 +90,7 @@ Run `/write-plan` with the Feature ticket id to develop a plan for building the 
 - The skill hard-gates on the Feature being `ready`. If the Feature is still `draft`, you'll be sent back to `/req-review` (or asked to manually mark the Feature `ready`) before planning can proceed.
 - The Plan is stored in the Plans store, with its source reference pointing back at the Feature so `develop-feature` can find the Plan from the Feature later.
 - `/write-plan` automatically chains into `/write-epic` for each Epic in dependency order, so a single command produces a fully decomposed Plan with Epics, Tasks, and Subtasks.
+- After the chain completes, a fresh-eyes reviewer reads the whole tree (Feature docs + Plan + Epics + Tasks + Subtasks) and the findings are surfaced verbatim before the skill exits. Read them before treating the plan as final.
 
 ### Develop Feature
 Run `/develop-feature` against a Feature ticket id to build the feature end-to-end.
