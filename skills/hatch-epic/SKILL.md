@@ -67,36 +67,44 @@ Task 1: Implement CSV export functionality
   - Exported CSV files open correctly in Excel/Google Sheets
 ```
 
-### 4. Create Task Team to Break Task into Subtasks
+### 4. Dispatch Planner Subagents to Break Task into Subtasks
 
-Form a team to write the Subtasks for this Epic. Your responsibilities are:
+You are the **calling agent**. Planner role players are **subagents** — named agent definitions installed in `.claude/agents/`, spawned via the Agent tool: `Agent(subagent_type: "<agent-name>", prompt: <task-specific dispatch prompt>, model: <per the job → model mapping below>)`. Your responsibilities are:
   - Surface design questions back to the Caller
-    - If the team proposes different approaches to a problem, surface this back up to the caller with an AskUserQuestion
-  - Responsible for coordinating the team and ensuring all work is complete, but the Product Manager has final authority on quality and completeness
+    - If the planner subagents propose different approaches to a problem, surface this back up to the caller with an AskUserQuestion
+  - Responsible for coordinating the planner subagents and ensuring all work is complete, but the Product Manager has final authority on quality and completeness
 - Instructions:
     - Carrying forward architectural decisions:
       - If the caller provides architectural decisions or constraints (e.g., "make parameter X optional with fallback Y"), explicitly reference it in every affected subtask description. 
       - Do not paraphrase or partially apply — use the caller's exact specification.
 
-#### Team
-If source code needs to be changed, include the Engineer. If not, the Engineer optional.
-If unit test code need to be changed, include the Test Writer. If not, the Test Writer is optional.
-If docs need to be changed, include the Doc Writer. If not, the Doc Writer is optional.
-Always spawn the Product Manager.
+Rules that apply to every dispatch in this skill:
 
-**IMPORTANT**: You do not break Tasks into Subtasks. This is the job of the Team.
+- **Background dispatch**: if the Agent tool schema accepts `run_in_background`, pass `run_in_background: true`; otherwise omit it — background is the harness default under Claude Code fork-subagents mode. Every dispatch in this skill is a background dispatch.
+- **Cold start**: subagents are never named, reused, or messaged mid-flight. Every dispatch is a fresh spawn with a self-contained prompt. Dispatch prompts name the relevant ticket IDs; planner subagents read the tickets from the bees CLI themselves.
+- **Hub-and-spoke**: subagents never talk to each other. Each planner returns its proposals in its report; you serialize dependent roles and thread each report into the next role's dispatch prompt.
+- **Reconciliation loop**: drive the work event-driven, not as one big blocking turn. Each tick: (1) observe current state — ticket store, in-flight Agent status; (2) reconcile — dispatch whatever fresh Agent invocations the delta requires; (3) yield the turn. The harness fires a completion notification when each background Agent finishes; that notification triggers the next tick. No polling, no sleep loops, no blocking waits inside a turn.
+- **Compaction recovery**: when a compaction/summarization marker is visible in your conversation, everything before it is non-authoritative. Before dispatching the next tick's work after a compaction, re-read the authoritative sources in full — the bees CLI for ticket state, git for code state, and the filesystem for any state files. Conversation memory is never a substitute for these sources.
 
-**CRITICAL — Subagent permissions**: Spawn ALL team members with `mode: "plan"`. Team members are read-only researchers. They must never create, update, or delete tickets. Only YOU (the team lead) call `create_ticket`, `update_ticket`, or `delete_ticket`.
+#### Roles
+If source code needs to be changed, include `apiary-engineer-planner`. If not, the Engineer is optional.
+If unit test code need to be changed, include `apiary-test-writer-planner`. If not, the Test Writer is optional.
+If docs need to be changed, include `apiary-doc-writer-planner`. If not, the Doc Writer is optional.
+Always dispatch `apiary-product-manager-planner`.
 
-When spawning team members, include the following restriction in each teammate's spawn prompt:
+**IMPORTANT**: You do not break Tasks into Subtasks. This is the job of the planner subagents.
+
+**CRITICAL — Subagent permissions**: Planner subagents are read-only researchers, enforced by `permissionMode: plan` in their agent definitions. They must never create, update, or delete tickets. Only YOU (the calling agent) call `create_ticket`, `update_ticket`, or `delete_ticket`.
+
+When dispatching planner subagents, include the following restriction in each dispatch prompt:
 
 ```prompt
 You are a READ-ONLY researcher. You must NEVER call create_ticket, update_ticket, or delete_ticket.
-Your job is to research the codebase and report your proposed subtasks back via SendMessage as text.
-Only the team lead creates tickets.
+Your job is to research the codebase and return your proposed subtasks as text in your report.
+Only the calling agent creates tickets.
 ```
 
-Also include the following Subtasks guidance in each teammate's spawn prompt:
+Also include the following Subtasks guidance in each dispatch prompt:
 
 ```prompt
 Subtask represent discrete sets of work required to achieve the Task outcome.
@@ -120,72 +128,18 @@ acceptance criteria:
 - All API tests pass after updates.
 ```
 
+Each planner's Responsibilities and Instructions live in its agent definition (`.claude/agents/apiary-*-planner.md`).
 
-##### Team Composition
+##### Job → model mapping
 
-The team should consist of the following agents:
+Pass `model` at dispatch time — model choice belongs to this skill, not the agent definition:
 
-- Engineer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Writing implementation Subtasks for a task (if required)
-      - Tasks that only involve research (no code or doc changes) may omit all of these subtasks.
-  - Instructions:
-    - Review any relevant internal architecture docs referenced in CLAUDE.md under "Documentation Locations"
-    - Review the existing code to determine the current state
-    - Review the engineering best practices guide referenced in CLAUDE.md under "Documentation Locations"
-    - Write subtasks for each logical implementation step.
-    - There may be one or many implementation subtasks
-- Test Writer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Writing testing Subtasks for a task (if required)
-  - Instructions:
-    - Use the test writing guide referenced in CLAUDE.md under "Documentation Locations"
-    - Use the test review guide referenced in CLAUDE.md under "Documentation Locations"
-    - Write or modify any required unit tests
-    - Write or modify any required Integration tests
-    - Add a subtask **for each test file or logical group of test file** that needs to be modified based on the work described by the Engineer
-      - The substask will provide high level instructions to:
-        - Update any tests that cover the work done in the parent Task
-        - Delete any tests that are now made obsolete by work done in the parent Task
-        - Add any tests to cover functionality that is currently not tested based on the work done in the parent Task
-    - Add a final substask to run the full unit test suite and fix any failures. Integration tests will be handled by the calling function.
-       - This subtask tells the agent to ensure 100% unit tests passing before completing, this means fixing broken tests
-       - If for some reason the agent cannot get 100% unit tests passing it should report the failure to the Team Lead
-- Doc Writer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Writing documentation Subtasks for a task (if required)
-  - Instructions:
-    - Use the doc writing guide referenced in CLAUDE.md under "Documentation Locations"
-    - Readme:
-      - If the Task modifies user-facing code or installation and setup:
-        - Review the customer-facing docs referenced in CLAUDE.md under "Documentation Locations"
-        - Write a subtask describing how the customer-facing docs should be updated based on the work done in this Task
-    - Architecture Docs:
-      - If the Task modifies source code:
-        - Review the internal architecture docs referenced in CLAUDE.md under "Documentation Locations"
-        - Write a subtask for each architecture doc that needs to be updated based on the work done in this Task
-- Product Manager
-  - Model: Claude Opus
-  - Responsibilities:
-    - Responsible for reviewing Tasks against the PRD and SRD
-    - Ensures that the work being described meets the requirements
-  - Instructions:
-    - Read any source documents provided in the top level Bee
-    - Review the Task and Subtasks to ensure that the work proposed: 
-      - Aligns with the requirements
-      - Does not introduce more functionality than asked for
-        - e.g The PRD calls for no legacy support but the Engineers proposes a task for backwards compatibility.
-        - Call this out as unacceptable
-      - Review all Tasks once they are complete against the Epic to ensure that:
-        - The work will meet the Acceptance Criteria
-        - The work covers all functionality required by the Epic
-        - The work does not introduce any functionality not required or explicitly disallowed in the Epic
-    - Review the subtasks created by the Test Writer
-      - Ensure they have done their best to create a subtask per test file that needs to be changed
-
+| Agent | Model |
+|---|---|
+| `apiary-engineer-planner` | sonnet |
+| `apiary-test-writer-planner` | sonnet |
+| `apiary-doc-writer-planner` | sonnet |
+| `apiary-product-manager-planner` | opus |
 
 
 #### Mandatory Subtask Description Template
@@ -208,7 +162,7 @@ Specific files, functions, and changes required. Include line numbers where know
 ```
 
 #### Task Loop
-Spawn one persistent team to handle all Tasks. Work through each Task sequentially with the same team, planning subtasks one Task at a time, **without asking the User for permission**. 
+Spawn fresh planner subagents per Task via background dispatch, threading prior-Task reports into subsequent dispatch prompts. Work through each Task sequentially, planning subtasks one Task at a time, **without asking the User for permission** — reconcile each Task's completion notifications before dispatching the next Task's planners. Within a single Task you may dispatch multiple planners in parallel (Engineer/Test Writer/Doc Writer research on disjoint parts before the Product Manager's synthesis).
 Only stop to review with the User once all Tasks are done.
 
 ### 5. Review Epic 
@@ -238,4 +192,3 @@ Show the Tasks you just created to the User in detail and ask them if they want 
 - [ ] All descriptions follow the mandatory template (see below)
 - [ ] NO git commit subtasks created (commits handled automatically by executors)
 - [ ] Testing subtasks support maximum parallelization on execution by making one subtask per test file to be modified
-
