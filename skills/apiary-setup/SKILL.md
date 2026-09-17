@@ -54,13 +54,21 @@ Before configuring hives, verify the following are installed and configured.
 
 Verify bees is available either as a CLI on PATH (`which bees`) or as a configured MCP server. If neither is present, direct the user to the bees repo for installation instructions: https://github.com/gabemahoney/bees
 
-#### 2. Claude Code Agent Teams
+#### 2. Apiary Agent Definitions
 
-The Apiary workflow uses agent teams to parallelize work. Check whether `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` is set to `"1"` in `~/.claude/settings.json`. If not configured, direct the user to: https://code.claude.com/docs/en/agent-teams
+The Apiary workflow spawns role players as subagents defined in `agents/*.md` files. This is a **verify-only** step — no install, no repair.
 
-#### 3. tmux (optional)
+Detect the skill install location and check that all 14 agent definition files are present at the parallel path:
+- `<repo>/.claude/agents/` when the Apiary skills live in `<repo>/.claude/skills/`
+- `~/.claude/agents/` when they live in `~/.claude/skills/`
 
-tmux enables split-pane display so each agent teammate gets its own pane. Without it, teammates run in-process (still functional). Check if tmux is installed (`which tmux`). If not, note it is optional but recommended and direct the user to the Claude Code agent teams documentation for setup guidance.
+The 14 files: `apiary-engineer.md`, `apiary-test-writer.md`, `apiary-doc-writer.md`, `apiary-product-manager.md`, `apiary-engineer-bugfix.md`, `apiary-test-writer-bugfix.md`, `apiary-doc-writer-bugfix.md`, `apiary-engineer-planner.md`, `apiary-test-writer-planner.md`, `apiary-doc-writer-planner.md`, `apiary-product-manager-planner.md`, `apiary-code-reviewer.md`, `apiary-test-reviewer.md`, `apiary-doc-reviewer.md`.
+
+If all 14 are present, report success and move on. If any are missing, report the missing filenames and instruct the user to re-run README Install step 2 (the paired copy of `skills/` and `agents/`). Perform no file copies, no backups, and no clone-path prompts.
+
+#### 3. tmux (required for worktree skills)
+
+The `configure_worktree` and `teardown_worktree` skills launch and manage Claude Code sessions in tmux and hard-depend on it. Check if tmux is installed (`which tmux`). If not, direct the user to install it via their system package manager (e.g. `apt install tmux`, `brew install tmux`).
 
 #### 4. Repository Directory Structure
 
