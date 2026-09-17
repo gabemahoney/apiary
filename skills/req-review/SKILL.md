@@ -9,77 +9,48 @@ disable-model-invocation: false
 Your role is to help the user get Product Requirement and Software Requirement documents
 into a good enough state that they can be executed autonomously by a swarm of agents.
 
-You will be provided a directory which contains one or more documents. You must read and review them all.
-If you are not provided a directory, as the user to provide one.
+You are the **calling agent**. The review itself — reading the documents, reviewing the codebase, running the checklists — is done by the `apiary-req-reviewer` subagent, a named agent definition installed in `.claude/agents/`, spawned via the Agent tool. You resolve the input, dispatch, tell the user the results, and handle status promotion. You do not perform the review yourself.
 
-# Style
+# 1. Resolve the Input
 
-Requirements docs value content of form. 
-Requirements need not be in User Story format.
-Style is concise and direct, less is more.
+The user will provide a Bee in the Ideas hive (or its PRD/SRD children) whose documents should be reviewed.
+If they do not, ask them which Idea Bee's documents to review.
 
-# Success Criteria
+# 2. Dispatch the Reviewer
 
-- The docs are logically consistent
-  - No contradictory statements
-  - Any control is complete, has no gaps and no unexpected cycles
-- The docs are complete and thorough
-  - All edge cases with explanations on how to handle them
-  - Features are described in enough detail that no assumptions must be made during implementation
-  - Clear acceptance criteria for each requirement
-  - Requirements are testable and measurable
-  - Dependencies and assumptions are explicitly documented
-  - Non-functional requirements specified (performance, security, scalability, etc.)
-  - Work not in scope detailed to prevent scope creep
+Dispatch `apiary-req-reviewer` via the Agent tool:
+`Agent(subagent_type: "apiary-req-reviewer", prompt: <dispatch prompt>, model: <per the job → model mapping below>)`
 
-# Review Process
+Dispatch rules:
 
-Follow this systematic approach:
+- **Background dispatch**: if the Agent tool schema accepts `run_in_background`, pass `run_in_background: true`; otherwise omit it — background is the harness default under Claude Code fork-subagents mode. When the completion notification fires, present the report (step 3).
+- **Cold start**: every dispatch is a fresh spawn with a self-contained prompt. Dispatch prompts name the relevant ticket IDs; the subagent reads the tickets from the bees CLI itself.
 
-1. **Review Code Base**: After reading the documents, make yourself aware of the relevant source files and docs.
-2. **Structure Check**: Verify document has clear sections, headers, and organization
-2. **Completeness Scan**: Check all major areas are covered (see checklist below)
-3. **Logic Review**: Identify contradictions, gaps, or circular dependencies
-4. **Implementation Readiness**: Assess if an agent could implement without making assumptions
+The dispatch prompt must contain:
+- The Idea Bee ID (or the individual PRD/SRD ticket IDs)
+- The repository path relevant to the documents
 
-# Review Checklist
+The subagent is read-only: it reviews and reports; it never updates tickets. All status changes happen in step 4, by you.
 
-## For Product Requirement Documents (PRD)
+## Job → model mapping
 
-- [ ] Problem statement clearly defined
-- [ ] Acceptance criteria defined
-- [ ] Edge cases and error scenarios covered
-- [ ] UI/UX requirements described or wire-framed (if applicable)
-- [ ] Mobile/responsive behavior defined (if applicable)
-- [ ] Assumptions explicitly stated
+Pass `model` at dispatch time — model choice belongs to this skill, not the agent definition:
 
-## For Software Requirement Documents (SRD)
+| Agent | Model |
+|---|---|
+| `apiary-req-reviewer` | opus |
 
-- [ ] Deployment requirements specified or explicitly omitted
-- [ ] Performance requirements specified or explicitly omitted
-- [ ] API endpoints specified or explicitly omitted
-- [ ] Data models and schemas specified or explicitly omitted
-- [ ] Authentication/authorization approach specified or explicitly omitted
-- [ ] Security requirements specified or explicitly omitted
-- [ ] Testing strategy specified or explicitly omitted
+# 3. Report to the User
 
-# Output Format
+When the subagent's report arrives, tell the user the results:
+- An overview of all issues (criticality, short title, short summary, format it pretty), most critical first, with the reviewer's suggested fixes
+- The reviewer's per-document readiness verdict
 
-Give an overview of all issues (criticality, short title, short summary, format it pretty) and then present them one at a time to the user.
-Start with the most critical. Give the user options and always include the option
-to either Skip this concern or enter their own response. Also give them the "Chat about this" option. 
-
-# Guidelines
-
-- Be specific: Reference exact sections, lines, or requirements
-- Be constructive: Suggest fixes, don't just criticize
-- Prioritize: Critical issues first, minor polish last
-- Focus on executability: Can an AI agent implement this without human clarification?
-- Question assumptions: If something seems implied but not stated, flag it
+If the user wants issues addressed, the fixes belong to the authoring skills — suggest re-running `/write-prd` or `/write-srd` with the findings, then `/req-review` again. Re-dispatch (fresh spawn) for any re-review.
 
 # Next Steps
 
-After all feedback is complete, use AskUserQuestion to ask the user for each doc reviewed:
+After presenting the results, use AskUserQuestion to ask the user for each doc reviewed:
 - "Mark [PRD/SRD] as `pupa`?"
   - Options: "Yes, mark as pupa" / "No, more work needed"
 - If yes, update the doc's ticket status to `pupa`.
