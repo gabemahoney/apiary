@@ -35,6 +35,7 @@ The subagent is read-only: it reviews and reports; it never updates tickets. All
 ## Job → model mapping
 
 Pass `model` at dispatch time — model choice belongs to this skill, not the agent definition:
+If the user requests a specific model, pass it at dispatch in place of the mapping default — still use the `apiary-*` agent, never a general-purpose one.
 
 | Agent | Model |
 |---|---|
