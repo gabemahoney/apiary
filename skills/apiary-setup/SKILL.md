@@ -58,13 +58,13 @@ Verify bees is available either as a CLI on PATH (`which bees`) or as a configur
 
 The Apiary workflow spawns role players as subagents defined in `agents/*.md` files. This is a **verify-only** step — no install, no repair.
 
-Detect the skill install location and check that all 14 agent definition files are present at the parallel path:
+Detect the skill install location and check that all 18 agent definition files are present at the parallel path:
 - `<repo>/.claude/agents/` when the Apiary skills live in `<repo>/.claude/skills/`
 - `~/.claude/agents/` when they live in `~/.claude/skills/`
 
-The 14 files: `apiary-engineer.md`, `apiary-test-writer.md`, `apiary-doc-writer.md`, `apiary-product-manager.md`, `apiary-engineer-bugfix.md`, `apiary-test-writer-bugfix.md`, `apiary-doc-writer-bugfix.md`, `apiary-engineer-planner.md`, `apiary-test-writer-planner.md`, `apiary-doc-writer-planner.md`, `apiary-product-manager-planner.md`, `apiary-code-reviewer.md`, `apiary-test-reviewer.md`, `apiary-doc-reviewer.md`.
+The 18 files: `apiary-engineer.md`, `apiary-test-writer.md`, `apiary-doc-writer.md`, `apiary-product-manager.md`, `apiary-engineer-bugfix.md`, `apiary-test-writer-bugfix.md`, `apiary-doc-writer-bugfix.md`, `apiary-engineer-planner.md`, `apiary-test-writer-planner.md`, `apiary-doc-writer-planner.md`, `apiary-product-manager-planner.md`, `apiary-code-reviewer.md`, `apiary-test-reviewer.md`, `apiary-doc-reviewer.md`, `apiary-prd-writer.md`, `apiary-srd-writer.md`, `apiary-req-reviewer.md`, `apiary-plan-writer.md`.
 
-If all 14 are present, report success and move on. If any are missing, report the missing filenames and instruct the user to re-run README Install step 2 (the paired copy of `skills/` and `agents/`). Perform no file copies, no backups, and no clone-path prompts.
+If all 18 are present, report success and move on. If any are missing, report the missing filenames and instruct the user to re-run README Install step 2 (the paired copy of `skills/` and `agents/`). Perform no file copies, no backups, and no clone-path prompts.
 
 #### 3. tmux (required for worktree skills)
 
