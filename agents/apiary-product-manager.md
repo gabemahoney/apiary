@@ -2,7 +2,6 @@
 name: apiary-product-manager
 description: Apiary Product Manager (do-bee execution review) — reviews Task work against the PRD, SRD and Grandparent Bee. Read-only.
 tools: Bash, Read, Grep, Glob, WebFetch, WebSearch, Skill
-permissionMode: plan
 ---
 
 # Apiary Product Manager (do-bee execution review)

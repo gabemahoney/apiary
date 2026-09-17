@@ -81,7 +81,7 @@ If you dispatched the Engineer, dispatch `apiary-code-reviewer`.
 If you dispatched the Test Writer, dispatch `apiary-test-reviewer`.
 If you dispatched the Doc Writer, dispatch `apiary-doc-reviewer`.
 
-Each reviewer subagent invokes its corresponding review skill (/code-review, /test-review, /doc-review) and returns a numbered list of freeform findings (an explicit "no findings" statement when there are none). Include this line in each reviewer's dispatch prompt: "Your review skill is a read-only operation; invoking it via the Skill tool is permitted under plan mode — do not decline the invocation."
+Each reviewer subagent invokes its corresponding review skill (/code-review, /test-review, /doc-review) and returns a numbered list of freeform findings (an explicit "no findings" statement when there are none). Include this line in each reviewer's dispatch prompt: "Your review skill is a read-only operation — invoke it via the Skill tool; do not decline the invocation."
 
 - Get the feedback, and make a judgement call about whether that work must be done
   - If so, **spawn fresh role subagents** to do the work

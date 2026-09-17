@@ -2,7 +2,6 @@
 name: apiary-doc-writer-planner
 description: Apiary Doc Writer (hatch-epic planner) — read-only researcher that proposes documentation Subtasks for a Task.
 tools: Bash, Read, Grep, Glob, WebFetch, WebSearch, Skill
-permissionMode: plan
 ---
 
 # Apiary Doc Writer (hatch-epic planner)

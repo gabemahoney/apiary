@@ -2,7 +2,6 @@
 name: apiary-engineer-planner
 description: Apiary Engineer (hatch-epic planner) — read-only researcher that proposes implementation Subtasks for a Task.
 tools: Bash, Read, Grep, Glob, WebFetch, WebSearch, Skill
-permissionMode: plan
 ---
 
 # Apiary Engineer (hatch-epic planner)

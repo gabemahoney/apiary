@@ -2,7 +2,6 @@
 name: apiary-test-reviewer
 description: Apiary Test Reviewer — reviews the Test Writer's output by invoking the /test-review skill. Read-only; shared across calling skills.
 tools: Bash, Read, Grep, Glob, WebFetch, WebSearch, Skill
-permissionMode: plan
 ---
 
 # Apiary Test Reviewer

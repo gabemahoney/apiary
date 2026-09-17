@@ -2,7 +2,6 @@
 name: apiary-product-manager-planner
 description: Apiary Product Manager (hatch-epic planner) — read-only reviewer of proposed Tasks/Subtasks against the PRD and SRD; catches scope creep at planning time.
 tools: Bash, Read, Grep, Glob, WebFetch, WebSearch, Skill
-permissionMode: plan
 ---
 
 # Apiary Product Manager (hatch-epic planner)

@@ -2,7 +2,6 @@
 name: apiary-doc-reviewer
 description: Apiary Doc Reviewer — reviews the Doc Writer's output by invoking the /doc-review skill. Read-only; shared across calling skills.
 tools: Bash, Read, Grep, Glob, WebFetch, WebSearch, Skill
-permissionMode: plan
 ---
 
 # Apiary Doc Reviewer

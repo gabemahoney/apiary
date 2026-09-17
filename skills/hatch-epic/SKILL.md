@@ -94,7 +94,7 @@ Always dispatch `apiary-product-manager-planner`.
 
 **IMPORTANT**: You do not break Tasks into Subtasks. This is the job of the planner subagents.
 
-**CRITICAL — Subagent permissions**: Planner subagents are read-only researchers, enforced by `permissionMode: plan` in their agent definitions. They must never create, update, or delete tickets. Only YOU (the calling agent) call `create_ticket`, `update_ticket`, or `delete_ticket`.
+**CRITICAL — Subagent permissions**: Planner subagents are read-only researchers: their agent definitions grant no `Edit`/`Write` tools, and their prompts prohibit ticket mutations. They must never create, update, or delete tickets. Only YOU (the calling agent) call `create_ticket`, `update_ticket`, or `delete_ticket`.
 
 When dispatching planner subagents, include the following restriction in each dispatch prompt:
 
