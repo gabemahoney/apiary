@@ -11,6 +11,32 @@ The user will either call without arguments or with a Bug id
 
 You will ultimately get the Bug ID you need to work on.
 
+### Execution model
+
+You are the **calling agent**. Role players are **subagents** — named agent definitions installed in `.claude/agents/`, spawned via the Agent tool: `Agent(subagent_type: "<agent-name>", prompt: <bug-specific dispatch prompt>, model: <per the job → model mapping below>)`.
+
+Rules that apply to every dispatch in this skill:
+
+- **Background dispatch**: if the Agent tool schema accepts `run_in_background`, pass `run_in_background: true`; otherwise omit it — background is the harness default under Claude Code fork-subagents mode. Every dispatch in this skill is a background dispatch.
+- **Cold start**: subagents are never named, reused, or messaged mid-flight. Every dispatch is a fresh spawn with a self-contained prompt. Dispatch prompts name the Bug ID; subagents read the ticket from the bees CLI themselves.
+- **Hub-and-spoke**: subagents never talk to each other. The working tree diff plus the returned report is the handoff. You serialize dependent roles and thread each report into the next role's dispatch prompt.
+- **Reconciliation loop**: drive the work event-driven, not as one big blocking turn. Each tick: (1) observe current state — ticket store, working tree, in-flight Agent status; (2) reconcile — dispatch whatever fresh Agent invocations the delta requires; (3) yield the turn. The harness fires a completion notification when each background Agent finishes; that notification triggers the next tick. No polling, no sleep loops, no blocking waits inside a turn.
+- **Compaction recovery**: when a compaction/summarization marker is visible in your conversation, everything before it is non-authoritative. Before dispatching the next tick's work after a compaction, re-read the authoritative sources in full — the bees CLI for ticket state, git for code state, and the filesystem for any state files. Conversation memory is never a substitute for these sources.
+- **Delegate discipline**: you must not do role work yourself. You dispatch subagents, route reports on completion, and commit.
+
+#### Job → model mapping
+
+Pass `model` at dispatch time — model choice belongs to this skill, not the agent definition:
+
+| Agent | Model |
+|---|---|
+| `apiary-engineer-bugfix` | sonnet |
+| `apiary-test-writer-bugfix` | sonnet |
+| `apiary-doc-writer-bugfix` | sonnet |
+| `apiary-code-reviewer` | sonnet |
+| `apiary-test-reviewer` | sonnet |
+| `apiary-doc-reviewer` | sonnet |
+
 ### Setup:
 There must be a hive called "Bugs". If it does not exist, ask the user where you can create one.
 It must have no child tiers and the following valid status values:
@@ -35,84 +61,33 @@ If blocked:
 If not blocked:
 - Mark Bee status with a state that signals work has begun (if needed)
 
-### 3. Form Teams to Fix Bug
+### 3. Dispatch Subagents to Fix Bug
 
 Analyze the bug, the source code, the tests and the docs. Understand the likely scope of the bug fix.
-If the fix requires modifications to the source code, you will need to spawn and Engineer.
-If the fix will require modifications to unit tests, you will need to spawn a Test Writer.
-Always spawn a Doc Writer so that it can determine if any docs need updating based on the changes.
+If the fix requires modifications to the source code, you will need to dispatch `apiary-engineer-bugfix`.
+If the fix will require modifications to unit tests, you will need to dispatch `apiary-test-writer-bugfix`.
+Always dispatch `apiary-doc-writer-bugfix` so that it can determine if any docs need updating based on the changes.
 
-Determine the scope and form the appropriate team. Do not ask for confirmation.
+Determine the scope and dispatch the appropriate role subagents as background dispatches. Do not ask for confirmation.
 
-**IMPORTANT: You must stay in `delegate` mode. Do not take on work, delegate work to Team members.**
+**IMPORTANT: You must not do role work yourself. Dispatch subagents, route their reports, and commit.**
 
-The team may consist of any of the following agents:
-- Engineer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Executing implementation Subtasks for a task (if required)
-  - Instructions:
-    - Read the Bug description from the Bees server
-    - Review any relevant internal architecture docs referenced in CLAUDE.md under "Documentation Locations"
-    - Review the existing code to determine the current state
-    - Review the engineering best practices guide referenced in CLAUDE.md under "Documentation Locations"
-    - Modify any source code required to fix the bug
-- Test Writer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Executing testing Subtasks for a task (if required)
-  - Instructions:
-    - Use the test writing guide referenced in CLAUDE.md under "Documentation Locations"
-    - Use the test review guide referenced in CLAUDE.md under "Documentation Locations"
-    - Review the work of the Engineer and see if any tests need to be added, deleted or updated based on that work
-      - Review the work of the Engineer to find any gaps, then add, delete or updated required tests
-- Doc Writer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Execute documentation Subtasks for a task (if required)
-  - Instructions:
-    - Use the doc writing guide referenced in CLAUDE.md under "Documentation Locations"
-    - Review the customer-facing docs referenced in CLAUDE.md under "Documentation Locations" and see if they need any updates
-    - Review the internal architecture docs referenced in CLAUDE.md under "Documentation Locations" and see if they need any updates
-    - Review the work of the Engineer and see if any docs need to be updated based on that work
-      - Review the work of the Engineer to find any gaps, then update docs
-    - Update any docs that require updating
-
+Each role's Responsibilities and Instructions live in its agent definition (`.claude/agents/apiary-*-bugfix.md`). Your dispatch prompt supplies the job-specific context: the Bug ID and any threaded reports from prior roles. Sequencing you own across ticks: on the Engineer's completion tick, dispatch the Test Writer and Doc Writer with the Engineer's report threaded into their prompts — they review the Engineer's work as part of their instructions. After dispatching a tick's work, yield; completion notifications drive the next tick.
 
 #### 4. Review Loop
 
-Once the Team is done, form a review Team to check their work.
-If you invoked the Engineer in the first team, invoke the Code Reviewer in this team.
-If you invoked the Test Writer in the first team, invoke the Test Review in this team.
-If you invoked the Doc Write in the first team, invoke the Doc Reviewer in this team.
+Once the role subagents are done, dispatch the applicable reviewer subagents as parallel background dispatches in a single reconciliation tick.
+If you dispatched the Engineer, dispatch `apiary-code-reviewer`.
+If you dispatched the Test Writer, dispatch `apiary-test-reviewer`.
+If you dispatched the Doc Writer, dispatch `apiary-doc-reviewer`.
 
-- Code Reviewer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Review the output of the Engineer
-    - Provide feedback where the work of the Engineer was not up to standards
-  - Instructions:
-    - Invoke the /code-review skill
-- Test Reviewer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Review the output of the Test Writer
-    - Provide feedback where the work of the Test Writer was not up to standards
-  - Instructions:
-    - Invoke the /test-review skill
-- Doc Reviewer
-  - Model: Claude Sonnet
-  - Responsibilities:
-    - Review the output of the Doc Writer
-    - Provide feedback where the work of the Doc Writer was not up to standards
-  - Instructions:
-    - Invoke the /doc-review skill
+Each reviewer subagent invokes its corresponding review skill (/code-review, /test-review, /doc-review) and returns a numbered list of freeform findings (an explicit "no findings" statement when there are none).
 
 - Get the feedback, and make a judgement call about whether that work must be done
-  - If so, **reform the first team*** to do the work
-    - **IMPORTANT** Stay in delegate mode and do not do the work yourself.
-    - If the feedback was minor enough, you may choose to **NOT** spawn the Product Manager on this iteration 
-    - Spawn any team members required to do the work you deem necessary from the reviewer team
+  - If so, **spawn fresh role subagents** to do the work
+    - **IMPORTANT** Do not do the work yourself — dispatch, route reports, and commit.
+    - If the feedback was minor enough, you may choose to **NOT** dispatch the Product Manager on this iteration 
+    - Dispatch any role subagents required to do the work you deem necessary from the reviewer findings
   - If not, move on to Final Review but you MUST share the ignored feedback for review
   - Note: This could create an infinite loop so you may ignore feedback so long as you present it in Final Review
 
@@ -139,5 +114,3 @@ Once the bug is fixed:
 ```
 
 Output the summary and exit. Do not ask for confirmation.
-
-
