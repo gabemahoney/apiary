@@ -18,6 +18,8 @@ Downstream skills will consume it:
 The PRD must be thorough enough that an agent swarm can execute the work
 autonomously, without needing to ask the user clarifying questions.
 
+You are the **calling agent**. You run the interview with the user, then dispatch the drafting to the `apiary-prd-writer` subagent — a named agent definition installed in `.claude/agents/`, spawned via the Agent tool. You do not write the PRD yourself.
+
 ## Workflow
 
 ### 1. Determine the Idea Bee
@@ -27,10 +29,10 @@ If the user did not provide a Bee id, ask it which Idea Bee you should build the
 
 ### 2. Gather Requirements
 
-You and the user may already have been chatting about and idea, if so, fill out the PRD body with as much
-information as you already have,
+You and the user may already have been chatting about an idea, if so, collect as much
+information as you already have.
 
-Then, interview the user to understand the work. Ask focused questions to fill gaps so you can update the PRD.
+Then, interview the user to understand the work. Ask focused questions to fill gaps.
 
 Key questions to explore:
 - What is the Problem Statement?
@@ -44,111 +46,40 @@ Key questions to explore:
 Use `AskUserQuestion` to gather information efficiently. Present options where
 possible rather than open-ended questions.
 
-#### Style Rules
+### 3. Dispatch the PRD Writer
 
-- **Plain english.** No code, no pseudocode, no technical implementation details.
-- **Concise and direct.** Less is more. Every sentence should add information.
-- **Requirements, not solutions.** Describe what must be true, not how to build it.
-- **Specific and testable.** Every requirement should be verifiable.
-- **No user-story format required.** Just clear statements of what is needed.
-- **Do not number product requirement numbers. Use plan conversational English to describe the problem**
+Dispatch `apiary-prd-writer` via the Agent tool:
+`Agent(subagent_type: "apiary-prd-writer", prompt: <dispatch prompt>, model: <per the job → model mapping below>)`
 
-#### Required Sections
+Dispatch rules:
 
-```markdown
-# [Feature/Project Name]
+- **Background dispatch**: if the Agent tool schema accepts `run_in_background`, pass `run_in_background: true`; otherwise omit it — background is the harness default under Claude Code fork-subagents mode. When the completion notification fires, present the report (step 4).
+- **Cold start**: every dispatch is a fresh spawn with a self-contained prompt. The subagent cannot see this conversation and cannot ask the user anything — everything it needs must be in the dispatch prompt.
 
-## Problem Statement
-What problem exists today? Who has it? Why does it matter?
-Keep this to 2-3 sentences max.
+The dispatch prompt must contain:
+- The Idea Bee ID (the subagent reads the ticket from the bees CLI itself)
+- The full set of interview answers and any relevant context from your conversation with the user — serialized as text, complete enough that the writer never has to guess
+- On a revision dispatch: the existing PRD ticket ID and the user's change notes
 
-## Goals
-What must be true when this work is complete?
-Bulleted list of concrete outcomes.
+The subagent drafts the PRD, creates (or updates) it as a child of the Idea Bee with title "PRD" and status `larva`, and returns a report.
 
-## Non-Goals / Out of Scope
-What this effort explicitly will NOT do.
-Prevents scope creep during implementation.
+#### Job → model mapping
 
-## Requirements
+Pass `model` at dispatch time — model choice belongs to this skill, not the agent definition:
 
-### Functional Requirements
-What the system must do. Each requirement should be:
-- Specific enough to test
-- Independent where possible
+| Agent | Model |
+|---|---|
+| `apiary-prd-writer` | opus |
 
-### Edge Cases and Error Handling
-How the system should behave in non-happy-path scenarios.
-Each edge case should describe the scenario and the expected behavior.
+### 4. Report to the User
 
-### Non-Functional Requirements (if applicable)
-Performance, security, scalability, compatibility constraints.
-Only include if relevant — do not pad with boilerplate.
-
-### UI/UX Requirements (if applicable)
-Layout, interaction, and presentation requirements.
-Only include if the feature has a user-facing component.
-
-## Acceptance Criteria
-The checklist that must pass for this work to be considered done.
-Each criterion should be observable and testable.
-Format as a checklist:
-- [ ] Criterion 1
-- [ ] Criterion 2
-
-## Assumptions
-What is assumed to be true going into this work.
-Dependencies on other systems, existing functionality, or prior work.
-
-## Open Questions (if any)
-Unresolved decisions flagged for user review.
-Remove this section if there are none.
-```
-
-### 3. Present and Iterate
-
-After writing the PRD, present a summary to the user:
+When the subagent's report arrives, tell the user the results:
+- The PRD ticket ID
 - One-line description of each section
-- Call out any assumptions made
-- Highlight open questions
+- Assumptions the writer made
+- Open questions the writer flagged
 
-Use `AskUserQuestion` with:
-- Question: "PRD is ready. How would you like to proceed?"
-- Options:
-  - "Looks good, save it"
-  - "I have changes to suggest"
-  - "Run /req-review on it"
-
-If the user has changes, iterate until they approve.
-
-## Quality Checklist
-
-Before presenting the PRD, verify:
-
-- [ ] Problem statement is clear and concise
-- [ ] Goals are concrete and measurable
-- [ ] Non-goals section exists and prevents scope creep
-- [ ] Every functional requirement is testable
-- [ ] Edge cases and error scenarios are covered
-- [ ] Acceptance criteria are specific and observable
-- [ ] Assumptions are explicitly stated
-- [ ] No implementation details or code anywhere in the document
-- [ ] No contradictions between sections
-- [ ] An agent could implement this without making assumptions
-
-## What NOT to Include
-
-- Source code, pseudocode, or technical implementation details
-- Architecture decisions or design proposals (that's the SRD's job)
-- Time estimates or scheduling
-- Specific file paths, function names, or line numbers
-- "How to build it" — only "what must be true"
-
-### 4. Write the PRD
-
-Add the PRD as a child to the Idea bee.
-Use the title "PRD".
-Set its status to `larva`.
+If the user wants changes, gather them and re-dispatch (fresh spawn, with the existing PRD ticket ID and the change notes in the prompt). Repeat until the user is satisfied.
 
 ### 5. Next steps
 
