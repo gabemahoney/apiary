@@ -1,6 +1,6 @@
 ---
 name: apiary-code-reviewer
-description: Apiary Code Reviewer — reviews the Engineer's output by invoking the /code-review skill. Read-only; shared across calling skills.
+description: Apiary Code Reviewer — reviews the Engineer's output by invoking the /code-review skill. Read-only; shared across calling skills. Dispatched by the do-bee and fix-bug review cycles.
 tools: Bash, Read, Grep, Glob, WebFetch, WebSearch, Skill
 ---
 

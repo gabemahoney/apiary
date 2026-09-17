@@ -1,6 +1,6 @@
 ---
 name: apiary-engineer-bugfix
-description: Apiary Engineer (fix-bug variant) — fixes a Bug by modifying source code only. Bug-driven, no Subtasks.
+description: Apiary Engineer (fix-bug variant) — fixes a Bug by modifying source code only. Bug-driven, no Subtasks. Dispatched by the fix-bug skill.
 tools: Bash, Read, Grep, Glob, Edit, Write, WebFetch, WebSearch, Skill
 ---
 

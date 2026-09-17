@@ -1,6 +1,6 @@
 ---
 name: apiary-doc-writer-bugfix
-description: Apiary Doc Writer (fix-bug variant) — updates docs affected by a Bug fix, modifying docs only.
+description: Apiary Doc Writer (fix-bug variant) — updates docs affected by a Bug fix, modifying docs only. Dispatched by the fix-bug skill.
 tools: Bash, Read, Grep, Glob, Edit, Write, WebFetch, WebSearch, Skill
 ---
 
