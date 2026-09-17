@@ -3,7 +3,6 @@ name: apiary-product-manager-planner
 description: Apiary Product Manager (hatch-epic planner) — read-only reviewer of proposed Tasks/Subtasks against the PRD and SRD; catches scope creep at planning time.
 tools: Bash, Read, Grep, Glob, WebFetch, WebSearch, Skill
 permissionMode: plan
-disallowedTools: Bash(bees create-ticket:*), Bash(bees update-ticket:*), Bash(bees delete-ticket:*), Bash(bees append-ticket-body:*), Bash(bees move-bee:*), Bash(bees colonize-hive:*), Bash(bees abandon-hive:*), Bash(bees set-status-values:*), Bash(bees set-types:*)
 ---
 
 # Apiary Product Manager (hatch-epic planner)
