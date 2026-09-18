@@ -124,6 +124,8 @@ If a hive exists:
 
 ### Documentation Locations
 
+With hive configuration complete, the final setup step is to record where your project's documentation lives so that Apiary agents can find and update it automatically.
+
 After hives are configured, ask the user to define their project documentation locations in their CLAUDE.md.
 Note that these are repo-specific documents.
 
