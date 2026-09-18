@@ -24,8 +24,10 @@ First check if the Idea Bee is in the `pupa` state (which means its ready to be 
 
 ### 3. Dispatch the Plan Writer
 
+Before dispatching, read the `apiary-plan-writer` agent definition file from the installed `.claude/agents/` directory and confirm the frontmatter's model field is present and not the placeholder value. If it is missing or still the placeholder, abort with: "Cannot dispatch apiary-plan-writer: model is not configured. Run /apiary-setup to select a model for each role."
+
 Dispatch `apiary-plan-writer` via the Agent tool:
-`Agent(subagent_type: "apiary-plan-writer", prompt: <dispatch prompt>, model: <per the job → model mapping below>)`
+`Agent(subagent_type: "apiary-plan-writer", prompt: <dispatch prompt>)`
 
 Dispatch rules:
 
@@ -39,15 +41,6 @@ The dispatch prompt must contain:
 - Any architectural decisions or constraints from your conversation with the user — use the user's exact specification, do not paraphrase
 
 The subagent reads the requirements documents, explores the repo, creates the Plan Bee (with `up_deps` and `reference_materials` pointing at the Idea Bee) and its Epics in the Plans hive, sets up dependencies and statuses (Plan Bee `pupa`, Epics `larva`), and returns a report.
-
-#### Job → model mapping
-
-Pass `model` at dispatch time — model choice belongs to this skill, not the agent definition:
-If the user requests a specific model, pass it at dispatch in place of the mapping default — still use the `apiary-*` agent, never a general-purpose one.
-
-| Agent | Model |
-|---|---|
-| `apiary-plan-writer` | opus |
 
 ### 4. Report to the User
 

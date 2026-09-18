@@ -122,9 +122,23 @@ If a hive exists:
 - Validate its child tiers and status values.
 - If they differ from above, ask user if you may change them to the values listed above.
 
+### Model Configuration
+
+After hives are configured, walk the operator through selecting a model for each agent role. This is required before any Apiary skill can dispatch subagents.
+
+Explain to the user: "Each Apiary agent role needs a model assigned. You must configure one now or skills will refuse to dispatch. Enter any model identifier your Claude Code installation supports (e.g. a model ID string)."
+
+For each of the 18 agent definition files, present the agent's name and role description, ask the user which model to assign it, then write the chosen value into the frontmatter's model field — the line whose value is currently the placeholder `CONFIGURE_ME`. Replace the placeholder with the user's answer. Write to the agent files at the install path detected in Step 2 (either `<repo>/.claude/agents/` or `~/.claude/agents/`) — not the source repo's `agents/` directory.
+
+Group the 18 agents by functional role to make the choices easier — for example: executor roles (engineer, test-writer, doc-writer, product-manager, and their bugfix and planner variants), reviewer roles (code-reviewer, test-reviewer, doc-reviewer), and writer roles (prd-writer, srd-writer, req-reviewer, plan-writer). Within each group the user may choose to assign all agents the same model or configure them individually — ask which they prefer before prompting per-agent.
+
+After all models are written, confirm to the user that configuration is complete and all agents are ready.
+
+---
+
 ### Documentation Locations
 
-After hives are configured, ask the user to define their project documentation locations in their CLAUDE.md.
+After model configuration and hives are configured, ask the user to define their project documentation locations in their CLAUDE.md.
 Note that these are repo-specific documents.
 
 Use AskUserQuestion to ask: "Would you like to define repo-specific documentation locations in a repo-specific CLAUDE.md now?"

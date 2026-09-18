@@ -13,30 +13,17 @@ You will ultimately get the Bug ID you need to work on.
 
 ### Execution model
 
-You are the **calling agent**. Role players are **subagents** — named agent definitions installed in `.claude/agents/`, spawned via the Agent tool: `Agent(subagent_type: "<agent-name>", prompt: <bug-specific dispatch prompt>, model: <per the job → model mapping below>)`.
+You are the **calling agent**. Role players are **subagents** — named agent definitions installed in `.claude/agents/`, spawned via the Agent tool: `Agent(subagent_type: "<agent-name>", prompt: <bug-specific dispatch prompt>)`.
 
 Rules that apply to every dispatch in this skill:
 
+- **Pre-dispatch validation**: before dispatching any subagent, read the target agent definition file from the installed `.claude/agents/` directory and confirm the frontmatter's model field is present and not the placeholder value. If it is missing or still the placeholder, abort with: "Cannot dispatch <agent-name>: model is not configured. Run /apiary-setup to select a model for each role."
 - **Background dispatch**: if the Agent tool schema accepts `run_in_background`, pass `run_in_background: true`; otherwise omit it — background is the harness default under Claude Code fork-subagents mode. Every dispatch in this skill is a background dispatch.
 - **Cold start**: subagents are never named, reused, or messaged mid-flight. Every dispatch is a fresh spawn with a self-contained prompt. Dispatch prompts name the Bug ID; subagents read the ticket from the bees CLI themselves.
 - **Hub-and-spoke**: subagents never talk to each other. The working tree diff plus the returned report is the handoff. You serialize dependent roles and thread each report into the next role's dispatch prompt.
 - **Reconciliation loop**: drive the work event-driven, not as one big blocking turn. Each tick: (1) observe current state — ticket store, working tree, in-flight Agent status; (2) reconcile — dispatch whatever fresh Agent invocations the delta requires; (3) yield the turn. The harness fires a completion notification when each background Agent finishes; that notification triggers the next tick. No polling, no sleep loops, no blocking waits inside a turn.
 - **Compaction recovery**: when a compaction/summarization marker is visible in your conversation, everything before it is non-authoritative. Before dispatching the next tick's work after a compaction, re-read the authoritative sources in full — the bees CLI for ticket state, git for code state, and the filesystem for any state files. Conversation memory is never a substitute for these sources.
 - **Delegate discipline**: you must not do role work yourself. You dispatch subagents, route reports on completion, and commit.
-
-#### Job → model mapping
-
-Pass `model` at dispatch time — model choice belongs to this skill, not the agent definition:
-If the user requests a specific model, pass it at dispatch in place of the mapping default — still use the `apiary-*` agent, never a general-purpose one.
-
-| Agent | Model |
-|---|---|
-| `apiary-engineer-bugfix` | sonnet |
-| `apiary-test-writer-bugfix` | sonnet |
-| `apiary-doc-writer-bugfix` | sonnet |
-| `apiary-code-reviewer` | sonnet |
-| `apiary-test-reviewer` | sonnet |
-| `apiary-doc-reviewer` | sonnet |
 
 ### Setup:
 There must be a hive called "Bugs". If it does not exist, ask the user where you can create one.

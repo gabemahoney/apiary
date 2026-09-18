@@ -69,7 +69,7 @@ Task 1: Implement CSV export functionality
 
 ### 4. Dispatch Planner Subagents to Break Task into Subtasks
 
-You are the **calling agent**. Planner role players are **subagents** — named agent definitions installed in `.claude/agents/`, spawned via the Agent tool: `Agent(subagent_type: "<agent-name>", prompt: <task-specific dispatch prompt>, model: <per the job → model mapping below>)`. Your responsibilities are:
+You are the **calling agent**. Planner role players are **subagents** — named agent definitions installed in `.claude/agents/`, spawned via the Agent tool: `Agent(subagent_type: "<agent-name>", prompt: <task-specific dispatch prompt>)`. Your responsibilities are:
   - Surface design questions back to the Caller
     - If the planner subagents propose different approaches to a problem, surface this back up to the caller with an AskUserQuestion
   - Responsible for coordinating the planner subagents and ensuring all work is complete, but the Product Manager has final authority on quality and completeness
@@ -80,6 +80,7 @@ You are the **calling agent**. Planner role players are **subagents** — named 
 
 Rules that apply to every dispatch in this skill:
 
+- **Pre-dispatch validation**: before dispatching any subagent, read the target agent definition file from the installed `.claude/agents/` directory and confirm the frontmatter's model field is present and not the placeholder value. If it is missing or still the placeholder, abort with: "Cannot dispatch <agent-name>: model is not configured. Run /apiary-setup to select a model for each role."
 - **Background dispatch**: if the Agent tool schema accepts `run_in_background`, pass `run_in_background: true`; otherwise omit it — background is the harness default under Claude Code fork-subagents mode. Every dispatch in this skill is a background dispatch.
 - **Cold start**: subagents are never named, reused, or messaged mid-flight. Every dispatch is a fresh spawn with a self-contained prompt. Dispatch prompts name the relevant ticket IDs; planner subagents read the tickets from the bees CLI themselves.
 - **Hub-and-spoke**: subagents never talk to each other. Each planner returns its proposals in its report; you serialize dependent roles and thread each report into the next role's dispatch prompt.
@@ -129,19 +130,6 @@ acceptance criteria:
 ```
 
 Each planner's Responsibilities and Instructions live in its agent definition (`.claude/agents/apiary-*-planner.md`).
-
-##### Job → model mapping
-
-Pass `model` at dispatch time — model choice belongs to this skill, not the agent definition:
-If the user requests a specific model, pass it at dispatch in place of the mapping default — still use the `apiary-*` agent, never a general-purpose one.
-
-| Agent | Model |
-|---|---|
-| `apiary-engineer-planner` | sonnet |
-| `apiary-test-writer-planner` | sonnet |
-| `apiary-doc-writer-planner` | sonnet |
-| `apiary-product-manager-planner` | opus |
-
 
 #### Mandatory Subtask Description Template
 

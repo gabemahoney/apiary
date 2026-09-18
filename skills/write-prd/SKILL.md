@@ -48,8 +48,10 @@ possible rather than open-ended questions.
 
 ### 3. Dispatch the PRD Writer
 
+Before dispatching, read the `apiary-prd-writer` agent definition file from the installed `.claude/agents/` directory and confirm the frontmatter's model field is present and not the placeholder value. If it is missing or still the placeholder, abort with: "Cannot dispatch apiary-prd-writer: model is not configured. Run /apiary-setup to select a model for each role."
+
 Dispatch `apiary-prd-writer` via the Agent tool:
-`Agent(subagent_type: "apiary-prd-writer", prompt: <dispatch prompt>, model: <per the job → model mapping below>)`
+`Agent(subagent_type: "apiary-prd-writer", prompt: <dispatch prompt>)`
 
 Dispatch rules:
 
@@ -62,15 +64,6 @@ The dispatch prompt must contain:
 - On a revision dispatch: the existing PRD ticket ID and the user's change notes
 
 The subagent drafts the PRD, creates (or updates) it as a child of the Idea Bee with title "PRD" and status `larva`, and returns a report.
-
-#### Job → model mapping
-
-Pass `model` at dispatch time — model choice belongs to this skill, not the agent definition:
-If the user requests a specific model, pass it at dispatch in place of the mapping default — still use the `apiary-*` agent, never a general-purpose one.
-
-| Agent | Model |
-|---|---|
-| `apiary-prd-writer` | opus |
 
 ### 4. Report to the User
 

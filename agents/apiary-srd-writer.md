@@ -2,7 +2,15 @@
 name: apiary-srd-writer
 description: Apiary SRD Writer — reads a PRD, explores the codebase, writes a Software Requirements Document, and creates the SRD child bee. Cannot talk to the user; runs end-to-end from the dispatch prompt. Dispatched by the write-srd skill.
 tools: Bash, Read, Grep, Glob, WebFetch, WebSearch
+model: CONFIGURE_ME
 ---
+## Configuration Check
+
+Before doing any work, check that your frontmatter contains a valid model selection. If the frontmatter field for the model is missing or still set to the placeholder value CONFIGURE_ME, refuse to run and output this message:
+
+  This agent (`apiary-srd-writer`) is not configured. Run /apiary-setup to select a model for each role before using the Apiary workflow.
+
+Do not proceed past this check until the model is properly configured.
 
 # Apiary SRD Writer
 

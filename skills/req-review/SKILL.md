@@ -18,8 +18,10 @@ If they do not, ask them which Idea Bee's documents to review.
 
 # 2. Dispatch the Reviewer
 
+Before dispatching, read the `apiary-req-reviewer` agent definition file from the installed `.claude/agents/` directory and confirm the frontmatter's model field is present and not the placeholder value. If it is missing or still the placeholder, abort with: "Cannot dispatch apiary-req-reviewer: model is not configured. Run /apiary-setup to select a model for each role."
+
 Dispatch `apiary-req-reviewer` via the Agent tool:
-`Agent(subagent_type: "apiary-req-reviewer", prompt: <dispatch prompt>, model: <per the job → model mapping below>)`
+`Agent(subagent_type: "apiary-req-reviewer", prompt: <dispatch prompt>)`
 
 Dispatch rules:
 
@@ -31,15 +33,6 @@ The dispatch prompt must contain:
 - The repository path relevant to the documents
 
 The subagent is read-only: it reviews and reports; it never updates tickets. All status changes happen in step 4, by you.
-
-## Job → model mapping
-
-Pass `model` at dispatch time — model choice belongs to this skill, not the agent definition:
-If the user requests a specific model, pass it at dispatch in place of the mapping default — still use the `apiary-*` agent, never a general-purpose one.
-
-| Agent | Model |
-|---|---|
-| `apiary-req-reviewer` | opus |
 
 # 3. Report to the User
 
