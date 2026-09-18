@@ -50,5 +50,7 @@ When the subagent's report arrives, tell the user the results as a markdown summ
 
 ### 5. Continue to hatch-epic
 
-Load the `hatch-epic` skill and execute it for each Epic in dependency order until all are hatched.
-Do not ask the user for permission — proceed automatically.
+Load the `hatch-epic` skill and run it once per Epic — pass each Epic ID explicitly, in dependency order — until EVERY Epic in the Plan Bee is hatched (status `pupa`). Run fully automatically: no user prompts between Epics.
+Hatching is planning only: do NOT invoke `do-bee` or begin any execution until all Epics are hatched. Execution is a separate, later step. (During execution, do-bee reconciles already-hatched Epics against completed work — never a reason to defer hatching.)
+If hatching is interrupted mid-batch, resume `hatch-epic` for the remaining `larva` Epics before any execution begins.
+After hatching, query the Plan Bee's child Epics and confirm none are `larva` before declaring the plan ready.

@@ -7,6 +7,8 @@ description: Break down a single Epic into Tasks. User can provide Epic ID or a 
 
 Your job is to break down an Epic ticket into Tasks and Subtasks.
 
+One invocation hatches ONE Epic. In the normal flow (from make-plan), it is run repeatedly until every Epic in the Bee is hatched — all before any execution (`do-bee`) begins. Every `larva` Epic is hatchable immediately; dependency order is a sequencing preference, not a gate.
+
 ## Workflow
 
 ### 1. Determine Which Epic to Break Down
@@ -15,7 +17,7 @@ Your job is to break down an Epic ticket into Tasks and Subtasks.
 
 **If caller provides a Bee ID**: Find workable Epics automatically by querying the `bees` MCP server for any
 Epic children of that Bee in the `larva` state. These are Epics that are written but whose children (Tasks) have not been written yet.
-If there are multiple, use `AskUserQuestion` with `multiSelect: false` to let user pick ONE Epic. Review the 
+Automated/batch callers (e.g. make-plan, or an orchestrator finishing hatching for a Bee) must pass an explicit Epic ID so this picker never fires; the Bee-ID lookup path is for standalone user invocation only. If there are multiple, use `AskUserQuestion` with `multiSelect: false` to let the user pick ONE Epic. Review the
 dependency chain and recommend the one that makes the most sense:
 - Question: "Which Epic do you want to hatch?"
 - Options:
@@ -33,8 +35,8 @@ Fetch full Epic details from the Bees server to understand scope of total work.
 - Read the reference_materials linked in the parent Bee.
 - Identify what implementation work is needed as a list of Tasks.
 - Find any Epics this Epic depends on (check `up_dependencies` field) and use `show_ticket()` to read them
-  - These Epics describe foundational work that will be complete before this Epic you are working on is done
-  - So presume that foundational work is done and make a plan to build on top of it
+  - These Epics will be *executed* before this Epic is *executed*. You are hatching NOW, before ANY execution has started — hatching never waits on execution of other Epics.
+  - When writing Tasks, plan as if that foundational work will exist by the time this Epic executes; do not duplicate it. (do-bee later reconciles these Tasks against what was actually built.)
 - Check for sibling overlap: 
   - Read ALL sibling Epics under the same Bee. 
   - Before proposing any Task, verify it does not duplicate work scoped to another Epic. 
@@ -151,7 +153,7 @@ Specific files, functions, and changes required. Include line numbers where know
 
 #### Task Loop
 Spawn fresh planner subagents per Task via background dispatch, threading prior-Task reports into subsequent dispatch prompts. Work through each Task sequentially, planning subtasks one Task at a time, **without asking the User for permission** — reconcile each Task's completion notifications before dispatching the next Task's planners. Within a single Task you may dispatch multiple planners in parallel (Engineer/Test Writer/Doc Writer research on disjoint parts before the Product Manager's synthesis).
-Only stop to review with the User once all Tasks are done.
+Do not stop for user review between Tasks — proceed to step 5 when all Tasks are done (step 5 defines when, if ever, to offer a user review).
 
 ### 5. Review Epic 
 
@@ -159,7 +161,7 @@ When all Tasks are complete,
 - Review quality of Task and Subtasks, make final decision when to present completed Task to caller
 - You must defer to the Product Manager on whether a Task is final and complete
 
-After Epic is complete, then create Tasks.
+Create all the Tasks and Subtasks for the Epic in the ticket store, then set the statuses below.
 Each Task should be a Child of the Epic it is for (and the Epic should be marked as Parent).
 If Tasks must be completed sequentially, add up and down dependencies to relevant tickets.
 
@@ -168,7 +170,7 @@ If Tasks must be completed sequentially, add up and down dependencies to relevan
 - Set each Task to `pupa` (it is written and its children — the Subtasks — are written)
 - Set each Subtask to `pupa` (it is written and has no children)
 
-Show the Tasks you just created to the User in detail and ask them if they want to make modifications.
+When invoked from make-plan's batch flow, do not show the Tasks to the User or ask for modifications — finish the status updates above and continue to the next Epic. (If a user invoked this skill standalone, you may offer that review.) Genuine blocking design questions are still escalated as they arise (step 4).
 
 
 #### Checklist Before Returning

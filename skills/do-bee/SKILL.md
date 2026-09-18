@@ -6,10 +6,10 @@ description: Proceed through each Epic in a Bee, doing the work described therin
 ## Overview
 
 This skill orchestrates the work for a complete Bee ticket by:
-1. Finding the Bee to work on and validating it is ready
+1. Finding the Bee to work on and validating it is ready (all child Epics hatched — none `larva`)
 2. Finding the best Epic to work on
    2.1. Validating the Epic is unblocked
-   2.2. Validating the Epic description still makes sense after reviewing work completed in previous Epics
+   2.2. Reconciling the Epic and downstream plan against work completed in previous Epics (re-plan, not hatch)
 3. Spawning role subagents to complete the work described in the Epic
    3.1. Sending questions and requests for clarification or guidance to the caller
    3.2. Creating one git commit per Task that includes all changes for that Task
@@ -43,7 +43,8 @@ The user will either call without arguments, with a Bee id or with an Epic ID:
 You will ultimately get the Bee ID you need to work on.
 Validate it is ready for work:
 - Must have a status of `pupa` or `worker`
-- If it has `up_dependencies` they must be in `pupa` state
+- If it has `up_dependencies` they must be `pupa` or later (not `larva`). (This leniency is deliberate: Bee-level dependencies express planning order, not "code already written".)
+- All child Epics must be `pupa` or later — none `larva`. A `larva` Epic means hatching is incomplete: stop and tell the caller to finish `hatch-epic` for every remaining `larva` Epic under this Bee. Never hatch Epics yourself; never execute a partially hatched Bee.
 
 #### Validate worktree
 You should have been launched in a worktree with a name like "b_Wx7" for a bee called "b.Wx7".
@@ -55,15 +56,17 @@ If you are not launched in such a worktree, use AskUserQuestion to confirm they 
 Find all Epics in the Bee and recommend the best one to work on first:
 - Must have a status of `pupa` or `worker`
 - If it has `up_dependencies` they must be in `finished` state
+- If ANY Epic under the Bee is still `larva`, that is an error — the Bee was handed off before hatching completed. Stop and report it to the caller; do not hatch it yourself and do not execute around it.
 
 
-#### Check if stale
-Be aware that the Epic was written before coding started. If the Epic has `up_dependencies` that have been completed then
-you must review the work actually done in those Epics to see if this current Epic description is stale:
+#### Reconcile the plan against completed work (re-plan, not hatch)
+All Epics were hatched up front, before any coding started, so each completed Epic can make the remaining plan stale. Before starting work on each Epic (skip this pass only when no Epic in the Bee is `finished` yet — nothing has been built):
 
-1. Review the git diff to understand what was actually implemented
-2. Read the upcoming Epic and its Tasks/Subtasks
-3. Update any Task or Subtask descriptions that are now stale given what the worker built (e.g., file paths changed, function signatures differ, new modules were created)
+1. Review the git diff of the Epics completed so far to understand what was actually built
+2. Read this upcoming Epic and its Tasks/Subtasks; update any descriptions now stale given what was built (file paths changed, function signatures differ, new modules created)
+3. Scan downstream not-yet-started Epics for descriptions the completed work has outright invalidated (removed files, renamed modules, changed contracts) and fix those; leave cosmetic drift for that Epic's own reconcile pass when it comes up
+
+This is RE-PLANNING: you are editing Tasks/Subtasks of Epics that are already hatched (`pupa`). It NEVER creates Tasks for a `larva` Epic — that is hatching, which finished before this skill started. This reconcile pass is exactly why all hatching can and must happen up front.
 
 #### Mark status when ready to start work
 
@@ -130,7 +133,7 @@ One of:
 ```
 
 #### 4.2 Find next Epic or move to Final Review
-If there are more Epics to work on, ask the user if they want to continue with the next logical one. If so, clear your context window and go back to step 2.
+If there are more Epics to work on, continue automatically with the next logical one — it must already be hatched (`pupa` or `worker`, never `larva`); execution never triggers hatching. Clear your context window and go back to step 2, which includes the reconcile pass.
 If not, move to final Bee review.
 
 ### 5. Final Bee-level Code, Doc and Eng reviews
