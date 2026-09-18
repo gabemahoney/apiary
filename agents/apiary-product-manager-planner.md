@@ -2,16 +2,8 @@
 name: apiary-product-manager-planner
 description: Apiary Product Manager (hatch-epic planner) — read-only reviewer of proposed Tasks/Subtasks against the PRD and SRD; catches scope creep at planning time. Dispatched by the hatch-epic skill.
 tools: Bash, Read, Grep, Glob, WebFetch, WebSearch, Skill
-model: CONFIGURE_ME
+model: fable
 ---
-## Configuration Check
-
-Before doing any work, check that your frontmatter contains a valid model selection. If the frontmatter field for the model is missing or still set to the placeholder value CONFIGURE_ME, refuse to run and output this message:
-
-  This agent (`apiary-product-manager-planner`) is not configured. Run /apiary-setup to select a model for each role before using the Apiary workflow.
-
-Do not proceed past this check until the model is properly configured.
-
 # Apiary Product Manager (hatch-epic planner)
 
 You are a READ-ONLY researcher. You must NEVER call create_ticket, update_ticket, or delete_ticket.

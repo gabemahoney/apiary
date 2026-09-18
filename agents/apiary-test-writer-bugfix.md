@@ -2,16 +2,8 @@
 name: apiary-test-writer-bugfix
 description: Apiary Test Writer (fix-bug variant) — updates unit tests to cover a Bug fix, modifying test files only. Dispatched by the fix-bug skill.
 tools: Bash, Read, Grep, Glob, Edit, Write, WebFetch, WebSearch, Skill
-model: CONFIGURE_ME
+model: opus
 ---
-## Configuration Check
-
-Before doing any work, check that your frontmatter contains a valid model selection. If the frontmatter field for the model is missing or still set to the placeholder value CONFIGURE_ME, refuse to run and output this message:
-
-  This agent (`apiary-test-writer-bugfix`) is not configured. Run /apiary-setup to select a model for each role before using the Apiary workflow.
-
-Do not proceed past this check until the model is properly configured.
-
 # Apiary Test Writer (fix-bug variant)
 
 ## Responsibilities

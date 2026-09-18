@@ -19,8 +19,6 @@ If nothing, ask them for the Bee in the Idea hive that has the PRD as a child.
 
 ## 2. Dispatch the SRD Writer
 
-Before dispatching, read the `apiary-srd-writer` agent definition file from the installed `.claude/agents/` directory and confirm the frontmatter's model field is present and not the placeholder value. If it is missing or still the placeholder, abort with: "Cannot dispatch apiary-srd-writer: model is not configured. Run /apiary-setup to select a model for each role."
-
 Dispatch `apiary-srd-writer` via the Agent tool:
 `Agent(subagent_type: "apiary-srd-writer", prompt: <dispatch prompt>)`
 

@@ -27,12 +27,12 @@ In either case, Claude will copy each skill directory (`apiary-setup`, `idea`, `
 
 ### Execution model
 
-Apiary's execution skills spawn role players (Engineer, Test Writer, Doc Writer, Product Manager, and reviewers) as **named subagents** via the Agent tool. The document and planning skills (`write-prd`, `write-srd`, `req-review`, `make-plan`) likewise delegate their heavy work to named subagents (PRD Writer, SRD Writer, Requirements Reviewer, Plan Writer) — the calling agent handles user interaction and reports the results. All definitions live in the install's `.claude/agents/` directory (user-global or per-repo, mirroring the skill install). Subagents run in-process and inherit the calling agent's permission surface — no experimental feature flags required. Each agent's model is configured in its frontmatter by the operator via `/apiary-setup`; the harness resolves the model from the agent definition — skills validate the field is set before dispatching but do not override it.
+Apiary's execution skills spawn role players (Engineer, Test Writer, Doc Writer, Product Manager, and reviewers) as **named subagents** via the Agent tool. The document and planning skills (`write-prd`, `write-srd`, `req-review`, `make-plan`) likewise delegate their heavy work to named subagents (PRD Writer, SRD Writer, Requirements Reviewer, Plan Writer) — the calling agent handles user interaction and reports the results. All definitions live in the install's `.claude/agents/` directory (user-global or per-repo, mirroring the skill install). Subagents run in-process and inherit the calling agent's permission surface — no experimental feature flags required. Each agent's model is set in its frontmatter; the harness resolves the model from the agent definition.
 
 ### 3. Configure
 Run `/apiary-setup`
 
-This step is required before running any skill. It configures hives and walks you through assigning a model to each agent role. Skills check each agent's model before dispatching it and refuse to dispatch an unconfigured agent.
+This step is required before running any skill. It configures hives for the Apiary workflow.
 
 
 ## Workflow

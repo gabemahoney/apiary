@@ -26,7 +26,6 @@ You are the **calling agent**. Role players (Engineer, Test Writer, Doc Writer, 
 
 Rules that apply to every dispatch in this skill:
 
-- **Pre-dispatch validation**: before dispatching any subagent, read the target agent definition file from the installed `.claude/agents/` directory and confirm the frontmatter's model field is present and not the placeholder value. If it is missing or still the placeholder, abort with: "Cannot dispatch <agent-name>: model is not configured. Run /apiary-setup to select a model for each role."
 - **Background dispatch**: if the Agent tool schema accepts `run_in_background`, pass `run_in_background: true`; otherwise omit it — background is the harness default under Claude Code fork-subagents mode. Every dispatch in this skill is a background dispatch.
 - **Cold start**: subagents are never named, reused, or messaged mid-flight. Every dispatch is a fresh spawn with a self-contained prompt. Dispatch prompts name the relevant ticket IDs; subagents read the tickets from the bees CLI themselves.
 - **Hub-and-spoke**: subagents never talk to each other. The working tree diff plus the returned report is the handoff. You serialize dependent roles and thread each report into the next role's dispatch prompt.

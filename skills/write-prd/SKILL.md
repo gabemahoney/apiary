@@ -48,8 +48,6 @@ possible rather than open-ended questions.
 
 ### 3. Dispatch the PRD Writer
 
-Before dispatching, read the `apiary-prd-writer` agent definition file from the installed `.claude/agents/` directory and confirm the frontmatter's model field is present and not the placeholder value. If it is missing or still the placeholder, abort with: "Cannot dispatch apiary-prd-writer: model is not configured. Run /apiary-setup to select a model for each role."
-
 Dispatch `apiary-prd-writer` via the Agent tool:
 `Agent(subagent_type: "apiary-prd-writer", prompt: <dispatch prompt>)`
 

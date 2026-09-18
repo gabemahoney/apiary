@@ -24,8 +24,6 @@ First check if the Idea Bee is in the `pupa` state (which means its ready to be 
 
 ### 3. Dispatch the Plan Writer
 
-Before dispatching, read the `apiary-plan-writer` agent definition file from the installed `.claude/agents/` directory and confirm the frontmatter's model field is present and not the placeholder value. If it is missing or still the placeholder, abort with: "Cannot dispatch apiary-plan-writer: model is not configured. Run /apiary-setup to select a model for each role."
-
 Dispatch `apiary-plan-writer` via the Agent tool:
 `Agent(subagent_type: "apiary-plan-writer", prompt: <dispatch prompt>)`
 

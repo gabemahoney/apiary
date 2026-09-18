@@ -18,8 +18,6 @@ If they do not, ask them which Idea Bee's documents to review.
 
 # 2. Dispatch the Reviewer
 
-Before dispatching, read the `apiary-req-reviewer` agent definition file from the installed `.claude/agents/` directory and confirm the frontmatter's model field is present and not the placeholder value. If it is missing or still the placeholder, abort with: "Cannot dispatch apiary-req-reviewer: model is not configured. Run /apiary-setup to select a model for each role."
-
 Dispatch `apiary-req-reviewer` via the Agent tool:
 `Agent(subagent_type: "apiary-req-reviewer", prompt: <dispatch prompt>)`
 
