@@ -1,0 +1,8 @@
+{
+  "skillOverrides": {
+    "do-bee": "off",
+    "fix-bug": "off",
+    "hatch-epic": "off",
+    "make-plan": "off"
+  }
+}
