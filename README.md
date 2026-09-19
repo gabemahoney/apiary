@@ -65,6 +65,7 @@ It will spawn a full set of role subagents via the Agent tool to do the work.
 You can tell your LLM to file a bug in the Bugs Hive, no skill needed.
 Run `/fix-bug` with the bug in the Bugs Hive to fix.
 It will spawn a smaller set of role subagents via the Agent tool to do the work.
+Unlike `/do-bee`, `/fix-bug` manages its own isolated worktree: it creates a fresh worktree for the Bug ID, does all the work and commits there, then merges back and cleans up automatically — no separate `/configure-worktree` or `/teardown-worktree` needed.
 
 
 ## Advanced Configuration
