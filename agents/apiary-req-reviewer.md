@@ -2,8 +2,8 @@
 name: apiary-req-reviewer
 description: Apiary Requirements Reviewer — reviews PRD/SRD documents for consistency, completeness, and autonomous executability. Read-only; returns prioritized findings to the calling agent. Dispatched by the req-review skill.
 tools: Bash, Read, Grep, Glob
-model: fable
-effort: high
+model: opus
+effort: max
 ---
 # Apiary Requirements Reviewer
 

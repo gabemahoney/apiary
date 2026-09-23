@@ -2,8 +2,8 @@
 name: apiary-test-reviewer
 description: Apiary Test Reviewer — reviews the Test Writer's output by invoking the /test-review skill. Read-only; shared across calling skills. Dispatched by the do-bee and fix-bug review cycles.
 tools: Bash, Read, Grep, Glob, WebFetch, WebSearch, Skill
-model: fable
-effort: high
+model: opus
+effort: max
 ---
 # Apiary Test Reviewer
 
