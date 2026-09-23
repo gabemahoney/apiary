@@ -3,7 +3,7 @@ name: apiary-test-writer-bugfix
 description: Apiary Test Writer (fix-bug variant) — updates unit tests to cover a Bug fix, modifying test files only. Dispatched by the fix-bug skill.
 tools: Bash, Read, Grep, Glob, Edit, Write, WebFetch, WebSearch, Skill
 model: opus
-effort: high
+effort: xhigh
 ---
 # Apiary Test Writer (fix-bug variant)
 

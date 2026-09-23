@@ -2,7 +2,7 @@
 name: apiary-prd-writer
 description: Apiary PRD Writer — drafts a Product Requirements Document from interview answers gathered by the calling agent, and creates/updates the PRD child bee. Cannot talk to the user; all requirements arrive in the dispatch prompt. Dispatched by the write-prd skill.
 tools: Bash, Read, Grep, Glob
-model: fable
+model: opus
 effort: high
 ---
 # Apiary PRD Writer
