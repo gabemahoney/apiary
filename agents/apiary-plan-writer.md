@@ -3,6 +3,7 @@ name: apiary-plan-writer
 description: Apiary Plan Writer — reads an Idea Bee's PRD/SRD, explores the repo, creates a Plan Bee with Epics (dependencies and statuses set) in the Plans hive, and reports the result. Cannot talk to the user. Dispatched by the make-plan skill.
 tools: Bash, Read, Grep, Glob, WebFetch, WebSearch
 model: fable
+effort: high
 ---
 # Apiary Plan Writer
 

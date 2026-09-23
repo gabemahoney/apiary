@@ -3,6 +3,7 @@ name: apiary-doc-writer
 description: Apiary Doc Writer (do-bee executor) — executes documentation Subtasks for a Task, modifying docs only. Dispatched by the do-bee skill.
 tools: Bash, Read, Grep, Glob, Edit, Write, WebFetch, WebSearch, Skill
 model: opus
+effort: high
 ---
 # Apiary Doc Writer (do-bee executor)
 

@@ -3,6 +3,7 @@ name: apiary-test-writer
 description: Apiary Test Writer (do-bee executor) — executes testing Subtasks for a Task, modifying test files only. Dispatched by the do-bee skill.
 tools: Bash, Read, Grep, Glob, Edit, Write, WebFetch, WebSearch, Skill
 model: opus
+effort: high
 ---
 # Apiary Test Writer (do-bee executor)
 
