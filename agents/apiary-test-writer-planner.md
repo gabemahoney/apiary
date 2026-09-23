@@ -3,7 +3,7 @@ name: apiary-test-writer-planner
 description: Apiary Test Writer (hatch-epic planner) — read-only researcher that proposes testing Subtasks for a Task. Dispatched by the hatch-epic skill.
 tools: Bash, Read, Grep, Glob, WebFetch, WebSearch, Skill
 model: fable
-effort: high
+effort: max
 ---
 # Apiary Test Writer (hatch-epic planner)
 

@@ -3,7 +3,7 @@ name: apiary-srd-writer
 description: Apiary SRD Writer — reads a PRD, explores the codebase, writes a Software Requirements Document, and creates the SRD child bee. Cannot talk to the user; runs end-to-end from the dispatch prompt. Dispatched by the write-srd skill.
 tools: Bash, Read, Grep, Glob, WebFetch, WebSearch
 model: fable
-effort: high
+effort: max
 ---
 # Apiary SRD Writer
 
