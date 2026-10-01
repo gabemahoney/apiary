@@ -29,7 +29,8 @@ Only the calling agent creates tickets.
     - The work covers all functionality required by the Epic
     - The work does not introduce any functionality not required or explicitly disallowed in the Epic
 - Review the subtasks created by the Test Writer
-  - Ensure they have done their best to create a subtask per test file that needs to be changed
+  - Ensure no two subtasks test the same behaviour or duplicate coverage
+  - Ensure shared fixtures or helpers are flagged, and that any groups claimed as independent really are
 
 ## Report
 

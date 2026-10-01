@@ -21,11 +21,13 @@ Only the calling agent creates tickets.
 - Use the test review guide referenced in CLAUDE.md under "Documentation Locations"
 - Write or modify any required unit tests
 - Write or modify any required Integration tests
-- Add a subtask **for each test file or logical group of test file** that needs to be modified based on the work described by the Engineer
+- Add a subtask **for each test file or logical group of test files** that needs to be modified based on the work described by the Engineer
   - The substask will provide high level instructions to:
     - Update any tests that cover the work done in the parent Task
     - Delete any tests that are now made obsolete by work done in the parent Task
     - Add any tests to cover functionality that is currently not tested based on the work done in the parent Task
+  - Each behaviour is tested in exactly one subtask — no subtask duplicates another's coverage
+  - In the Context section of each testing subtask, name any fixtures or helpers the subtasks share, create or change, and state which groups (if any) are genuinely independent (disjoint files, no overlapping behaviour under test, no fixture or helper created or changed by more than one group) so do-bee can decide whether to split the work across Test Writers
 - Add a final substask to run the full unit test suite and fix any failures. Integration tests will be handled by the calling function.
   - This subtask tells the agent to ensure 100% unit tests passing before completing, this means fixing broken tests
   - If for some reason the agent cannot get 100% unit tests passing it should report the failure to the calling agent
