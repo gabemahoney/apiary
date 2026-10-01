@@ -86,7 +86,7 @@ Determine the scope and dispatch the appropriate role subagents as background di
 
 **IMPORTANT: You must not do role work yourself. Dispatch subagents, route their reports, and commit.**
 
-Each role's Responsibilities and Instructions live in its agent definition (`.claude/agents/apiary-*-bugfix.md`). Your dispatch prompt supplies the job-specific context: the Bug ID and any threaded reports from prior roles. Sequencing you own across ticks: on the Engineer's completion tick, dispatch the Test Writer and Doc Writer with the Engineer's report threaded into their prompts — they review the Engineer's work as part of their instructions. After dispatching a tick's work, yield; completion notifications drive the next tick.
+Each role's Responsibilities and Instructions live in its agent definition (`.claude/agents/apiary-*-bugfix.md`). Your dispatch prompt supplies the job-specific context: the Bug ID and any threaded reports from prior roles. Sequencing you own across ticks: on the Engineer's completion tick, dispatch the Test Writer with the Engineer's report threaded into its prompt — it reviews the Engineer's work as part of its instructions. Dispatch the Doc Writer once code and tests have settled — on the Test Writer's completion tick, or on the Engineer's when no Test Writer is needed — with the Engineer and Test Writer reports threaded into its prompt. After dispatching a tick's work, yield; completion notifications drive the next tick.
 
 #### 4. Review Loop
 
@@ -102,6 +102,7 @@ Each reviewer subagent invokes its corresponding review skill (/code-review, /te
     - **IMPORTANT** Do not do the work yourself — dispatch, route reports, and commit.
     - If the feedback was minor enough, you may choose to **NOT** dispatch the Product Manager on this iteration 
     - Dispatch any role subagents required to do the work you deem necessary from the reviewer findings
+    - Batch the re-work in the same order as the initial pass: the Engineer, then the Test Writer, then the Doc Writer, each dispatched after the previous role's re-work completes, with the earlier re-work reports threaded into its prompt. Skip any role with no findings and no upstream changes to follow. Make at most **one** Doc Writer dispatch for that review round, carrying all doc-affecting findings batched together. Skip the doc pass entirely if nothing doc-affecting changed.
   - If not, move on to Final Review but you MUST share the ignored feedback for review
   - Note: This could create an infinite loop so you may ignore feedback so long as you present it in Final Review
 

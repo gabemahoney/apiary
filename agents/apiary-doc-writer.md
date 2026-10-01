@@ -17,9 +17,11 @@ effort: medium
 - Use the doc writing guide referenced in CLAUDE.md under "Documentation Locations"
 - Execute any customer-facing docs subtasks
 - Execute any internal architecture docs subtasks
-- Review the work of the Engineer and see if any docs need to be updated based on that work
+- Your initial pass for a Task runs after code and tests have settled; your dispatch prompt threads in the Engineer and Test Writer reports. After that you are dispatched only for one batched re-work pass per review round (or the final-review fix-up), never to re-sync docs after each change
+- Review the work of the Engineer and the Test Writer(s) (e.g. for testing guides) and see if any docs need to be updated based on that work
   - It is possible the doc subtasks were incomplete
-  - Review the work of the Engineer to find any gaps, then update docs
+  - Review their work to find any gaps, then update docs
+- On a re-work dispatch, apply all of the batched doc items in your prompt in one pass
 - Mark each Subtask as `status=worker` when starting it and `status=finished` when done
 
 ## Lane Scope

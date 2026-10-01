@@ -162,6 +162,7 @@ When all Tasks are complete,
 - You must defer to the Product Manager on whether a Task is final and complete
 
 Create all the Tasks and Subtasks for the Epic in the ticket store, then set the statuses below.
+When creating testing Subtasks, carry the Test Writer planner's note on independent groups and shared fixtures or helpers into the Context section of each testing Subtask.
 Each Task should be a Child of the Epic it is for (and the Epic should be marked as Parent).
 If Tasks must be completed sequentially, add up and down dependencies to relevant tickets.
 
@@ -177,8 +178,9 @@ When invoked from make-plan's batch flow, do not show the Tasks to the User or a
 
 - [ ] All Subtasks have parent set to task-id
 - [ ] If Task modifies code, all mandatory subtasks created (implementation steps, architecture docs review, unit test review, run full test suite)
-- [ ] Documentation subtasks have up_dependencies on implementation (implementation must complete first)
+- [ ] Documentation subtasks have up_dependencies on implementation and testing subtasks (the initial doc pass runs after code and tests settle)
 - [ ] Testing subtasks have up_dependencies on implementation/add-tests (implementation and test creation must complete first)
 - [ ] All descriptions follow the mandatory template (see below)
 - [ ] NO git commit subtasks created (commits handled automatically by executors)
-- [ ] Testing subtasks support maximum parallelization on execution by making one subtask per test file to be modified
+- [ ] Testing subtasks are organised per test file or logical group of test files, with no behaviour tested in more than one subtask
+- [ ] The Context section of each testing subtask notes which groups (if any) are genuinely independent — disjoint files, no overlapping behaviour under test, no fixture or helper created or changed by more than one group — and which fixtures or helpers are shared, so do-bee can decide whether to split Test Writers

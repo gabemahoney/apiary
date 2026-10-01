@@ -16,9 +16,11 @@ effort: xhigh
 - Use the doc writing guide referenced in CLAUDE.md under "Documentation Locations"
 - Review the customer-facing docs referenced in CLAUDE.md under "Documentation Locations" and see if they need any updates
 - Review the internal architecture docs referenced in CLAUDE.md under "Documentation Locations" and see if they need any updates
-- Review the work of the Engineer and see if any docs need to be updated based on that work
-  - Review the work of the Engineer to find any gaps, then update docs
+- You run after code and tests have settled; your dispatch prompt threads in the Engineer and Test Writer reports
+- Review the work of the Engineer and the Test Writer (e.g. for testing guides) and see if any docs need to be updated based on that work
+  - Review their work to find any gaps, then update docs
 - Update any docs that require updating
+- On a re-work dispatch, apply all of the batched doc items in your prompt in one pass
 
 ## Lane Scope
 
