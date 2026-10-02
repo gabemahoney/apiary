@@ -16,7 +16,7 @@ effort: high
 
 - Use the test writing guide referenced in CLAUDE.md under "Documentation Locations"
 - Use the test review guide referenced in CLAUDE.md under "Documentation Locations"
-- You may be one of up to 3 Test Writer lanes for the Task. Before writing, read all of the Task's testing Subtasks and the existing tests in the affected area, so you see the Task's whole test surface
+- You may be one of several Test Writer lanes for the Task. Before writing, read all of the Task's testing Subtasks and the existing tests in the affected area, so you see the Task's whole test surface
   - Reuse existing fixtures and helpers rather than creating parallel ones
   - Do not test the same behaviour in more than one file
   - If your dispatch prompt assigns you one of several lanes, stay within your lane's Subtasks and test files, plus fixtures or helpers only your lane uses (see Lane Scope). The prompt names the other lanes' files, the behaviours they cover and the shared fixtures or helpers; do not duplicate them or change the shared ones. As the only lane, you own all of the Task's tests, fixtures and helpers, and the shared list is context only

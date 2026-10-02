@@ -166,13 +166,13 @@ When creating a Task with testing Subtasks, end its body with the Test Writer pl
 
 ```
 ## Test Writer Lanes
-Suggested lanes: <1–3>
+Suggested lanes: <N>
 - Lane 1: <test files>
 - Lane 2: <test files>
 Shared fixtures or helpers: <names, or "none">
 ```
 
-Files that share anything — a fixture or helper the Task creates or changes, or overlapping behaviour under test — go in the same lane; record 1 lane only when that grouping leaves a single group. The final full-suite Subtask belongs to no lane. do-bee treats these lanes as a suggestion.
+Files that share anything — a fixture or helper the Task creates or changes, or overlapping behaviour under test — go in the same lane, and each independent group gets its own lane, with no upper limit; record 1 lane only when that grouping leaves a single group. The final full-suite Subtask belongs to no lane. do-bee treats these lanes as a suggestion.
 Each Task should be a Child of the Epic it is for (and the Epic should be marked as Parent).
 If Tasks must be completed sequentially, add up and down dependencies to relevant tickets.
 
@@ -194,4 +194,4 @@ When invoked from make-plan's batch flow, do not show the Tasks to the User or a
 - [ ] NO git commit subtasks created (commits handled automatically by executors)
 - [ ] Testing subtasks are organised per test file or logical group of test files, with no behaviour tested in more than one subtask
 - [ ] The Context section of each testing subtask names the fixtures or helpers it shares, creates or changes
-- [ ] Each Task with testing subtasks ends with a `## Test Writer Lanes` section: suggested lanes (1–3), the test files in each lane, and the shared fixtures or helpers — files that share anything in the same lane, and 1 lane only when that grouping leaves a single group
+- [ ] Each Task with testing subtasks ends with a `## Test Writer Lanes` section: suggested lanes (one per independent group, no upper limit), the test files in each lane, and the shared fixtures or helpers — files that share anything in the same lane, and 1 lane only when that grouping leaves a single group
