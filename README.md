@@ -56,7 +56,7 @@ The plan will be stored as a bee in the Plans Hive.
 ### Do Bee
 Run `/do-bee` with the Feature bee to build the feature.
 It will spawn a full set of role subagents via the Agent tool to do the work.
-Within each Task the roles run in order: the Engineer, then up to 3 Test Writer lanes in parallel (starting from the lanes suggested for the Task at planning time, which `/do-bee` may adjust to the actual change), then the Doc Writer once code and tests have settled. Doc rework from reviews is batched into one pass per review round.
+Within each Task the roles run in order: the Engineer, then one or more Test Writer lanes in parallel, with no upper limit (starting from the lanes suggested for the Task at planning time, which `/do-bee` may adjust to the actual change), then the Doc Writer once code and tests have settled. Doc rework from reviews is batched into one pass per review round.
 > Tip:
 > - Run `/configure-worktree` first to do the work in an isolated worktree
 > - Run your own tests

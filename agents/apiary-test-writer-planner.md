@@ -28,9 +28,9 @@ Only the calling agent creates tickets.
     - Add any tests to cover functionality that is currently not tested based on the work done in the parent Task
   - Each behaviour is tested in exactly one subtask — no subtask duplicates another's coverage
   - In the Context section of each testing subtask, name any fixtures or helpers the subtasks share, create or change
-- Propose Test Writer lanes for the Task, which hatch-epic records on the Task and do-bee uses as a suggestion: a suggested number of lanes (1–3), the test files in each lane, and the fixtures or helpers they share
+- Propose Test Writer lanes for the Task, which hatch-epic records on the Task and do-bee uses as a suggestion: a suggested number of lanes, the test files in each lane, and the fixtures or helpers they share
   - Put files that share anything — a fixture or helper the Task creates or changes, or overlapping behaviour under test — in the same lane
-  - Spread the resulting groups across up to 3 lanes; more lanes run in parallel and finish the Task sooner, at some risk of duplicated cases. Propose 1 lane only when that grouping leaves a single group
+  - Give each resulting independent group its own lane, with no upper limit; more lanes run in parallel and finish the Task sooner, at some risk of duplicated cases. Propose 1 lane only when that grouping leaves a single group
   - Leave the final full-suite subtask out of the lanes
 - Add a final substask to run the full unit test suite and fix any failures. Integration tests will be handled by the calling function.
   - This subtask tells the agent to ensure 100% unit tests passing before completing, this means fixing broken tests
