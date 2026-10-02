@@ -30,7 +30,7 @@ Only the calling agent creates tickets.
     - The work does not introduce any functionality not required or explicitly disallowed in the Epic
 - Review the subtasks created by the Test Writer
   - Ensure no two subtasks test the same behaviour or duplicate coverage
-  - Ensure shared fixtures or helpers are flagged, and that any groups claimed as independent really are
+  - Ensure shared fixtures or helpers are flagged, and that the proposed Test Writer lanes (at most 3) do not split files that share a fixture or helper the Task creates or changes, or overlapping behaviour under test
 
 ## Report
 

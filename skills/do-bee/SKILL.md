@@ -91,25 +91,26 @@ Choose which roles are required.
   - **The Engineer is responsible for source code. It does *not* know how to update unit tests or docs!**
 - If test code is being modified or created, dispatch `apiary-test-writer`.
     - **The Test Writer is responsible for unit tests. It does *not* know how to update source code or docs!**
-    - By default dispatch **one** Test Writer per Task, assigned all of the Task's testing Subtasks, so it sees the Task's whole test surface and does not duplicate cases, helpers or test matrices across files.
-    - Split into more than one Test Writer only when the test work divides into genuinely independent areas: disjoint test files, no overlapping behaviour under test, and no fixture or helper that more than one lane creates or changes. Give each Test Writer a lane of Subtasks, keep the number of lanes small, and name the other lanes' scope in each dispatch prompt so lanes do not duplicate each other. If a lane creates or changes a fixture another lane uses, dispatch that lane first.
-    - To decide whether to split, read the planner's note on independent groups and shared fixtures or helpers in the Context section of the testing Subtasks. If the note is missing or unclear, dispatch one Test Writer.
-    - When you split, keep the final "run the full unit test suite and fix failures" Subtask out of the lanes. Once all lanes finish, dispatch a single Test Writer for it, with the lanes' reports threaded into its prompt.
-    - Trade-off: fewer Test Writers make a Task more serial, but create far less duplication for the reviews to clean up.
+    - Divide the Task's testing Subtasks into Test Writer lanes and dispatch one Test Writer per lane, with a cap of **3** lanes per Task.
+    - Start from the suggested lanes in the Task body's `## Test Writer Lanes` section (written by hatch-epic). They are a suggestion: use more or fewer lanes, up to 3, when the Engineer's actual change calls for it, and state your reason in the Task report whenever you depart from the plan. If the Task has no recorded lanes (older plans), choose the lanes yourself under the same cap.
+    - Keep test files that share a fixture or helper the Task creates or changes, or that test overlapping behaviour, in one lane, so no lane depends on another and all lanes run fully in parallel.
+    - In each lane's dispatch prompt, name the other lanes' test files and the behaviours they cover, so lanes do not duplicate each other's cases, helpers or test matrices. Also include the `Shared fixtures or helpers` list from `## Test Writer Lanes` (or your own list when none was recorded). With more than one lane, a lane writer may create or change a fixture or helper only its own lane's files use, even in a common conftest or helper module (that entry only), but must not change any that another lane's files use (anything on that list, or that it can see other lanes' files rely on), and closes gaps in the Engineer's change only in its own lane's test files; it reports any other fixture or helper change or gap instead. With one lane, the list is context only: that Test Writer owns all of the Task's tests, fixtures and helpers, closes all gaps and also runs the full suite.
+    - Whenever more than one lane is used — first pass, re-work or fix-up — dispatch one final Test Writer once all lanes finish, with their reports threaded into its prompt, to run the full unit test suite, fix failures, make the shared fixture or helper changes the lanes reported and close the test gaps they reported. On the first pass it works the Task's final "run the full unit test suite and fix failures" Subtask, which stays out of the lanes.
+    - Trade-off: more lanes give more parallelism and a shorter Task, at some risk of duplicated cases for the reviews to clean up; fewer lanes are more serial but duplicate less.
 - If docs need to be modified or created, dispatch `apiary-doc-writer` for **one** initial pass per Task, after code and tests have settled (see Sequencing across ticks). After that it is dispatched only for the batched doc pass of each review round (and the final-review fix-up in step 5), never to re-sync docs after each code or test change.
 - If this is the initial dispatch for a Task, **always** dispatch `apiary-product-manager`.
   - If this is a re-work dispatch after reviewer feedback you may **optionally** choose to not dispatch the Product Manager, if the work is minor enough and will not impact Product functionality
 
-Parallelism within a Task is the exception: the Engineer, then the Test Writer(s), then the Doc Writer, with parallel Test Writers only for genuinely independent areas.
+Within a Task the roles run in order: the Engineer, then the Test Writer lanes in parallel (followed by the final Test Writer when more than one lane ran), then the Doc Writer.
 
 #### Sequencing across ticks
 
 Coordination between roles is sequencing you own, spread across reconciliation ticks:
-- On the Engineer's completion tick, dispatch the Test Writer(s) with the Engineer's report threaded into their dispatch prompts — they review the Engineer's work as part of their instructions.
+- On the Engineer's completion tick, dispatch the Test Writer lanes with the Engineer's report threaded into their dispatch prompts — they review the Engineer's work as part of their instructions. Dispatch the final Test Writer (when more than one lane ran) on the last lane's completion tick.
 - Dispatch the Doc Writer's initial pass after code and tests have settled: on the completion tick of the last Test Writer (or of the Engineer, when the Task has no test work), with the Engineer and Test Writer reports threaded into its dispatch prompt.
 - Dispatch the Product Manager sequentially with whatever prior reports you want it to review — commonly at the end for a full review of the Task, but nothing prevents interim PM dispatches (e.g., a PM check on the Engineer's design before a Test Writer starts writing against it).
 - One hard constraint: the PM must not run in parallel with a writer whose output it is supposed to review — concurrent subagents cannot see each other's in-flight work.
-- Batch re-work within a Task (e.g. after PM findings) in the same order as the initial pass: the Engineer, then the Test Writer(s), then the Doc Writer, each dispatched after the previous role's re-work completes, with the earlier re-work reports threaded into its prompt. Skip any role with no findings and no upstream changes to follow. Make at most **one** Doc Writer dispatch for that review round, carrying all doc-affecting findings batched together. Never dispatch one Doc Writer pass per finding, or a doc pass while that round's code or tests are still changing. Skip the doc pass entirely if nothing doc-affecting changed.
+- Batch re-work within a Task (e.g. after PM findings) in the same order as the initial pass: the Engineer, then the Test Writers per step 3 (lanes by your judgement, at most 3, plus the final Test Writer when more than one lane runs), then the Doc Writer, each dispatched after the previous role's re-work completes, with the earlier re-work reports threaded into its prompt. Skip any role with no findings and no upstream changes to follow. Make at most **one** Doc Writer dispatch for that review round, carrying all doc-affecting findings batched together. Never dispatch one Doc Writer pass per finding, or a doc pass while that round's code or tests are still changing. Skip the doc pass entirely if nothing doc-affecting changed.
 
 After dispatching this tick's work, yield — the harness fires a completion notification per Agent finish, which drives the next reconciliation tick.
 
@@ -129,6 +130,7 @@ When a Task and all its Subtasks are done (all reviewer feedback addressed or ig
 **Task ID**: <task-id>
 **Files Changed**: [count] files ([list key filenames if < 5, otherwise just count])
 **Reviews**: [Code review: X issues found/None needed | Docs review: Y issues found/None needed]
+**Test Writer Lanes**: [used: N | planned: M, or "none recorded" | reason, whenever you departed from the plan] or "No test work"
 **Ignored Review Feedback**: [list items that were flagged by code-review or doc-review but Director chose not to address, or "None"]
 **Follow-up Tasks Created**: [count, if any] [list task-ids if created]
 One of:
@@ -154,7 +156,7 @@ Each reviewer subagent invokes its corresponding review skill (/code-review, /te
   - If so, **spawn fresh role subagents as needed** to do the work
     - **IMPORTANT** Do not do the work yourself — dispatch, route reports, and commit.
     - If the feedback was minor enough, you may choose to **NOT** dispatch the Product Manager on this iteration 
-    - Dispatch any role subagents required to do the work you deem necessary from the reviewer findings, keeping the fix-up lean and in the same order as the initial pass: code findings to the Engineer, then all test findings to a single Test Writer (split only per the independent-areas rule in step 3), then all doc findings batched into a single Doc Writer. Dispatch each role after the previous role's fix-up completes, with the earlier fix-up reports threaded into its prompt; skip any role with no findings and no upstream changes to follow.
+    - Dispatch any role subagents required to do the work you deem necessary from the reviewer findings, keeping the fix-up lean and in the same order as the initial pass: code findings to the Engineer, then the test findings to Test Writers per step 3 (lanes by your judgement, at most 3, plus the final Test Writer when more than one lane runs), then all doc findings batched into a single Doc Writer. Dispatch each role after the previous role's fix-up completes, with the earlier fix-up reports threaded into its prompt; skip any role with no findings and no upstream changes to follow.
   - If not, move on to Final Review but you MUST share the ignored feedback for review
   - Note: This could create an infinite loop so you may ignore feedback so long as you present it in Final Review
 
