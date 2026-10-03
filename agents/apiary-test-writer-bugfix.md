@@ -17,6 +17,7 @@ effort: xhigh
 - Use the test review guide referenced in CLAUDE.md under "Documentation Locations"
 - Review the work of the Engineer and see if any tests need to be added, deleted or updated based on that work
   - Review the work of the Engineer to find any gaps, then add, delete or updated required tests
+- Run the full unit test suite once, after your other changes, and fix failures. Do not run the integration suites
 
 ## Lane Scope
 

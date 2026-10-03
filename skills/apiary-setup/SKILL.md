@@ -124,7 +124,7 @@ If a hive exists:
 
 ### Documentation Locations
 
-With hive configuration complete, the final setup step is to record where your project's documentation lives so that Apiary agents can find and update it automatically.
+With hive configuration complete, the next setup step is to record where your project's documentation lives so that Apiary agents can find and update it automatically.
 
 After hives are configured, ask the user to define their project documentation locations in their CLAUDE.md.
 Note that these are repo-specific documents.
@@ -160,4 +160,18 @@ Then write or update a `## Documentation Locations` section in the project's CLA
 - **Test writing guide**: <path>
 - **Test review guide**: <path>
 - **Doc writing guide**: <path>
+```
+
+### Integration Test Command
+
+Finally, use AskUserQuestion to ask: "Does this repo have an integration test suite? If so, what command runs it?"
+- Tell the user: "The integration Test Writer uses this command. If you skip this, it finds the command in the repo's docs or CI config, or reports that no integration suite was found."
+- Options: "Enter the command" / "Skip for now"
+
+If the user gives a command, write or update a `## Test Commands` section in the project's CLAUDE.md:
+
+```markdown
+## Test Commands
+
+- **Integration test command**: <command>
 ```
