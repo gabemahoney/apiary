@@ -10,15 +10,14 @@ This skill orchestrates the work for a complete Bee ticket by:
 2. Finding the best Epic to work on
    2.1. Validating the Epic is unblocked
    2.2. Reconciling the Epic and downstream plan against work completed in previous Epics (re-plan, not hatch)
-3. Spawning role subagents to complete the work described in the Epic
-   3.1. Sending questions and requests for clarification or guidance to the caller
-   3.2. Creating one git commit per Task that includes all changes for that Task
-4. Looping 2-3 until all Epics are done, then:
-   4.1. Dispatching reviewer subagents
-   4.2. Addressing issues found by the reviewers
-   4.3. Getting User approval
-   4.4. Marking Bee and all child tickets as closed
-   4.5. Outputting a final summary
+3. Spawning role subagents to complete the work described in the Epic, sending questions and requests for clarification or guidance to the caller
+4. Finishing Tasks and Epics:
+   4.1. After each Task: creating one git commit that includes all changes for that Task, and running the integration suites after a flagged Task
+   4.2. After the Epic's last Task: dispatching one Test Writer to run the integration suites (the Epic is not finished while they fail), then looping 2-4 until all Epics are done
+5. Dispatching reviewer subagents and addressing the issues they find
+6. Getting User approval
+7. Marking Bee and all child tickets as closed
+8. Outputting a final summary
 
 ### Execution model
 
@@ -56,6 +55,7 @@ If you are not launched in such a worktree, use AskUserQuestion to confirm they 
 Find all Epics in the Bee and recommend the best one to work on first:
 - Must have a status of `pupa` or `worker`
 - If it has `up_dependencies` they must be in `finished` state
+- An Epic in `worker` whose Tasks are all `finished` but whose body has no `**Integration Suites**:` result line stopped at the 4.2 gate: resume it at 4.2 step 1.
 - If ANY Epic under the Bee is still `larva`, that is an error — the Bee was handed off before hatching completed. Stop and report it to the caller; do not hatch it yourself and do not execute around it.
 
 
@@ -89,19 +89,24 @@ Dispatch role subagents to work on an individual Task.
 Choose which roles are required.
 - If source code is being modified or created, dispatch `apiary-engineer`.
   - **The Engineer is responsible for source code. It does *not* know how to update unit tests or docs!**
-- If test code is being modified or created, dispatch `apiary-test-writer`.
+- If test code is being modified or created, or the Engineer changed source code (so the full unit suite runs), dispatch `apiary-test-writer`.
     - **The Test Writer is responsible for unit tests. It does *not* know how to update source code or docs!**
     - Divide the Task's testing Subtasks into Test Writer lanes and dispatch one Test Writer per lane, with no upper limit on lanes per Task.
     - Start from the suggested lanes in the Task body's `## Test Writer Lanes` section (written by hatch-epic). They are a suggestion: use more or fewer lanes when the Engineer's actual change calls for it, and state your reason in the Task report whenever you depart from the plan. If the Task has no recorded lanes (older plans), choose the lanes yourself by the same grouping rule hatch-epic uses: one lane per independent group of test files.
     - Keep test files that share a fixture or helper the Task creates or changes, or that test overlapping behaviour, in one lane, so no lane depends on another and all lanes run fully in parallel.
-    - In each lane's dispatch prompt, name the other lanes' test files and the behaviours they cover, so lanes do not duplicate each other's cases, helpers or test matrices. Also include the `Shared fixtures or helpers` list from `## Test Writer Lanes` (or your own list when none was recorded). With more than one lane, a lane writer may create or change a fixture or helper only its own lane's files use, even in a common conftest or helper module (that entry only), but must not change any that another lane's files use (anything on that list, or that it can see other lanes' files rely on), and closes gaps in the Engineer's change only in its own lane's test files; it reports any other fixture or helper change or gap instead. With one lane, the list is context only: that Test Writer owns all of the Task's tests, fixtures and helpers, closes all gaps and also runs the full suite.
-    - Whenever more than one lane is used — first pass, re-work or fix-up — dispatch one final Test Writer once all lanes finish, with their reports threaded into its prompt, to run the full unit test suite, fix failures, make the shared fixture or helper changes the lanes reported and close the test gaps they reported. On the first pass it works the Task's final "run the full unit test suite and fix failures" Subtask, which stays out of the lanes.
+    - In each lane's dispatch prompt, name the other lanes' test files and the behaviours they cover, so lanes do not duplicate each other's cases, helpers or test matrices. Also include the `Shared fixtures or helpers` list from `## Test Writer Lanes` (or your own list when none was recorded). With more than one lane, a lane writer may create or change a fixture or helper only its own lane's files use, even in a common conftest or helper module (that entry only), but must not change any that another lane's files use (anything on that list, or that it can see other lanes' files rely on), and closes gaps in the Engineer's change only in its own lane's test files; it reports any other fixture or helper change or gap instead. With one lane, the list is context only: that Test Writer owns all of the Task's tests, fixtures and helpers and closes all gaps.
+    - Whenever more than one lane is used — first pass, re-work or fix-up — dispatch one final Test Writer once all lanes finish, with their reports threaded into its prompt, to make the shared fixture or helper changes the lanes reported and close the test gaps they reported.
     - Trade-off: more lanes give more parallelism and a shorter Task, at some risk of duplicated cases for the reviews to clean up; fewer lanes are more serial but duplicate less.
 - If docs need to be modified or created, dispatch `apiary-doc-writer` for **one** initial pass per Task, after code and tests have settled (see Sequencing across ticks). After that it is dispatched only for the batched doc pass of each review round (and the final-review fix-up in step 5), never to re-sync docs after each code or test change.
 - If this is the initial dispatch for a Task, **always** dispatch `apiary-product-manager`.
   - If this is a re-work dispatch after reviewer feedback you may **optionally** choose to not dispatch the Product Manager, if the work is minor enough and will not impact Product functionality
 
 Within a Task the roles run in order: the Engineer, then the Test Writer lanes in parallel (followed by the final Test Writer when more than one lane ran), then the Doc Writer.
+
+Each full test suite has exactly one owner:
+- **Full unit suite**: the last Test Writer of each Test Writer pass — the sole Test Writer when one lane runs, otherwise the final Test Writer after the lanes — runs it once and fixes failures; its dispatch prompt tells it that it owns the full unit-suite run, and no other Test Writer's prompt does. That is once per Task, plus once per later re-work, fix-up or integration-fix pass. On a Task's first pass, assign that writer the Task's "run the full unit test suite and fix failures" Subtask, which stays out of the lanes.
+- **Integration suites**: the integration Test Writer you dispatch once per Epic after its last Task, after any flagged Task, and after final-review fix-ups that change source code or integration tests (4.1, 4.2, step 5).
+- No one else — not you, the Engineer, lane Test Writers, the Doc Writer, the Product Manager or the reviewers — runs either full suite; roles may run targeted tests for the code they touched.
 
 #### Sequencing across ticks
 
@@ -110,6 +115,7 @@ Coordination between roles is sequencing you own, spread across reconciliation t
 - Dispatch the Doc Writer's initial pass after code and tests have settled: on the completion tick of the last Test Writer (or of the Engineer, when the Task has no test work), with the Engineer and Test Writer reports threaded into its dispatch prompt.
 - Dispatch the Product Manager sequentially with whatever prior reports you want it to review — commonly at the end for a full review of the Task, but nothing prevents interim PM dispatches (e.g., a PM check on the Engineer's design before a Test Writer starts writing against it).
 - One hard constraint: the PM must not run in parallel with a writer whose output it is supposed to review — concurrent subagents cannot see each other's in-flight work.
+- Dispatch the integration Test Writer (4.2) on the tick the Epic's last Task, or a flagged Task, is committed (or the final-review fix-ups settle, step 5), never alongside another role: it must run against the settled tree.
 - Batch re-work within a Task (e.g. after PM findings) in the same order as the initial pass: the Engineer, then the Test Writers per step 3 (lanes by your judgement, plus the final Test Writer when more than one lane runs), then the Doc Writer, each dispatched after the previous role's re-work completes, with the earlier re-work reports threaded into its prompt. Skip any role with no findings and no upstream changes to follow. Make at most **one** Doc Writer dispatch for that review round, carrying all doc-affecting findings batched together. Never dispatch one Doc Writer pass per finding, or a doc pass while that round's code or tests are still changing. Skip the doc pass entirely if nothing doc-affecting changed.
 
 After dispatching this tick's work, yield — the harness fires a completion notification per Agent finish, which drives the next reconciliation tick.
@@ -121,8 +127,9 @@ Each role's Responsibilities and Instructions live in its agent definition (`.cl
 When a Task and all its Subtasks are done (all reviewer feedback addressed or ignored):
 
 1. Create one git commit for the Task. Use system or project defined guidance on git usage. **NEVER push to remote — committing only.**
-2. Mark the Task as `status=finished` (Subtasks were marked finished by each subagent as they completed their work).
-3. Output the summary below to the screen and continue to the next Task
+2. If the Task is flagged — its body has a `## Run Integration After This Task` section (written by hatch-epic) — and it is not the Epic's last Task, run the integration loop now (4.2 steps 1-3) and meet its gate (4.2 step 4) before marking the Task finished. The Epic's last Task needs no separate run: 4.2 covers it.
+3. Mark the Task as `status=finished` (Subtasks were marked finished by each subagent as they completed their work).
+4. Output the summary below to the screen and continue to the next Task
 
 ```
 ## Task [N] of [total] Complete: [task-title]
@@ -131,14 +138,37 @@ When a Task and all its Subtasks are done (all reviewer feedback addressed or ig
 **Files Changed**: [count] files ([list key filenames if < 5, otherwise just count])
 **Reviews**: [Code review: X issues found/None needed | Docs review: Y issues found/None needed]
 **Test Writer Lanes**: [used: N | planned: M, or "none recorded" | reason, whenever you departed from the plan] or "No test work"
+**Integration Run**: [passed | passed after fixing: <summary> | no integration suite found | waived by User: <last result>] when flagged and run after this Task, otherwise "End of Epic only"
 **Ignored Review Feedback**: [list items that were flagged by code-review or doc-review but Director chose not to address, or "None"]
 **Follow-up Tasks Created**: [count, if any] [list task-ids if created]
 One of:
 - Proceeding to next Task <task-id>
-- Final Task, moving on to Final Reviews 
+- Final Task of the Epic, moving on to the Epic's integration run
 ```
 
-#### 4.2 Find next Epic or move to Final Review
+#### 4.2 Run the Epic's integration suites, then find next Epic or move to Final Review
+Once the Epic's last Task is committed, run the integration suites once for the Epic:
+
+1. Dispatch one `apiary-test-writer` as the integration Test Writer, naming the Epic ID (and the flagged Task ID, for a run after a flagged Task). It finds the integration test command (configured in the project's CLAUDE.md, otherwise discovered from the repo's docs or CI config), runs the integration suites, fixes and re-runs failures caused by the tests without editing source, and reports exactly one result: `passed` (or `passed after fixing: <summary>`), `source failures: <list>`, `could not run: <reason>` or `no integration suite found`. You do not run the suites yourself.
+2. Act on the result:
+   - `source failures`: dispatch `apiary-engineer` with the failures threaded into its prompt, then re-dispatch the integration Test Writer with the Engineer's report threaded in (it covers the fix in unit tests and runs the full unit suite itself). Repeat, but stop and ask the caller if an Engineer round does not reduce the failures, or after 3 Engineer rounds, whichever comes first.
+   - `could not run`: ask the caller straight away; never dispatch the Engineer for it.
+   - After you ask, one of three things happens: the User fixes the environment or gives guidance and you re-run from step 1; the User explicitly waives the gate for this Epic — record the waiver as its result; or execution stops with the Epic left in `worker`.
+3. If the integration run changed any files, create one git commit for them. **NEVER push to remote — committing only.**
+4. **Gate**: an Epic is not done until its last integration run reported `passed` or `no integration suite found`, or the User waived the gate (step 2). Until then, never mark it `finished` (wherever that happens, including step 7), start the next Epic or move to Final Review.
+5. Append the result to the Epic ticket's body, for the step 8 summary, and output the summary below to the screen
+
+```bees
+append_ticket_body(ticket_id="<epic-id>", chunk="\n\n**Integration Suites**: <result>")
+```
+
+```
+## Epic Complete: [epic-title]
+
+**Epic ID**: <epic-id>
+**Integration Suites**: [passed | passed after fixing: <summary> | no integration suite found | waived by User: <last result>] (command: <command>, configured or discovered)
+```
+
 If there are more Epics to work on, continue automatically with the next logical one — it must already be hatched (`pupa` or `worker`, never `larva`); execution never triggers hatching. Clear your context window and go back to step 2, which includes the reconcile pass.
 If not, move to final Bee review.
 
@@ -157,6 +187,7 @@ Each reviewer subagent invokes its corresponding review skill (/code-review, /te
     - **IMPORTANT** Do not do the work yourself — dispatch, route reports, and commit.
     - If the feedback was minor enough, you may choose to **NOT** dispatch the Product Manager on this iteration 
     - Dispatch any role subagents required to do the work you deem necessary from the reviewer findings, keeping the fix-up lean and in the same order as the initial pass: code findings to the Engineer, then the test findings to Test Writers per step 3 (lanes by your judgement, plus the final Test Writer when more than one lane runs), then all doc findings batched into a single Doc Writer. Dispatch each role after the previous role's fix-up completes, with the earlier fix-up reports threaded into its prompt; skip any role with no findings and no upstream changes to follow.
+    - If the fix-ups changed source code or integration tests, run the integration loop (4.2 steps 1-3) once after they settle, before step 6, naming the Bee ID (all its Epics) instead of an Epic ID, and append its result to the Bee ticket's body as in 4.2 step 5; the 4.2 gate still applies when the Epics are marked `finished` in step 7.
   - If not, move on to Final Review but you MUST share the ignored feedback for review
   - Note: This could create an infinite loop so you may ignore feedback so long as you present it in Final Review
 
@@ -178,7 +209,7 @@ Then use `AskUserQuestion` with:
 
 Once the user approves the Bee as finished:
 
-1. Mark all Epics in the Bee as `status=finished`:
+1. Mark all Epics in the Bee as `status=finished` — only once each has met the 4.2 gate:
 ```bees
 update_ticket(ticket_id="<epic-id>", status="finished")
 ```
@@ -196,6 +227,7 @@ update_ticket(ticket_id="<bee-id>", status="finished")
 **Bee ID**: <bee-id>
 **Epics Completed**: [count]
 **Tasks Completed**: [count]
+**Integration Suites**: [one line per Epic: <epic-id>: <result recorded in its body>; plus the post-review run's result from the Bee's body, if one ran]
 **Bee Status**: Finished
 
 All work has been synced to git.

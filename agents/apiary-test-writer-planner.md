@@ -31,8 +31,8 @@ Only the calling agent creates tickets.
 - Propose Test Writer lanes for the Task, which hatch-epic records on the Task and do-bee uses as a suggestion: a suggested number of lanes, the test files in each lane, and the fixtures or helpers they share
   - Put files that share anything — a fixture or helper the Task creates or changes, or overlapping behaviour under test — in the same lane
   - Give each resulting independent group its own lane, with no upper limit; more lanes run in parallel and finish the Task sooner, at some risk of duplicated cases. Propose 1 lane only when that grouping leaves a single group
-  - Leave the final full-suite subtask out of the lanes
-- Add a final substask to run the full unit test suite and fix any failures. Integration tests will be handled by the calling function.
+  - Leave the final full-unit-suite subtask out of the lanes
+- Add a final substask to run the full unit test suite once and fix any failures; it is worked by the final Test Writer (the sole Test Writer when there is one lane), which owns the Task's full unit suite run. Do not add a subtask to run the integration suites.
   - This subtask tells the agent to ensure 100% unit tests passing before completing, this means fixing broken tests
   - If for some reason the agent cannot get 100% unit tests passing it should report the failure to the calling agent
 

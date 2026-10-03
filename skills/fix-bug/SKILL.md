@@ -77,8 +77,14 @@ Call the resulting path `{worktree_path}` (`{repo_root}/../{normalized_bug_id}`)
 
 Analyze the bug, the source code, the tests and the docs. Understand the likely scope of the bug fix.
 If the fix requires modifications to the source code, you will need to dispatch `apiary-engineer-bugfix`.
-If the fix will require modifications to unit tests, you will need to dispatch `apiary-test-writer-bugfix`.
+If the fix changes source code or unit tests, you will need to dispatch `apiary-test-writer-bugfix`; it also owns the regression test (step 5) and the full unit-suite run.
 Always dispatch `apiary-doc-writer-bugfix` so that it can determine if any docs need updating based on the changes.
+Always dispatch one `apiary-test-writer` as the integration Test Writer at the end of the fix (step 5).
+
+Each full test suite has exactly one owner:
+- **Full unit suite**: the Test Writer of each pass — `apiary-test-writer-bugfix` in the initial and re-work passes, or the integration Test Writer after an integration fix (step 5) — runs it once and fixes failures.
+- **Integration suites**: the integration Test Writer, once at the end of the fix (step 5).
+- No one else — not you, the Engineer, the Doc Writer or the reviewers — runs either full suite; roles may run targeted tests for the code they touched.
 
 Determine the scope and dispatch the appropriate role subagents as background dispatches. Do not ask for confirmation.
 
@@ -86,7 +92,7 @@ Determine the scope and dispatch the appropriate role subagents as background di
 
 **IMPORTANT: You must not do role work yourself. Dispatch subagents, route their reports, and commit.**
 
-Each role's Responsibilities and Instructions live in its agent definition (`.claude/agents/apiary-*-bugfix.md`). Your dispatch prompt supplies the job-specific context: the Bug ID and any threaded reports from prior roles. Sequencing you own across ticks: on the Engineer's completion tick, dispatch the Test Writer with the Engineer's report threaded into its prompt — it reviews the Engineer's work as part of its instructions. Dispatch the Doc Writer once code and tests have settled — on the Test Writer's completion tick, or on the Engineer's when no Test Writer is needed — with the Engineer and Test Writer reports threaded into its prompt. After dispatching a tick's work, yield; completion notifications drive the next tick.
+Each role's Responsibilities and Instructions live in its agent definition (`.claude/agents/apiary-*-bugfix.md`, plus `apiary-test-writer.md` for the integration run). Your dispatch prompt supplies the job-specific context: the Bug ID and any threaded reports from prior roles. Sequencing you own across ticks: on the Engineer's completion tick, dispatch the Test Writer with the Engineer's report threaded into its prompt — it reviews the Engineer's work as part of its instructions. Dispatch the Doc Writer once code and tests have settled — on the Test Writer's completion tick, or on the Engineer's when no Test Writer is needed — with the Engineer and Test Writer reports threaded into its prompt. After dispatching a tick's work, yield; completion notifications drive the next tick.
 
 #### 4. Review Loop
 
@@ -109,11 +115,17 @@ Each reviewer subagent invokes its corresponding review skill (/code-review, /te
 #### 5. Testing the bug
 - Ensure there is at least one unit test that fails before the bug fix and passes after
   - This ensures we will not introduce this particular regression again in the future
+- Run the integration suites once, after code and tests have settled (the review loop's re-work is done), never alongside another role:
+  - Dispatch one `apiary-test-writer` as the integration Test Writer, naming the Bug ID and `{worktree_path}`. It finds the integration test command (configured in the project's CLAUDE.md, otherwise discovered from the repo's docs or CI config), runs the integration suites, fixes and re-runs failures caused by the tests without editing source, and reports exactly one result: `passed` (or `passed after fixing: <summary>`), `source failures: <list>`, `could not run: <reason>` or `no integration suite found`. You do not run the suites yourself.
+  - `source failures`: dispatch `apiary-engineer-bugfix` with the failures threaded into its prompt, then re-dispatch the integration Test Writer with the Engineer's report threaded in (it covers the fix in unit tests and runs the full unit suite itself). Repeat, but stop and ask the user if an Engineer round does not reduce the failures, or after 3 Engineer rounds, whichever comes first.
+  - `could not run`: ask the user straight away; never dispatch the Engineer for it.
+  - After you ask, one of three things happens: the User fixes the environment or gives guidance and you re-dispatch the integration Test Writer; the User explicitly waives the gate for this Bug — record the waiver as its result; or execution stops with the Bug left open, and you tell the User the fix is uncommitted in `{worktree_path}`.
+  - **Gate**: the Bug is not done until its last integration run reported `passed` or `no integration suite found`, or the User waived the gate. Do not start step 6 until then.
 
 
 #### 6. After Bug is fixed
 
-Once the bug is fixed:
+Once the bug is fixed and the step 5 integration gate is met:
 
 1. Create one git commit for the Bug **inside the worktree** — commit via `git -C {worktree_path}` (or with `{worktree_path}` as the working directory), never in the main repo tree. Use system or project defined guidance on git usage.
 2. Set the bug status to the state which means the work is done
@@ -125,6 +137,7 @@ Once the bug is fixed:
 **Bug**: <bug-id>
 **Files Changed**: [count] files ([list key filenames if < 5, otherwise just count])
 **Reviews**: [Code review: X issues found/None needed | Docs review: Y issues found/None needed]
+**Integration Suites**: [passed | passed after fixing: <summary> | no integration suite found | waived by User: <last result>] (command: <command>, configured or discovered)
 **Ignored Review Feedback**: [list items that were flagged but not addresses, or "None"]
 ```
 

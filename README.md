@@ -31,6 +31,8 @@ Apiary's execution skills spawn role players (Engineer, Test Writer, Doc Writer,
 
 ### 3. Configure
 Run `/apiary-setup` to configure hives for the Apiary workflow.
+It can also record your project's documentation locations and integration test command in the repo's CLAUDE.md; you may skip either step.
+Without a configured command, the integration Test Writer looks in the repo's docs or CI config, and reports "no integration suite found" if there is none.
 
 
 ## Workflow
@@ -57,6 +59,7 @@ The plan will be stored as a bee in the Plans Hive.
 Run `/do-bee` with the Feature bee to build the feature.
 It will spawn a full set of role subagents via the Agent tool to do the work.
 Within each Task the roles run in order: the Engineer, then one or more Test Writer lanes in parallel, with no upper limit (starting from the lanes suggested for the Task at planning time, which `/do-bee` may adjust to the actual change), then the Doc Writer once code and tests have settled. Doc rework from reviews is batched into one pass per review round.
+The final (or only) Test Writer of each pass runs the full unit suite once. An integration Test Writer runs the integration suites at the end of each Epic, after any Task flagged at planning time as an interface change, and after final-review fix-ups that touch source code or integration tests. An Epic is not finished while they fail unless the User waives it; `/do-bee` stops and asks if they cannot run, or if a source-fix round does not reduce the failures or 3 rounds pass. No other role runs a full suite.
 > Tip:
 > - Run `/configure-worktree` first to do the work in an isolated worktree
 > - Run your own tests
@@ -66,7 +69,8 @@ Within each Task the roles run in order: the Engineer, then one or more Test Wri
 You can tell your LLM to file a bug in the Bugs Hive, no skill needed.
 Run `/fix-bug` with the bug in the Bugs Hive to fix.
 It will spawn a smaller set of role subagents via the Agent tool to do the work, in the same Engineer, Test Writer, Doc Writer order.
-Unlike `/do-bee`, `/fix-bug` manages its own isolated worktree: it creates a fresh worktree for the Bug ID, does all the work and commits there, then merges back and cleans up automatically — no separate `/configure-worktree` or `/teardown-worktree` needed.
+The same suite ownership applies at bug scope: the Test Writer of each pass runs the full unit suite once, and an integration Test Writer runs the integration suites once at the end of the fix. The bug is not done while they fail unless the User waives it; `/fix-bug` stops and asks on the same terms as `/do-bee`.
+Unlike `/do-bee`, `/fix-bug` manages its own isolated worktree: it creates a fresh worktree for the Bug ID, does all the work and commits there, then merges back and cleans up automatically (unless it stops at the integration gate, leaving the uncommitted fix in the worktree) — no separate `/configure-worktree` or `/teardown-worktree` needed.
 
 
 ## Advanced Configuration
@@ -74,6 +78,6 @@ Apiary provides default `/code-review`, `/test-review` and `doc-review` skills. 
 or wholesale with your own guidelines.
 
 **Note:** These guidelines are enforced across all repos.
-Documents describing repo-specific guidelines should be defined in a repo-specific Claude.md file. 
-`/apiary-setup` configures these repo-specific entries but does not modify the above-listed skills.
+Repo-specific guidelines are listed in the repo's CLAUDE.md under `## Documentation Locations`, which `/apiary-setup` can write for you (see Configure).
+`/apiary-setup` does not modify the above-listed skills.
 

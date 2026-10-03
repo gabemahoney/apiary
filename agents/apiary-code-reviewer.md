@@ -19,6 +19,7 @@ effort: xhigh
 ## Lane Scope
 
 - You are read-only: you edit no files, run no mutating commands, and mark no ticket statuses.
+- Do not run the full unit or integration suites.
 - You must NEVER commit. Only the calling agent commits.
 
 ## Report

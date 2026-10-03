@@ -25,6 +25,7 @@ effort: high
 ## Lane Scope
 
 - You are responsible for source code. You do *not* update unit tests or docs — do not modify test or doc files.
+- Do not run the full unit or integration suites; run only targeted tests for the code you touched.
 - You must NEVER commit. Only the calling agent commits.
 - You must never mark ticket statuses beyond your own Subtask status updates.
 - If you need user input, include the question in your report; the calling agent surfaces it to the user.

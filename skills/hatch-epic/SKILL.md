@@ -172,7 +172,17 @@ Suggested lanes: <N>
 Shared fixtures or helpers: <names, or "none">
 ```
 
-Files that share anything — a fixture or helper the Task creates or changes, or overlapping behaviour under test — go in the same lane, and each independent group gets its own lane, with no upper limit; record 1 lane only when that grouping leaves a single group. The final full-suite Subtask belongs to no lane. do-bee treats these lanes as a suggestion.
+Files that share anything — a fixture or helper the Task creates or changes, or overlapping behaviour under test — go in the same lane, and each independent group gets its own lane, with no upper limit; record 1 lane only when that grouping leaves a single group. The final full-unit-suite Subtask belongs to no lane. do-bee treats these lanes as a suggestion.
+
+When a Task changes a contract, API, schema or other cross-component interface, flag it so do-bee runs the integration suites right after that Task, by adding this section to its body, before any `## Test Writer Lanes` section (leave it out for every other Task):
+
+```
+## Run Integration After This Task
+Interface changed: <the contract, API, schema or interface>
+```
+
+Never add a Subtask to run the integration suites; do-bee dispatches that run itself.
+
 Each Task should be a Child of the Epic it is for (and the Epic should be marked as Parent).
 If Tasks must be completed sequentially, add up and down dependencies to relevant tickets.
 
@@ -187,7 +197,8 @@ When invoked from make-plan's batch flow, do not show the Tasks to the User or a
 #### Checklist Before Returning
 
 - [ ] All Subtasks have parent set to task-id
-- [ ] If Task modifies code, all mandatory subtasks created (implementation steps, architecture docs review, unit test review, run full test suite)
+- [ ] If Task modifies code, all mandatory subtasks created (implementation steps, architecture docs review, unit test review, the final "run the full unit test suite and fix failures" subtask)
+- [ ] Each Task that changes a contract, API, schema or other cross-component interface has a `## Run Integration After This Task` section; no other Task has one
 - [ ] Documentation subtasks have up_dependencies on implementation and testing subtasks (the initial doc pass runs after code and tests settle)
 - [ ] Testing subtasks have up_dependencies on implementation/add-tests (implementation and test creation must complete first)
 - [ ] All descriptions follow the mandatory template (see below)
