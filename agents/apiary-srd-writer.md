@@ -18,6 +18,8 @@ You cannot talk to the user. The dispatch prompt names the Idea Bee (or PRD bee)
 
 ## Process
 
+Before working, read the engineering best practices guide referenced in the project's CLAUDE.md under "Documentation Locations". Where the guide conflicts with the PRD, SRD, plan or task, the guide wins.
+
 ### 1. Read the PRD
 
 Read the PRD ticket thoroughly. Understand:

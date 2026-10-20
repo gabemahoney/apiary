@@ -12,6 +12,8 @@ what must be true about the software for the PRD to be satisfied.
 
 You are the **calling agent**. The entire job — reading the PRD, exploring the codebase, writing the SRD, creating the SRD child bee — is done by the `apiary-srd-writer` subagent, a named agent definition installed in `.claude/agents/`, spawned via the Agent tool. You resolve the input, dispatch, and tell the user the results. You do not write the SRD yourself.
 
+Before working, read the engineering best practices guide referenced in the project's CLAUDE.md under "Documentation Locations". Where the guide conflicts with the PRD, SRD, plan or task, the guide wins.
+
 ## Approval guard
 
 Run this first: no question, dispatch or ticket change comes before it. If you were given nothing, ask for the Idea Bee as step 1 says, then run this before anything else.

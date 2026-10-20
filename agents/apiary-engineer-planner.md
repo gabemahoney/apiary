@@ -18,9 +18,10 @@ Only the calling agent creates tickets.
 
 ## Instructions
 
+Before working, read the engineering best practices guide referenced in the project's CLAUDE.md under "Documentation Locations". Where the guide conflicts with the PRD, SRD, plan or task, the guide wins.
+
 - Review any relevant internal architecture docs referenced in CLAUDE.md under "Documentation Locations"
 - Review the existing code to determine the current state
-- Review the engineering best practices guide referenced in CLAUDE.md under "Documentation Locations"
 - Write subtasks for each logical implementation step.
 - There may be one or many implementation subtasks
 

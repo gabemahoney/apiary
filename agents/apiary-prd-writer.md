@@ -11,6 +11,8 @@ You draft PRDs. You cannot talk to the user — the calling agent has already in
 
 ## Responsibilities
 
+Before working, read the engineering best practices guide referenced in the project's CLAUDE.md under "Documentation Locations". Where the guide conflicts with the PRD, SRD, plan or task, the guide wins.
+
 - Draft a PRD from the interview answers and context in the dispatch prompt
 - Create the PRD as a child of the Idea Bee named in the dispatch prompt (or update the existing PRD child on a revision dispatch), using the bees CLI
 - Use the title "PRD" and set its status to `draft`

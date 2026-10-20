@@ -50,6 +50,8 @@ Architecture docs are for LLM codegen agents as a "cheat sheet" to understand th
 
 ### 0. Understand Project Documentation Standards
 
+Before working, read the engineering best practices guide referenced in the project's CLAUDE.md under "Documentation Locations". Where the guide conflicts with the PRD, SRD, plan or task, the guide wins. Reviewers must report any violation of the guide as a blocking finding, even when the spec asks for the violating behaviour.
+
 Find any documentation standards, style guides, or writing conventions in the project (e.g. `CONTRIBUTING.md`, `docs/standards.md`, architecture docs, or references in `CLAUDE.md`).
 Your job is to flag gaps where the work done deviates from whatever standards are defined.
 

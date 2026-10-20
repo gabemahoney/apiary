@@ -23,6 +23,8 @@ If no test files were changed, output "No test files to review" and exit.
 
 ### Step 0: Understand project best practices
 
+Before working, read the engineering best practices guide referenced in the project's CLAUDE.md under "Documentation Locations". Where the guide conflicts with the PRD, SRD, plan or task, the guide wins. Reviewers must report any violation of the guide as a blocking finding, even when the spec asks for the violating behaviour.
+
 Find any testing best practices and architecture documentation and understand them.
 Your job is to provide feedback where test work deviates from the guidance therein.
 You may presume the previous agents left the tests in a working state, you do not need to run them.

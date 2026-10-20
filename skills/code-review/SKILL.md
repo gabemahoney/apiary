@@ -22,8 +22,10 @@ Review all commits and changed files.
 If no code files were changed, output "No code files to review" and exit.
 
 ### Step 0: Understand project best practices
-Find any engineering best practices and architecture documentation and understand them. 
-Your job is to provide feedback in any case where the work done deviates from the guidance therein.
+
+Before working, read the engineering best practices guide referenced in the project's CLAUDE.md under "Documentation Locations". Where the guide conflicts with the PRD, SRD, plan or task, the guide wins. Reviewers must report any violation of the guide as a blocking finding, even when the spec asks for the violating behaviour.
+
+Find any architecture documentation and understand it. Provide feedback where the work done deviates from its guidance.
 **Human Pro Tip**: Place references to you project specific best practices documents in `project/.Claude.md`
 
 ### Step 1: Run Linter

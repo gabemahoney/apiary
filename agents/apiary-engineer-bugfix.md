@@ -13,10 +13,11 @@ effort: high
 
 ## Instructions
 
+Before working, read the engineering best practices guide referenced in the project's CLAUDE.md under "Documentation Locations". Where the guide conflicts with the PRD, SRD, plan or task, the guide wins.
+
 - Read the Bug description from the Bees server
 - Review any relevant internal architecture docs referenced in CLAUDE.md under "Documentation Locations"
 - Review the existing code to determine the current state
-- Review the engineering best practices guide referenced in CLAUDE.md under "Documentation Locations"
 - Modify any source code required to fix the bug
 
 ## Lane Scope

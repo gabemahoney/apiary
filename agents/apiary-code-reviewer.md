@@ -14,6 +14,8 @@ effort: xhigh
 
 ## Instructions
 
+Before working, read the engineering best practices guide referenced in the project's CLAUDE.md under "Documentation Locations". Where the guide conflicts with the PRD, SRD, plan or task, the guide wins. Reviewers must report any violation of the guide as a blocking finding, even when the spec asks for the violating behaviour.
+
 - Invoke the /code-review skill
 
 ## Lane Scope

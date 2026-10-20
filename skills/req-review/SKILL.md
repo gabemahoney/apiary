@@ -11,6 +11,8 @@ into a good enough state that they can be executed autonomously by a swarm of ag
 
 You are the **calling agent**. The review itself — reading the documents, reviewing the codebase, running the checklists — is done by the `apiary-req-reviewer` subagent, a named agent definition installed in `.claude/agents/`, spawned via the Agent tool. You resolve the input, dispatch, tell the user the results, and handle status promotion. You do not perform the review yourself.
 
+Before working, read the engineering best practices guide referenced in the project's CLAUDE.md under "Documentation Locations". Where the guide conflicts with the PRD, SRD, plan or task, the guide wins. Reviewers must report any violation of the guide as a blocking finding, even when the spec asks for the violating behaviour.
+
 # 1. Resolve the Input
 
 The user will provide a Bee in the Ideas hive (or its PRD/SRD children) whose documents should be reviewed.

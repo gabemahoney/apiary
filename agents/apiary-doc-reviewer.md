@@ -14,6 +14,8 @@ effort: high
 
 ## Instructions
 
+Before working, read the engineering best practices guide referenced in the project's CLAUDE.md under "Documentation Locations". Where the guide conflicts with the PRD, SRD, plan or task, the guide wins. Reviewers must report any violation of the guide as a blocking finding, even when the spec asks for the violating behaviour.
+
 - Invoke the /doc-review skill
 - For every touched README or guide-governed doc, re-read the whole file against the repo's doc-writing guide and flag every violation, not only those in the new text
 

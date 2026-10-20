@@ -22,6 +22,8 @@ You are the **calling agent**. You run the interview with the user, then dispatc
 
 ## Workflow
 
+Before working, read the engineering best practices guide referenced in the project's CLAUDE.md under "Documentation Locations". Where the guide conflicts with the PRD, SRD, plan or task, the guide wins.
+
 ### Approval guard
 
 Run this first: no question, dispatch or ticket change comes before it. If you were not given an Idea Bee ID, ask for it as step 1 says, then run this before anything else.
